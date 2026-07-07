@@ -1,0 +1,113 @@
+# AgentCore Evals
+
+**A 16-week, eval-first learning plan for building tool-calling agents with the Strands Agents SDK and Amazon Bedrock AgentCore — where tool selection accuracy and execution reliability are measured contracts, not vibes.**
+
+This is the sequel to [aws-ai-evals](https://github.com/rhprasad0/aws-ai-evals), a 12-week project that built an evaluation harness around a deliberately boring chatbot: schemas, synthetic datasets, human labels, judge calibration, managed Bedrock eval jobs, and a CI gate that caught a real regression on camera. That project's guardrails explicitly deferred agent and tool-use evaluation to a future plan. This repo is that plan.
+
+The full week-by-week curriculum lives in [`LEARNING_PLAN.md`](LEARNING_PLAN.md). This README is the map: what gets built, in what order, and how to follow along or fork it.
+
+## The methodology in five bullets
+
+1. **Define "correct tool use" before building more tools.** Tool contracts, capability manifests, and a failure taxonomy come before the fun parts.
+2. **Deterministic gates before LLM judges.** Schema validators, tool-selection gates, and sequence checks are cheap, explainable, and never hallucinate.
+3. **Humans are the only ground truth.** A blind-labeled 64-row fixture calibrates every judge — the self-built one *and* AWS's managed evaluators — before either is trusted.
+4. **Deployment is evidence.** The agent ships so that CI regression gates, online evaluations, and dashboards have something real to measure. A preserved red-gate screenshot beats a green-badge collection.
+5. **Optimizers face holdouts.** Proposed improvements (including AgentCore's managed recommendations) are adopted or rejected based on rows they never saw — and rejections get published too.
+
+## Why AgentCore + Strands, and why now
+
+Amazon Bedrock AgentCore went GA in October 2025 as composable infrastructure for agents built with any framework: **Runtime** (session-isolated serverless hosting), **Gateway** (APIs/Lambda/MCP servers as governed MCP tools), **Memory**, **Identity**, **Policy**, built-in tools (Code Interpreter, Browser, Web Search), and OpenTelemetry-based **Observability**. Through 2026 the evaluation story matured fast: **AgentCore Evaluations** (GA March 2026) ships built-in judges down to the tool level — `Builtin.ToolSelectionAccuracy`, `Builtin.ToolParameterAccuracy` — plus online/on-demand/batch modes, custom evaluators, and an optimization loop (recommendations, batch validation, A/B testing, GA June 2026). The **AgentCore CLI** (`npm install -g @aws/agentcore`) scaffolds, runs, and deploys agents with CDK under the hood.
+
+[Strands Agents](https://strandsagents.com/) is the open-source, model-driven SDK this plan builds on (Python, `strands-agents` 1.x), with first-class MCP support, multi-agent patterns (Graph, Swarm, workflow, A2A v1.0), OTEL-native tracing, and a dedicated evals SDK (`strands-agents-evals`).
+
+That maturity is the point of the exercise: the managed services will happily score your agent. This repo builds the ground truth that says whether to believe them — and publishes the agreement numbers.
+
+## What 16 weeks produces
+
+- A deployed multi-tool Strands agent on AgentCore Runtime, every tool behind an explicit schema-validated contract — no magic tool discovery.
+- A 100-row synthetic tool-calling dataset + deterministic local harness (tool selection, parameter fidelity, sequencing, failure behavior) that runs offline in CI.
+- A 64-row blind human-labeled fixture and a **three-way judge calibration**: human labels vs a self-built blind judge vs AgentCore's managed evaluators, with published agreement, false-pass/false-fail rates, and a written trust policy.
+- Resilience under real external APIs: retries, circuit breakers, honest degradation — evaluated with injected outages, not asserted.
+- A two-lane CI regression pipeline (deterministic fixtures on PR, managed batch evaluation against the deployed agent on merge) with a preserved red-gate receipt.
+- Production observability: scrubbed OTEL traces, online evaluation sampling, a CloudWatch dashboard, and alarms on selection-accuracy drift.
+- Multi-agent orchestration (Graph/Swarm/A2A) with coordination accuracy measured, and safety boundaries (AgentCore Policy + Gateway-level guardrails) enforced outside agent code and probed with inert adversarial rows.
+- A public demo, a metrics page fed by real eval artifacts, and a LinkedIn case study.
+
+## Prerequisites
+
+- An AWS account with Bedrock **model access granted** (Claude models for agent + judges) in `us-east-1`, and permissions for AgentCore, IAM, CloudWatch, Lambda, and CDK bootstrap.
+- **Python 3.10+** (agent code), **Node.js 20+** (the AgentCore CLI is an npm package), Docker only if you choose container builds.
+- Comfort with AWS fundamentals, Python, and basic ML concepts. **No prior AgentCore or Strands experience assumed** — Week 1 starts from install.
+- A free OpenWeatherMap API key (Week 2) and a search API key (Week 11).
+- **Budget awareness:** everything managed is consumption-billed (Runtime per-second, Evaluations per judged token, Gateway per call). The plan is structured so Weeks 5–10 run almost entirely local/mocked; deployed-lane weeks include teardown steps (`agentcore remove all` + `agentcore deploy`) and a Budgets alarm is a Week 1 deliverable. Expect low double-digit USD per month during cloud-heavy weeks if you tear down diligently.
+
+## Repository structure
+
+```text
+agentcore-evals/
+  README.md                  # you are here
+  LEARNING_PLAN.md           # the 16-week curriculum
+  docs/                      # architecture notes, reports, receipts, screenshots
+  schemas/                   # tool contracts, manifests, datasets, traces, labels, judge output
+  datasets/                  # synthetic scenarios, human-label fixtures, CI regression fixtures
+  src/                       # agents, tools (+ mocks), contracts, trace adapters, judges
+  evals/                     # strands-evals cases, deterministic gates, harness entrypoint
+  scripts/                   # dataset validator, safety scanner, label workbench, run summarizer
+  infra/                     # dashboards & anything outside CLI-managed CDK
+  .github/workflows/         # CI regression lanes
+```
+
+The tree grows week by week; nothing lands in `main` without its schema, validator, or fixture.
+
+## The 16-week schedule
+
+| Status | Week | Focus | Outcome | Deliverable |
+|--------|------|-------|---------|-------------|
+| 🔜 Next | **1** | **AgentCore & Strands Fundamentals** | Understand AgentCore architecture (Runtime, Gateway, Memory, Identity, Observability), Strands SDK basics, MCP protocol, and A2A communication. Set up local development environment. | **Local Dev Environment + Architecture Notes** - Working Strands installation, AgentCore CLI setup, "Hello World" agent that calls one AWS service, and architecture diagram showing AgentCore components with your annotations. |
+| ⬜ Planned | **2** | **Basic Agent Development with Strands** | Build first Strands agent with single tool, understand agent loop (reasoning → tool selection → execution → response), deploy to local runtime, and explore model providers (Bedrock, Anthropic, OpenAI). | **First Functional Agent + Tool** - Weather agent using Strands that calls OpenWeatherMap API, handles errors gracefully, deployed locally with conversation logs, plus custom @tool decorator implementation. |
+| ⬜ Planned | **3** | **AgentCore Runtime & Deployment** | Deploy Strands agent to AgentCore Runtime, understand serverless agent hosting, session isolation, and basic observability. Compare local vs. AgentCore deployment patterns. | **AgentCore Deployment Proof** - Same weather agent deployed to AgentCore Runtime, side-by-side comparison document (local vs AgentCore), and screenshot of agent running in AWS console with execution traces. |
+| ⬜ Planned | **4** | **Tool Integration Patterns** | Explore MCP tool integration, custom tool creation with @tool decorator, AgentCore Gateway for API transformation, and tool discovery patterns. Build 2-3 simple tools. | **Multi-Tool Agent Portfolio** - Agent with 3 tools (weather, calculator, web search), MCP integration example, custom Gateway transformation, and tool discovery/registration code with clear boundaries. |
+| ⬜ Planned | **5** | **Agent/Tool Contract Architecture** | Formalize tool interface contracts, agent capability boundaries, execution context isolation, and explicit tool-failure handling patterns. No "magic tool discovery" - explicit tool registration and capability declaration. | **Tool Contract Specification** - Formal tool interface schema (JSON/YAML), agent capability manifest, execution context isolation demo, and failure handling patterns with code examples. |
+| ⬜ Planned | **6** | **Tool Execution Dataset & Validation Schema** | Synthetic tool-calling datasets, execution trace schemas, tool-selection fixtures, success/failure/timeout validators, and deterministic tool mocks for consistent eval runs. | **Synthetic Dataset + Validators** - 100-row synthetic tool-calling dataset, execution trace schema, tool-selection fixtures, success/failure validators, and deterministic mock tools for testing. |
+| ⬜ Planned | **7** | **Minimal Tool-Calling Specimen** | Single-tool agent specimen (e.g., calculator or weather API), normalized execution traces, tool-selection reasoning capture, and stub external integrations with controlled responses. | **Instrumented Agent Specimen** - Single-tool agent with full execution tracing, normalized response capture, tool-selection reasoning logs, and stubbed external integrations with controlled responses. |
+| ⬜ Planned | **8** | **Local Tool Execution Harness** | Local harness validates tool selection accuracy, execution success rates, error handling, and timeout behavior. Reports tool-usage patterns without assuming "more tools = better agent." | **Local Evaluation Harness** - Automated harness that runs agent against dataset, validates tool selection accuracy, measures execution success rates, and generates text/JSON reports. |
+| ⬜ Planned | **9** | **Human Tool-Selection Labeling** | Browser workflow for labeling correct tool choices, execution quality assessment, multi-step reasoning validation, and 64-row fixture: tool selection accuracy, execution reliability, error recovery patterns. | **Human Labeling Workflow** - Browser-based labeling interface, 64-row human-labeled fixture (tool selection + execution quality), blind evaluation process, and inter-rater reliability metrics. |
+| ⬜ Planned | **10** | **Tool Selection Judge Calibration** | Claude judge predicts tool selection correctness and execution quality against human labels. Separate reasoning evaluation from execution validation - judge can't see actual tool outputs. | **Automated Judge System** - Claude judge that predicts tool selection correctness, agreement metrics vs human labels, false positive/negative analysis, and separate reasoning evaluation pipeline. |
+| ⬜ Planned | **11** | **Multi-Tool Integration Complexity** | Expand to 3-5 tools with dependency chains (e.g., search → summarize → email). Eval tool sequencing logic, intermediate state handling, and cascade failure patterns. | **Multi-Tool Chain Agent** - Agent with 5+ tools in dependency chains, tool sequencing logic, intermediate state handling, cascade failure recovery, and execution flow visualization. |
+| ⬜ Planned | **12** | **External Integration Reliability Gates** | Real external APIs with rate limits, failures, and timeouts. Eval retry logic, graceful degradation, and user communication during tool failures. Circuit breaker patterns. | **Production Integration Gates** - Agent with real external APIs, rate limiting, timeout handling, retry logic, circuit breakers, and user communication during failures with live demo. |
+| ⬜ Planned | **13** | **Production Agent CI Regression** | Deployed tool-calling agent with live external integrations, committed regression fixtures for tool selection accuracy, execution reliability gates, and red-gate proof of catching tool-selection regressions. | **CI/CD Regression Pipeline** - Deployed agent with automated regression tests, committed fixtures, red-gate screenshot catching tool-selection regression, and GitHub Actions workflow. |
+| ⬜ Planned | **14** | **Agent Execution Trace Instrumentation** | Normalized trace schema for tool selection reasoning, execution timing, error patterns, and user satisfaction signals. CloudWatch integration without logging sensitive API responses. | **Observability Dashboard** - CloudWatch dashboard showing tool selection patterns, execution timing, error rates, user satisfaction signals, and distributed tracing without sensitive data logging. |
+| ⬜ Planned | **15** | **Advanced Agent Patterns & Safety** | Multi-agent orchestration (Graph, Swarm, Workflow patterns), agent-to-agent communication (A2A), safety guardrails, and capability limitation enforcement. Eval coordination accuracy and safety boundary violations. | **Multi-Agent Orchestration** - Graph/Swarm/Workflow pattern implementation, A2A communication demo, safety guardrails, coordination accuracy metrics, and agent handoff patterns. |
+| ⬜ Planned | **16** | **Production Agent Architecture Reference** | Complete agent deployment with tool portfolio, execution monitoring, safety guardrails, and eval-driven improvement pipeline. Public demo with documented tool selection accuracy and reliability metrics. | **Production Reference Architecture** - Complete deployed system with public demo, documented metrics (tool accuracy, reliability), eval-driven improvement pipeline, and LinkedIn-ready case study. |
+
+Every deliverable is designed to be **demo-ready** (shows in an interview), **linkable** (LinkedIn/portfolio), **code-complete** (runs from a fresh clone), and **metrics-proven** (numbers with receipts).
+
+## Progress log
+
+One dated entry per closed week, linking the artifacts. Convention:
+
+> **Week N closed — YYYY-MM-DD.** One-sentence outcome. Links: report, code, receipt. One honest sentence about what didn't work.
+
+*(No entries yet — Week 1 starts next.)*
+
+## Following along / forking
+
+1. Fork the repo, read [`LEARNING_PLAN.md`](LEARNING_PLAN.md) front matter (especially **Working assumptions**, **Managed evaluation boundaries**, and **Appendix C — Guardrails**) before Week 1.
+2. Work one week at a time; each week's **Success criteria** are the exit gate — don't start Week N+1 with Week N's checkboxes open.
+3. Keep the placeholder discipline: no account IDs, ARNs, real bucket names, raw traces, or secrets in commits. The safety scanner (Week 6) enforces this, but the habit starts Week 1.
+4. Expect drift: AWS ships fast. When this repo's paraphrase and the [current docs](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html) disagree, **the docs win** — and a PR fixing the paraphrase is welcome.
+
+## Guardrails (the short version)
+
+- Judges — mine and AWS's — are measurements, not truth; humans calibrate both.
+- Deployment is evidence, not polish; the public claim is scoped regression discipline, never production-readiness or safety certification.
+- Optimizer suggestions face holdout rows or they don't ship.
+- Write-action tools stay stubbed until reliability gates exist.
+- Adversarial test rows use inert canaries; this repo is not an attack cookbook.
+- Raw traces and payloads stay out of git; public artifacts carry provenance, not data.
+
+The full version, with rationale, is [Appendix C of the learning plan](LEARNING_PLAN.md).
+
+---
+
+*Built in public as a learning journey. Corrections and issues welcome — especially of the "the docs changed, your Week N command is stale" variety.*

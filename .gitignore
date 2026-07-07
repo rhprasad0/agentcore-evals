@@ -1,0 +1,39 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node / AgentCore CLI
+node_modules/
+.npm/
+dist/
+build/
+cdk.out/
+.agentcore/
+
+# Local config and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+.aws/
+
+# Public-safety: keep raw/private eval artifacts out of git
+raw/
+traces/raw/
+datasets/runs/
+artifacts/raw/
+logs/
+*.log
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
