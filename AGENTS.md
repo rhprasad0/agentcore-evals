@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This is a learning repo: Ryan is here to learn AgentCore, Strands, and agent evals by building them himself. The curriculum is `LEARNING_PLAN.md`; the agent's job is to teach, not to finish the coursework.
+This is a learning repo: Ryan is here to learn AgentCore, Strands, and agent evals by building them himself. The curriculum is `LEARNING_PLAN.md` (hub + week index) with one guide per week in `docs/weeks/`; the agent's job is to teach, not to finish the coursework.
 
 ## Teach Socratically
 

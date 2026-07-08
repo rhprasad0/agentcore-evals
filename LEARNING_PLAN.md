@@ -129,6 +129,7 @@ agentcore-evals/
   README.md
   LEARNING_PLAN.md
   docs/
+    weeks/                     # the 16 weekly guides (week-NN-*.md + index)
     architecture.md            # annotated AgentCore component diagram (W1)
     local-vs-agentcore.md      # deployment comparison (W3)
     tool-contract-spec.md      # contract rationale (W5)
@@ -177,630 +178,71 @@ Weeks 1–4 start documentation-first and grow this tree; nothing lands in `main
 
 Each week follows the same template: **Objective · Why it matters · Build steps · Deliverable checklist · Success criteria · Docs to consult.** Deliverables are designed to be demo-ready (shows in an interview), linkable (LinkedIn/portfolio), code-complete (runs from a fresh clone), and metrics-proven (numbers, not adjectives).
 
+The full week-by-week detail — expanded concepts, guided-discovery exercises, gotchas and drift-watch lists, and doc-verified reading lists — lives in [`docs/weeks/`](docs/weeks/README.md), one guide per week. The summaries below are the map; the guides are the territory. Each week's **success criteria** (in its guide) are the exit gate: don't start Week N+1 with Week N's checkboxes open.
+
 ## Week 1 — AgentCore & Strands Fundamentals
 
-**Objective.** Understand the AgentCore architecture (Runtime, Gateway, Memory, Identity, Policy, Evaluations, Observability, built-in tools), Strands SDK basics, the MCP protocol, and A2A communication. Stand up a local development environment.
-
-**Why it matters.** The previous plan evaluated a chatbot; agents add a new failure surface — the tool-call loop — and AgentCore is nine-plus services with overlapping names. A week spent drawing the map prevents fifteen weeks of confusing Runtime (hosting) with the managed harness (orchestration), or Policy (deterministic control) with Guardrails (content evaluation).
-
-**Build steps.**
-
-1. Install the toolchain and verify versions:
-
-   ```bash
-   python3 --version          # 3.10+
-   node --version             # 20+
-   npm install -g @aws/agentcore
-   agentcore --version
-   uv venv && source .venv/bin/activate
-   uv pip install strands-agents strands-agents-tools
-   aws configure              # or SSO; then grant Bedrock model access in the console
-   ```
-
-2. Write the hello-world agent — one custom tool calling one AWS service, so the first agent you ever run already goes through the tool loop:
-
-   ```python
-   # src/agents/hello.py
-   import boto3
-   from strands import Agent, tool
-
-   @tool
-   def caller_identity() -> dict:
-       """Return the AWS account ID and ARN this environment is authenticated as."""
-       ident = boto3.client("sts").get_caller_identity()
-       return {"account": ident["Account"], "arn": ident["Arn"]}
-
-   agent = Agent(
-       system_prompt="You are a lab assistant. Answer AWS facts only via tools; never guess.",
-       tools=[caller_identity],
-   )
-   agent("Which AWS identity am I running as?")
-   ```
-
-   Strands defaults to Claude on Bedrock — if this errors, fix model access now, not in Week 3.
-
-3. Read the agent loop docs and annotate what actually happened: model reasoning → tool selection → execution → response synthesis. Capture the message list (`agent.messages`) and label each entry.
-4. Write `docs/architecture.md` with a Mermaid diagram of the AgentCore components and one-sentence annotations *in your own words*, including the two 2026 additions most plans omit: Policy and Evaluations. Add a half-page primer each for MCP (spec rev 2025-11-25: tools/resources/prompts, stdio + streamable HTTP transports) and A2A (v1.0: Agent Cards, tasks, messages).
-5. Optional dev-environment upgrade: register the AgentCore MCP server from `awslabs/mcp` with your coding assistant so it can inspect AgentCore resources during later weeks.
-
-**Deliverable checklist — Local Dev Environment + Architecture Notes.**
-
-- [ ] Repo initialized with the target tree, `README.md`, and this plan.
-- [ ] `src/agents/hello.py` runs from a fresh clone with documented setup.
-- [ ] `docs/architecture.md`: annotated component diagram + MCP/A2A primers.
-- [ ] Annotated agent-loop trace (message list with your labels) committed as a doc.
-
-**Success criteria.**
-
-- [ ] You can explain, without notes, when a request touches Runtime vs Gateway vs Memory vs Policy.
-- [ ] Hello-world agent answers via the tool (verified in the message list — not from model memory).
-- [ ] Budget alarm active; teardown habits documented before anything is deployed.
-
-**Docs to consult.** AgentCore "What is" + CLI quickstart; Strands Python quickstart; MCP spec overview; A2A v1.0 topics.
+Understand the AgentCore service map (Runtime, Gateway, Memory, Identity, Policy, Evaluations, Observability, built-in tools), Strands SDK basics, MCP, and A2A; stand up the local dev environment and run a hello-world agent whose first answer already goes through the tool loop. **Deliverable:** Local Dev Environment + Architecture Notes. → [Full guide](docs/weeks/week-01-fundamentals.md)
 
 ## Week 2 — Basic Agent Development with Strands
 
-**Objective.** Build the first real Strands agent with a single tool, understand the agent loop deeply, run it locally, and explore model providers.
-
-**Why it matters.** The weather agent becomes the specimen for the entire eval contract (Weeks 5–10). Building it with explicit error handling now — rather than retrofitting — is what makes its behavior *labelable* later. A tool that fails vaguely cannot be evaluated crisply.
-
-**Build steps.**
-
-1. Implement the weather tool against OpenWeatherMap (free tier), with a typed failure envelope instead of raw exceptions:
-
-   ```python
-   # src/tools/weather.py
-   import os, requests
-   from strands import tool
-
-   FAILURE_KINDS = ("bad_input", "auth", "upstream_4xx", "upstream_5xx", "timeout", "network")
-
-   @tool
-   def get_current_weather(city: str, units: str = "metric") -> dict:
-       """Get current weather for a city. units: 'metric' or 'imperial'.
-
-       Returns {ok, city, temp, conditions} on success or
-       {ok: False, error: {kind, message, retryable}} on failure.
-       """
-       if not city or not city.strip():
-           return _fail("bad_input", "city must be non-empty", retryable=False)
-       try:
-           resp = requests.get(
-               "https://api.openweathermap.org/data/2.5/weather",
-               params={"q": city, "units": units, "appid": os.environ["OWM_API_KEY"]},
-               timeout=5,
-           )
-       except requests.Timeout:
-           return _fail("timeout", "upstream exceeded 5s", retryable=True)
-       except requests.RequestException as exc:
-           return _fail("network", str(exc), retryable=True)
-       if resp.status_code >= 500:
-           return _fail("upstream_5xx", f"status {resp.status_code}", retryable=True)
-       if resp.status_code >= 400:
-           return _fail("upstream_4xx", f"status {resp.status_code}", retryable=False)
-       data = resp.json()
-       return {"ok": True, "city": city, "temp": data["main"]["temp"],
-               "conditions": data["weather"][0]["description"]}
-   ```
-
-   The failure envelope (`kind` ∈ a closed set, `retryable` explicit) is the seed of Week 5's failure taxonomy and Week 6's validators.
-
-2. Exercise the agent loop deliberately: ask questions that should call the tool, questions that shouldn't (`"What's the capital of France?"`), and questions that should fail cleanly (`"Weather in ''?"`, key unset, network blocked). Log full conversations to `docs/reports/week-02-conversations.md` (scrubbed).
-3. Swap model providers behind the same agent — Bedrock default vs one alternative (`strands.models` providers: Bedrock, Anthropic, OpenAI, etc.) — and note tool-calling behavior differences. Provider choice is a variable your evals will control for later.
-4. Write a second custom `@tool` from scratch (any small utility) purely to internalize the decorator contract: docstring → tool description, signature → input schema. Tool descriptions are prompts; treat them as versioned artifacts from day one.
-
-**Deliverable checklist — First Functional Agent + Tool.**
-
-- [ ] Weather agent with typed failure envelope, graceful degradation messages, and unit-tested tool code (mock the HTTP layer).
-- [ ] Conversation logs: success, refusal-to-call, and each failure kind, committed scrubbed.
-- [ ] Custom `@tool` implementation with notes on how docstring/signature surface to the model.
-- [ ] Provider-swap notes (Bedrock vs one other) on tool-calling differences.
-
-**Success criteria.**
-
-- [ ] Every `FAILURE_KINDS` value is reachable in a test and produces a distinct, user-appropriate agent response.
-- [ ] The agent does *not* call the weather tool for non-weather questions (spot-checked now; gated in Week 8).
-- [ ] Tool unit tests pass offline — no network, no API key.
-
-**Docs to consult.** Strands tools + model-providers concepts; OpenWeatherMap API reference.
+Build the first real Strands agent — the weather specimen — with a typed failure envelope that makes its behavior *labelable* later; exercise the agent loop deliberately (call / refuse / fail cleanly) and compare model providers as a controlled variable. **Deliverable:** First Functional Agent + Tool. → [Full guide](docs/weeks/week-02-first-agent.md)
 
 ## Week 3 — AgentCore Runtime & Deployment
 
-**Objective.** Deploy the Week 2 agent to AgentCore Runtime via the AgentCore CLI, understand serverless agent hosting and session isolation, and compare local vs managed execution honestly.
-
-**Why it matters.** Runtime's promises — per-session microVM isolation, consumption billing, managed scaling — are exactly the claims your later evals run against a *deployed* agent must account for. Deploying the boring agent early surfaces the IAM, packaging, and observability seams while the blast radius is one tool.
-
-**Build steps.**
-
-1. Scaffold and run locally with the CLI (this wraps your existing agent code into a Runtime-shaped project):
-
-   ```bash
-   agentcore create --name weather-agent --framework Strands \
-     --model-provider Bedrock --memory none --build CodeZip
-   cd weather-agent
-   agentcore dev        # local server + browser Agent Inspector: chat, token usage, tool calls, trace timeline
-   ```
-
-2. Deploy and invoke:
-
-   ```bash
-   agentcore deploy --plan   # preview the CDK changes first
-   agentcore deploy          # CodeZip direct-code deploy; container build is the alternative
-   agentcore status
-   agentcore invoke --prompt "What's the weather in Seattle?"
-   agentcore logs --since 30m
-   agentcore traces list && agentcore traces get <trace-id>
-   ```
-
-3. Prove session isolation to yourself: two invocations with different session IDs, show state does not leak; then two calls in one session, show continuity. Document what a "session" is (microVM lifecycle, idle timeout).
-4. Write `docs/local-vs-agentcore.md`: cold start, latency, credential model (local env vars vs execution role), failure modes, cost per invocation estimate, debuggability. Screenshot the agent and an execution trace in the AWS console for `docs/assets/`.
-5. Tear down (`agentcore remove all` + `agentcore deploy`), then re-deploy from scratch to prove the repo is the source of truth.
-
-**Deliverable checklist — AgentCore Deployment Proof.**
-
-- [ ] Weather agent live on AgentCore Runtime, deployed via committed CLI/CDK config.
-- [ ] `docs/local-vs-agentcore.md` comparison with measured (not vibes) latency numbers.
-- [ ] Console screenshots: agent resource + execution trace with tool-call span visible.
-- [ ] Session isolation demo transcript.
-- [ ] Teardown/re-deploy runbook proving reproducibility.
-
-**Success criteria.**
-
-- [ ] `agentcore invoke` returns a tool-backed answer with the tool-call span visible in `agentcore traces`.
-- [ ] Fresh-clone → deployed agent works following only your runbook.
-- [ ] Account returns to zero deployed agent resources after teardown.
-
-**Docs to consult.** AgentCore CLI quickstart; Runtime concepts (sessions, direct code deploy vs container); Observability view docs.
+Deploy the weather agent to AgentCore Runtime via the CLI; understand per-session microVM isolation and the credential flip to execution roles; write a measured (not vibes) local-vs-managed comparison and prove teardown/re-deploy reproducibility. **Deliverable:** AgentCore Deployment Proof. → [Full guide](docs/weeks/week-03-runtime-deployment.md)
 
 ## Week 4 — Tool Integration Patterns
 
-**Objective.** Integrate tools three different ways — direct `@tool`, MCP servers, and AgentCore Gateway — and understand when each seam is the right one.
-
-**Why it matters.** Weeks 5–13 evaluate *tool selection among alternatives*, which requires genuinely different tools wired through realistic seams. Gateway also introduces the pattern the rest of AWS's agent story leans on: every tool behind one governed MCP endpoint.
-
-**Build steps.**
-
-1. Grow the portfolio to three tools with non-overlapping capability boundaries: `get_current_weather` (yours), `calculator` (from `strands-agents-tools`), and web search. For search, use the Gateway **built-in Web Search connector** (GA June 2026, exposed as an MCP tool on your gateway) — fall back to a direct external search API `@tool` if it's unavailable in your Region.
-2. Consume an external MCP server from Strands (`MCPClient` with stdio or streamable-HTTP transport) — e.g., the AWS documentation MCP server — and list what tools it advertises. Note the trust question: an MCP tool description is a prompt injected into your agent.
-3. Stand up a Gateway and put a Lambda tool behind it:
-
-   ```bash
-   agentcore add gateway --name eval-gateway
-   agentcore add gateway-target --name weather-lambda \
-     --type lambda-function-arn \
-     --lambda-arn arn:aws:lambda:us-east-1:<AWS_ACCOUNT_ID>:function:weather-tool \
-     --tool-schema-file schemas/weather-tool.json \
-     --gateway eval-gateway
-   agentcore deploy
-   ```
-
-   The tool schema file is the interesting artifact: Gateway transforms a plain Lambda into a described MCP tool. Diff the schema you wrote against what the agent sees.
-4. Document the tool-discovery spectrum and pick a side: this repo uses **explicit registration** (a checked-in tool list per agent) even though Gateway offers semantic tool search. Write down why (evaluability beats convenience at this scale).
-
-**Deliverable checklist — Multi-Tool Agent Portfolio.**
-
-- [ ] Agent with three working tools and clear capability boundaries documented per tool.
-- [ ] MCP client integration example with advertised-tool listing and trust notes.
-- [ ] Gateway with Lambda target: schema file, creation commands, before/after transformation notes.
-- [ ] `docs/` note on integration seams: when `@tool` vs MCP vs Gateway, and the explicit-registration decision.
-
-**Success criteria.**
-
-- [ ] One conversation exercises all three tools correctly with no misfires (transcript committed).
-- [ ] The same weather capability is reachable via direct `@tool` *and* via Gateway — and you can articulate the operational difference.
-- [ ] Ambiguous prompts ("what's 30% of the temperature in Oslo?") produce defensible tool sequences — noted as future eval rows.
-
-**Docs to consult.** Strands MCP tools docs; Gateway target configuration (Lambda/OpenAPI/MCP-server types); Web Search tool docs.
+Integrate tools three ways — direct `@tool`, external MCP servers, and AgentCore Gateway (Lambda target + built-in Web Search connector) — and commit in writing to explicit tool registration over semantic discovery. **Deliverable:** Multi-Tool Agent Portfolio. → [Full guide](docs/weeks/week-04-tool-integration.md)
 
 ## Week 5 — Agent/Tool Contract Architecture
 
-**Objective.** Freeze the informal patterns of Weeks 2–4 into formal contracts: tool interface schemas, agent capability manifests, execution-context isolation, and an explicit failure taxonomy. No magic tool discovery.
-
-**Why it matters.** This is the pivot week — the same move as the previous plan's "eval/product contract" week, now for tools. Everything downstream (dataset rows, validators, labels, judges, CI gates) keys off these contracts. A contract that only lives in code comments cannot fail a build.
-
-**Build steps.**
-
-1. Write `schemas/tool-contract.schema.json` — the shape every tool in this repo must satisfy:
-
-   ```json
-   {
-     "toolId": "weather.get_current_weather",
-     "version": "1.2.0",
-     "description": "Current weather for a city. Not forecasts, not history.",
-     "inputSchema": { "...": "JSON Schema for arguments" },
-     "outputSchema": { "...": "success + failure envelope shapes" },
-     "failureModes": ["bad_input", "auth", "upstream_4xx", "upstream_5xx", "timeout", "network"],
-     "sideEffects": "none | read_external | write_external",
-     "authScope": "owm:read",
-     "latencyBudgetMs": 5000
-   }
-   ```
-
-2. Write `schemas/capability-manifest.schema.json` and one manifest per agent: which toolIds it may call, side-effect ceiling (`write_external` requires Week 12 gates), and out-of-scope declarations ("this agent does not answer non-weather questions with tools"). Load and validate the manifest in agent construction — an agent literally cannot register a tool its manifest doesn't grant.
-3. Demonstrate execution-context isolation at two layers: Runtime's per-session microVMs (re-run the Week 3 demo, now written up against the contract) and least-privilege IAM (the deployed agent's execution role can call the weather Lambda and nothing else — prove it with a denied call).
-4. Formalize the failure taxonomy: for each failure kind, the *required agent behavior* (retry? degrade? tell the user what, exactly?) with code examples. This document becomes Week 6's validator spec and Week 12's retry-policy input.
-
-**Deliverable checklist — Tool Contract Specification.**
-
-- [ ] `tool-contract.schema.json` + `capability-manifest.schema.json` with valid and invalid fixtures.
-- [ ] All three tools re-described as contract instances; manifest-enforced registration in agent code.
-- [ ] `docs/tool-contract-spec.md`: rationale, isolation demo (microVM + IAM denial receipt), failure taxonomy with required behaviors.
-- [ ] `scripts/validate_dataset.py` seed: schema validation wired into a pre-commit/CI check.
-
-**Success criteria.**
-
-- [ ] An agent constructed with an un-manifested tool fails loudly at startup (test proves it).
-- [ ] Invalid contract fixtures fail validation; valid ones pass — in CI.
-- [ ] Every failure kind maps to exactly one required behavior, written down.
-
-**Docs to consult.** JSON Schema spec; Runtime session/isolation docs; IAM condition keys for AgentCore.
+Freeze the informal patterns into contracts: tool-contract and capability-manifest schemas with valid/invalid fixtures, manifest-enforced registration that fails loudly, a two-layer isolation proof (microVM + IAM denial receipt), and a failure taxonomy mapping every kind to exactly one required behavior. **Deliverable:** Tool Contract Specification. → [Full guide](docs/weeks/week-05-tool-contracts.md)
 
 ## Week 6 — Tool Execution Dataset & Validation Schema
 
-**Objective.** Build the synthetic evaluation corpus: 100 tool-calling scenarios, an execution-trace schema aligned with OTEL conventions, tool-selection fixtures, success/failure validators, and deterministic mock tools.
-
-**Why it matters.** This is the eval contract made concrete. The dataset defines what "correct tool use" means row by row; the mocks make runs reproducible; the OTEL alignment is the quiet investment that lets Week 14's managed observability and the AgentCore Evaluations lane consume the same shapes without adapters.
-
-**Build steps.**
-
-1. Design `schemas/tool-calling-example.schema.json`, then generate `datasets/synthetic/tool-calling-100.jsonl`. Every row:
-
-   ```json
-   {
-     "exampleId": "tc-0042",
-     "prompt": "Is it warmer in Oslo or Bergen right now?",
-     "expected": {
-       "toolIds": ["weather.get_current_weather"],
-       "minCalls": 2, "maxCalls": 2,
-       "argConstraints": [{"path": "$.city", "inSet": ["Oslo", "Bergen"]}],
-       "mustNotCall": ["search.web_search"],
-       "responseMust": ["compare", "name both cities"]
-     },
-     "failureInjection": null,
-     "tags": ["multi-call", "comparison"]
-   }
-   ```
-
-   Distribution to hit: ~40 straightforward single-tool rows, ~15 multi-call rows, ~15 **no-tool rows** (the model should answer directly or decline — "more tool calls" is not "better agent"), ~15 failure-injection rows (mock returns each failure kind; expected behavior comes from the Week 5 taxonomy), ~10 adversarial/ambiguous rows including inert injection canaries and forced-choice traps. Generate drafts with an LLM, then hand-review every row — you are the dataset's editor, not its typist.
-2. Design `schemas/execution-trace.schema.json` for normalized runs: session/trace/span ids, per-span `tool.name`, `tool.arguments`, `tool.result.ok`, `tool.result.kind`, latency, token counts, and the model's stated reasoning for tool choice where available. Name fields to match OTEL GenAI / OpenInference semantic conventions wherever one exists.
-3. Build deterministic mocks: a mock registry that returns fixture responses per (toolId, args-hash), including scripted failures for injection rows. Mocked tools satisfy the same tool contracts — the agent cannot tell.
-4. Extend `scripts/validate_dataset.py`: schema-validate every row, check tag/kind coverage against the taxonomy, verify canaries are inert, and fail on real-looking secrets (fold in `public_safety_scan.py`).
-
-**Deliverable checklist — Synthetic Dataset + Validators.**
-
-- [ ] 100-row reviewed dataset with the distribution above; generation prompts committed too.
-- [ ] Execution-trace schema with OTEL-convention field mapping table.
-- [ ] Deterministic mock tool registry with scripted failure fixtures.
-- [ ] Validators in CI: schema, coverage, canary-inertness, safety scan.
-
-**Success criteria.**
-
-- [ ] `validate_dataset.py` passes; deliberately corrupted rows fail with actionable messages.
-- [ ] Two identical harness runs over mocks produce byte-identical trace files (determinism proven).
-- [ ] A teammate (or you, blind, a week later) can predict expected behavior from any row without asking.
-
-**Docs to consult.** OTEL GenAI semantic conventions; OpenInference spec; AgentCore Observability trace docs (for field-name alignment).
+Build the eval corpus: 100 hand-reviewed tool-calling rows (straightforward, multi-call, no-tool, failure-injection, adversarial with inert canaries), an OTEL-aligned execution-trace schema, deterministic mocks keyed by (toolId, args-hash), and validators in CI. **Deliverable:** Synthetic Dataset + Validators. → [Full guide](docs/weeks/week-06-dataset-validation.md)
 
 ## Week 7 — Minimal Tool-Calling Specimen
 
-**Objective.** Reduce to a single-tool agent specimen with full instrumentation: normalized execution traces, tool-selection reasoning capture, and stubbed externals with controlled responses.
-
-**Why it matters.** Weeks 8–10 need an agent whose every run produces a complete, normalized, deterministic record. One tool means tool-*selection* questions reduce to "call it or not, with what args" — unambiguous for human labelers. Complexity returns in Week 11, under contract.
-
-**Build steps.**
-
-1. Configure the specimen: weather agent, weather tool only (mock registry from Week 6 behind it), pinned model ID, pinned system prompt, temperature pinned low. Record all pins in a run manifest (`runId`, model, prompt hash, dataset version, mock fixture version, date).
-2. Instrument with Strands hooks/callbacks + OTEL export to capture every loop step; write the adapter (`src/adapters/`) that normalizes raw traces into `execution-trace.schema.json` shape. Capture the model's tool-selection reasoning: the assistant message content preceding each tool call, stored as `selectionReasoning` on the span.
-3. Run the full 100-row dataset through the specimen. Store normalized traces under `datasets/runs/<runId>/` (git-ignored raw, committed public-safe summaries).
-4. Review 10 traces by hand end-to-end and annotate surprises — mislabeled expectations in the dataset get fixed *now*, with a changelog entry, before humans label against them.
-
-**Deliverable checklist — Instrumented Agent Specimen.**
-
-- [ ] Specimen config + run manifest schema; everything pinned and recorded.
-- [ ] Trace normalization adapter with tests (raw fixture in → schema-valid trace out).
-- [ ] Full-dataset run: 100 normalized traces + a public-safe summary report.
-- [ ] Dataset errata changelog from the hand review.
-
-**Success criteria.**
-
-- [ ] 100/100 traces validate against the trace schema.
-- [ ] Re-running with the same manifest reproduces identical tool-call sequences (mocked lane).
-- [ ] Every trace answers, mechanically: which tool, what args, what result kind, what did the agent say, and *why did it choose the tool*.
-
-**Docs to consult.** Strands observability/hooks docs; OTEL exporter configuration.
+Reduce to a single-tool specimen with every behavioral input pinned in a run manifest; instrument with OTEL, normalize traces through a tested adapter, capture tool-selection reasoning, run the full dataset, and close the dataset-errata window before humans label. **Deliverable:** Instrumented Agent Specimen. → [Full guide](docs/weeks/week-07-specimen.md)
 
 ## Week 8 — Local Tool Execution Harness
 
-**Objective.** An automated local harness that replays the dataset through the specimen and reports tool-selection accuracy, execution success rates, error-handling compliance, and timeout behavior — deterministically, in CI, without cloud calls.
-
-**Why it matters.** This is the clipboard the rest of the plan writes on. Every later claim — "the judge agrees with humans", "the PR regressed tool selection", "the multi-tool agent sequences correctly" — is a harness report. Deterministic gates come first because they are cheap, explainable, and never hallucinate.
-
-**Build steps.**
-
-1. Build `evals/harness.py` on `strands-agents-evals` primitives, loading Cases from the Week 6 dataset:
-
-   ```python
-   from strands_evals import Case, Experiment
-   from strands_evals.evaluators import ToolCalled, Contains
-   from evals.evaluators.gates import ExpectedToolsGate, ArgConstraintGate, FailureBehaviorGate, NoToolGate
-
-   cases = load_cases("datasets/synthetic/tool-calling-100.jsonl")
-   evaluators = [ExpectedToolsGate(), ArgConstraintGate(), FailureBehaviorGate(), NoToolGate()]
-   experiment = Experiment(cases=cases, evaluators=evaluators)
-   report = await experiment.run_evaluations_async(run_specimen)   # replays via mock registry
-   report.run_display()
-   ```
-
-   Custom deterministic gates (extending the SDK's `ToolCalled`/`Equals`/`Contains` family) implement the Week 6 `expected` block: right tools, right call counts, arg constraints satisfied, forbidden tools untouched, failure-injection rows produce the taxonomy-required behavior, no-tool rows stay tool-free.
-2. Report per-tag and per-kind, not just overall: tool-selection accuracy on ambiguous rows is the number that matters; a blended average hides it. Emit text (console), JSON (machine), and Markdown (docs/reports) — same numbers, three renderings, via `scripts/summarize_run.py`.
-3. Wire the harness into GitHub Actions on every PR (mocked lane only — fast, free, deterministic). Keep unlabeled-quality questions out of scope: the harness validates *mechanical* contract compliance; response *quality* waits for human labels (Week 9). Say so in the report footer.
-4. Baseline: run three times, confirm identical results; then flip one system-prompt word and watch which gates move. That sensitivity check is your first evidence the harness measures the agent, not the harness.
-
-**Deliverable checklist — Local Evaluation Harness.**
-
-- [ ] `evals/harness.py` + custom gate evaluators with unit tests.
-- [ ] Reports in text/JSON/Markdown with per-tag breakdowns; committed baseline report.
-- [ ] CI workflow running dataset validation + harness on PRs.
-- [ ] Sensitivity-check note (what moved when the prompt changed).
-
-**Success criteria.**
-
-- [ ] Harness runs the 100-row dataset locally in minutes, offline, deterministically.
-- [ ] Baseline metrics recorded: overall + per-tag tool-selection accuracy, execution success rate, failure-behavior compliance, no-tool compliance.
-- [ ] A deliberately broken tool description produces a visibly worse report (proven, screenshotted).
-
-**Docs to consult.** Strands Evals deterministic evaluators + experiments docs.
+Build the local harness on `strands-agents-evals`: deterministic gates implementing the dataset's `expected` blocks, per-tag reporting in three renderings, CI wiring on every PR, and a baseline ×3 plus sensitivity check proving the instrument measures the agent. **Deliverable:** Local Evaluation Harness. → [Full guide](docs/weeks/week-08-local-harness.md)
 
 ## Week 9 — Human Tool-Selection Labeling
 
-**Objective.** A browser-based labeling workflow and a reviewed 64-row human-labeled fixture covering tool-selection correctness, execution quality, and error-recovery behavior — labeled blind.
-
-**Why it matters.** Human labels are the only ground truth this repo recognizes. Every judge — yours in Week 10, AWS's built-ins, the Week 16 optimization loop — gets measured against this fixture. Sixty-four careful rows beat six hundred careless ones; the previous plan's 48-row fixture caught real failures precisely because every row was actually reviewed.
-
-**Build steps.**
-
-1. Extend the previous plan's `label_workbench.py` pattern: a local browser UI that shows one trace at a time — prompt, tool calls with args, results, final response — and collects labels against `schemas/human-label.schema.json`:
-   - `toolSelection`: correct / incorrect / defensible-alternative
-   - `parameterQuality`: correct / wrong-value / fabricated
-   - `executionQuality`: pass / fail (+ tags: ignored-tool-failure, hallucinated-tool-output, over-called, under-called)
-   - `errorRecovery` (failure-injection rows only): compliant / non-compliant with the Week 5 taxonomy
-   - free-text rationale, required on every fail
-2. **Blind protocol:** the workbench hides the dataset's `expected` block and all harness verdicts. You label what the agent did, not whether it matched your own spec — divergences between labels and gates are findings, not annoyances.
-3. Select 64 traces deliberately: every tag represented, all failure kinds covered, every harness-gate disagreement candidate included, plus a random fill. Label in two passes on different days; compute self-agreement (test–retest) per label field as your inter-rater proxy — and recruit a second labeler for a 16-row overlap subset if you can (report Cohen's κ).
-4. Reconcile: where second-pass labels disagree with first-pass, adjudicate with written rationale. Export the reviewed fixture to `datasets/fixtures/human-labels-64.jsonl`. File dataset/harness bugs the labels exposed.
-
-**Deliverable checklist — Human Labeling Workflow.**
-
-- [ ] Browser labeling workbench (screenshot in docs) + label schema with fixtures.
-- [ ] Reviewed 64-row blind-labeled fixture with rationales.
-- [ ] Reliability metrics: test–retest agreement per field (and κ on the overlap subset if second labeler).
-- [ ] Findings report: label-vs-gate disagreements and what they revealed.
-
-**Success criteria.**
-
-- [ ] 64/64 rows schema-valid with rationales on every fail label.
-- [ ] Test–retest agreement ≥ 0.85 on `toolSelection` (if lower, the label definitions are the bug — fix and relabel).
-- [ ] At least one genuine agent failure documented from labeling (if zero, the dataset is too easy — add harder rows and say so).
-
-**Docs to consult.** Your own Week 5–6 schemas; previous repo's labeling workflow docs.
+Label 64 deliberately selected traces blind, in two passes, against a schema that distinguishes defensible alternatives and fabricated parameters; measure test–retest reliability (κ with a second labeler if possible); reconcile, export the fixture, and file findings from label-vs-gate disagreements. **Deliverable:** Human Labeling Workflow. → [Full guide](docs/weeks/week-09-human-labeling.md)
 
 ## Week 10 — Tool Selection Judge Calibration
 
-**Objective.** Build a blind LLM judge that predicts tool-selection correctness and execution quality, calibrate it against the human fixture, and run the same traces through managed AgentCore Evaluations built-ins — a three-way agreement analysis: human vs your judge vs AWS's judge.
-
-**Why it matters.** This is the flagship week. Anyone can call an LLM a judge; the portfolio-grade move is publishing agreement numbers, false-pass/false-fail analysis, and a decision about *which* judge to trust *for what* — including the managed one AWS would sell you. Judges only earn scaling rights (labeling rows 65–10,000) after they match humans on rows 1–64.
-
-**Build steps.**
-
-1. Build the blind judge (`src/judges/`): Claude on Bedrock via the Converse API, structured-output contract mirroring the built-in evaluators' shape (`{reasoning, score}` JSON). **Separation rule:** the tool-selection judge sees the conversation up to the tool call and the available-tools list — *never actual tool outputs* — so it evaluates the decision, not the outcome. A separate execution-quality judge sees the full trace. Version the judge prompts like code.
-2. Run the judge over the 64 labeled traces ×3 repeats (measure verdict flip rate). Compute per-field: agreement, false-pass rate, false-fail rate, and where judge confidence diverges from human rationale. Analyze every disagreement by hand — some will be judge errors, some will be *your* label errors; both go in the report.
-3. Managed lane: run AgentCore Evaluations **on-demand** over the same traces with `Builtin.ToolSelectionAccuracy`, `Builtin.ToolParameterAccuracy`, and `Builtin.GoalSuccessRate` (`agentcore add evaluator` / the Evaluate API path — confirm current invocation shape in the docs; results land in a CloudWatch log group as JSON). Export scores via a small adapter into the same comparison frame.
-4. Publish `docs/judge-calibration.md`: the three-way table, a confusion matrix per judge, cost-per-verdict for each lane, and a written policy — e.g., "own judge for PR-time selection checks (cheap, calibrated, blind); managed built-ins for production sampling (no infra); disagreements route to human review."
-
-**Deliverable checklist — Automated Judge System.**
-
-- [ ] Blind judge + execution judge with versioned prompts, structured output schema, repeat-run variance stats.
-- [ ] Managed on-demand evaluation run over the same traces, with export adapter.
-- [ ] `docs/judge-calibration.md`: three-way agreement, FP/FN analysis, per-verdict cost, trust policy.
-- [ ] Disagreement casebook (every human-vs-judge conflict adjudicated in writing).
-
-**Success criteria.**
-
-- [ ] Your judge's agreement with humans on `toolSelection` beats a majority-class baseline by a margin you state — and you can name its failure modes.
-- [ ] Verdict flip rate across repeats measured and reported (if >5%, temperature/prompt work before any scaling).
-- [ ] The trust policy names concrete uses for each judge lane, including "not trusted for X yet."
-
-**Docs to consult.** Built-in evaluator prompt templates (read the actual rubrics you're comparing against); on-demand evaluation docs; Bedrock Converse structured output.
+Build a blind selection judge and a full-trace execution judge (structured output, versioned prompts, measured flip rate); run AgentCore Evaluations built-ins over the same traces; publish the three-way human/own-judge/managed-judge agreement analysis with per-verdict costs and a written trust policy. **Deliverable:** Automated Judge System. → [Full guide](docs/weeks/week-10-judge-calibration.md)
 
 ## Week 11 — Multi-Tool Integration Complexity
 
-**Objective.** Scale to a 5-tool agent with dependency chains (search → fetch → summarize → convert → notify), and extend the eval contract to sequencing, intermediate-state handling, and cascade-failure behavior.
-
-**Why it matters.** Chains are where agents actually break: a defensible step-2 choice after a bad step-1 result, stale intermediate state, or a failure at step 4 that the user hears about as a cheerful success. Each new tool arrives *with* its contract, dataset rows, and gates — complexity under contract, not complexity then panic.
-
-**Build steps.**
-
-1. Add tools per the Week 5 contract discipline: `search.web_search`, `fetch.get_url` (allowlisted domains), `text.summarize` (a second, cheaper model behind a tool boundary — a deliberate agent-as-tool seam), `convert.units`, `notify.send` (**stub sink only** — `sideEffects: write_external` stays gated until Week 12). Update the capability manifest.
-2. Author `datasets/synthetic/chain-scenarios.jsonl` (~40 rows): full-chain tasks, partial-chain tasks (agent should skip unneeded steps), mid-chain failure injections (fetch 403s, summarizer timeout), and state-handoff traps (does step 3 use step 2's actual output or a hallucinated version?). Extend the trace schema with `parentSpanId`/`stepIndex` if Week 6's shape didn't already cover it.
-3. Extend harness gates: valid-sequence sets per scenario (DAG membership, not one golden path — "defensible alternative order" is a legal verdict), intermediate-state fidelity checks (grep step-N inputs for step-N−1 outputs), and cascade rules from the taxonomy (a failed step must surface, not vanish). Add `strands-evals`' trajectory evaluation as the LLM-judged complement to the deterministic sequence gates, using Week 10's calibration posture.
-4. Visualize: generate a Mermaid execution-flow diagram *from trace data* per scenario (a `scripts/` renderer). Baseline the chain agent on the original 100-row dataset too — adding four tools must not regress single-tool selection accuracy; that number goes in the report.
-
-**Deliverable checklist — Multi-Tool Chain Agent.**
-
-- [ ] 5-tool agent with contracts, manifest, and stub-gated write action.
-- [ ] Chain scenario dataset + sequencing/state/cascade gates with tests.
-- [ ] Trace-derived execution flow visualizations (committed for 3+ interesting runs).
-- [ ] Regression note: single-tool metrics before vs after the portfolio grew.
-
-**Success criteria.**
-
-- [ ] Sequencing accuracy ≥ target you set *before* running (state it in the report either way).
-- [ ] Every mid-chain failure injection surfaces in the final response (zero silent cascade failures).
-- [ ] Single-tool selection accuracy within noise of the Week 8 baseline — or the regression is investigated in writing.
-
-**Docs to consult.** Strands multi-agent concepts (agents-as-tools); Strands Evals trajectory evaluators.
+Scale to a 5-tool dependency chain under contract discipline: chain scenarios with state-handoff traps, DAG-membership sequencing gates, cascade rules (no silent mid-chain failures), calibrated trajectory evaluation, and the regression check that portfolio growth didn't cost single-tool accuracy. **Deliverable:** Multi-Tool Chain Agent. → [Full guide](docs/weeks/week-11-multi-tool-chains.md)
 
 ## Week 12 — External Integration Reliability Gates
 
-**Objective.** Swap mocks for real external APIs and evaluate resilience: rate limits, timeouts, retries with backoff, circuit breakers, graceful degradation, and honest user communication during failures.
-
-**Why it matters.** The difference between a demo agent and a production candidate is what happens during the bad five minutes. "Handles failures gracefully" becomes a measurable claim: inject real failure conditions, gate on the observed behavior, and only then un-stub the write action.
-
-**Build steps.**
-
-1. Wire real integrations behind the same contracts: OpenWeatherMap, a real search API, real HTTP fetch. Keys live in AgentCore Identity credential providers / Secrets Manager references when deployed — never env-var-committed.
-2. Build the resilience layer *inside the tool boundary* (agents reason; tools defend): per-tool retry policy from the failure taxonomy (retryable kinds only, exponential backoff + jitter, budget-capped), a small circuit breaker (closed → open on N consecutive upstream failures → half-open probe), and degradation responses that tell the user what failed, what's stale, and what still worked.
-3. Evaluate it: a failure-injection proxy (or fault-flag on the tool wrapper) drives scripted scenarios — burst 429s, hard timeouts, 30-minute outage simulation. New gates: retry compliance (counts/backoff observed in traces), breaker state transitions, degradation-message quality (judged lane, calibrated rubric), and **no fabricated data during outages** (deterministic: outage-window responses must not contain plausible-looking weather numbers).
-4. Un-stub `notify.send` to a real sink you own (e.g., SNS → your email) only after the gates above pass; write actions get an additional idempotency check (same request twice → one send).
-5. Record a short live demo: agent answering during an induced outage, degrading honestly, recovering when the breaker half-opens.
-
-**Deliverable checklist — Production Integration Gates.**
-
-- [ ] Real-API tools with Identity/Secrets-managed credentials and committed resilience configs.
-- [ ] Circuit breaker + retry implementation with unit tests and trace-visible state.
-- [ ] Failure-scenario eval suite with gates; report on all scenarios.
-- [ ] Live outage demo recording/transcript + the un-stubbed, idempotent write action.
-
-**Success criteria.**
-
-- [ ] Zero fabricated tool data across all outage scenarios (gate, not aspiration).
-- [ ] Retry/backoff behavior in traces matches the declared policy exactly.
-- [ ] Degradation messages score ≥ your pre-stated rubric bar with the calibrated judge, spot-checked by you.
-
-**Docs to consult.** AgentCore Identity credential providers; Secrets Manager references; your Week 5 taxonomy (it is the spec).
+Swap mocks for real APIs behind the same contracts; build retries with backoff, circuit breakers, and honest degradation inside the tool boundary; gate on injected failure scenarios (zero fabricated data during outages); then un-stub the write action with an idempotency check. **Deliverable:** Production Integration Gates. → [Full guide](docs/weeks/week-12-reliability-gates.md)
 
 ## Week 13 — Production Agent CI Regression
 
-**Objective.** A deployed chain agent with a two-lane CI regression pipeline — fast deterministic fixtures on every PR, managed batch evaluation against the deployed agent on merge/nightly — and a preserved red-gate receipt of a caught tool-selection regression.
-
-**Why it matters.** The previous plan's most persuasive artifact was a screenshot of CI failing for the right reason. Same move, bigger claim: changes to prompts, tool descriptions, or the portfolio cannot silently regress tool selection, because committed fixtures and score thresholds stand in the way.
-
-**Build steps.**
-
-1. Deploy the Week 12 agent via `agentcore deploy` (config in repo; observability enabled). Freeze `datasets/fixtures/regression/`: ~30 rows spanning single-tool, chain, no-tool, and failure-injection cases, each with pinned expected behavior — chosen from rows that have *already caught something*.
-2. `ci.yml` lane 1 (every PR, minutes, free): dataset validation → safety scan → unit tests → harness over regression fixtures with mocks → thresholds (e.g., tool-selection gate pass rate = 100% on regression rows; they're regression rows *because* they must not flake).
-3. Lane 2 (merge to main / nightly): invoke the *deployed* agent over the pinned prompt set, normalize fresh traces, then run **AgentCore batch evaluation** over them with the calibrated evaluator set (`Builtin.ToolSelectionAccuracy`, `Builtin.ToolParameterAccuracy`, goal success) plus your own judge; fail the workflow if scores drop below the Week 10-informed thresholds. Post the score table as a job summary.
-4. Prove the gate is alive: open a PR that plausibly-innocently breaks tool selection (e.g., "improve" the weather tool description to also claim forecasts), watch lane 1 or 2 go red, screenshot it, revert, and write the incident up in `docs/reports/`. A gate that has never fired is decoration.
-
-**Deliverable checklist — CI/CD Regression Pipeline.**
-
-- [ ] Deployed agent + committed regression fixtures with selection rationale.
-- [ ] `ci.yml`: PR lane + deployed/batch-eval lane with thresholds and score-table summaries.
-- [ ] **Red-gate receipt:** screenshot + written incident report of the caught regression.
-- [ ] Runbook: what to do when each lane fails (including "the managed evaluator changed underneath us").
-
-**Success criteria.**
-
-- [ ] PR lane completes fast enough that you never skip it (< ~5 min).
-- [ ] The seeded regression was caught by the pipeline, not by you eyeballing (receipt proves which gate fired).
-- [ ] Batch-eval thresholds trace to Week 10 calibration, not round numbers pulled from air.
-
-**Docs to consult.** Batch evaluations getting-started; GitHub Actions OIDC→AWS auth; `agentcore invoke` scripting.
+Two-lane CI: deterministic regression fixtures with mocks on every PR, managed batch evaluation against the deployed agent on merge/nightly with calibration-derived thresholds — and a deliberately seeded regression caught by the pipeline, screenshotted, and written up. **Deliverable:** CI/CD Regression Pipeline. → [Full guide](docs/weeks/week-13-ci-regression.md)
 
 ## Week 14 — Agent Execution Trace Instrumentation
 
-**Objective.** Production observability: normalized traces flowing to CloudWatch, an online evaluation config sampling live traffic, and a dashboard showing tool-selection patterns, timing, error rates, and satisfaction signals — with sensitive data kept out by design.
-
-**Why it matters.** Weeks 6–13 built offline truth; production truth drifts. Online evaluation is the managed bridge — sampled live traces scored by the same evaluators you calibrated — and the previous plan's rule still binds: instrument provenance, never log payloads you wouldn't put on a billboard.
-
-**Build steps.**
-
-1. Enable AgentCore Observability end to end (one-click/CLI enablement; Strands emits OTEL natively — confirm exporter env/config against current docs). Verify your Week 6 field-name alignment paid off: spans in CloudWatch carry the shapes your adapters expect.
-2. Scrub at the emitter: span attributes carry toolId, args-*shape* hashes, result kind, latencies, token counts, model/prompt/dataset versions — not raw user text, not raw tool payloads, not secrets. Prove it with a CloudWatch Logs Insights query committed to docs (the "billboard test" receipt).
-3. Create the online evaluation config on the deployed agent:
-
-   ```bash
-   agentcore add online-eval --name prod_quality \
-     --runtime weather-chain-agent \
-     --evaluator "Builtin.ToolSelectionAccuracy" "Builtin.ToolParameterAccuracy" "Builtin.GoalSuccessRate" \
-     --sampling-rate <MINIMUM_USEFUL_RATE> \
-     --enable-on-create
-   agentcore deploy
-   ```
-
-   Verify sampling-rate semantics and cost in the current docs before enabling; results land in a dedicated CloudWatch log group as JSON.
-4. Build the CloudWatch dashboard: tool-call volume by toolId, selection-accuracy trend (online eval scores over time), p50/p95 tool latency, error rate by failure kind, breaker-state changes, session counts, and a satisfaction proxy you define honestly (e.g., no-retry follow-up rate — documented as a proxy, not "user satisfaction"). Alarm on selection-accuracy drop and error-rate spike.
-
-**Deliverable checklist — Observability Dashboard.**
-
-- [ ] End-to-end tracing: local dev and deployed agent both land normalized spans in CloudWatch.
-- [ ] Billboard-test receipt: committed query + screenshot showing no sensitive payloads in logs.
-- [ ] Online evaluation config live at a justified sampling rate, scores visible on the dashboard.
-- [ ] Dashboard JSON in `infra/`, screenshot in docs, alarms wired to email/SNS.
-
-**Success criteria.**
-
-- [ ] A single trace is followable from `agentcore invoke` → CloudWatch span tree → online-eval score.
-- [ ] Scrubbing verified by query, not by hope; one seeded "sensitive" test string provably absent downstream.
-- [ ] Dashboard answers "did tool selection get worse this week?" in one glance.
-
-**Docs to consult.** Observability configure/view docs; online evaluation creation; CloudWatch GenAI observability pages.
+Production observability: scrubbed-at-the-emitter spans to CloudWatch with a committed billboard-test receipt, an online evaluation config sampling live traffic at a justified minimum rate, and a dashboard + alarms that answer "did tool selection get worse this week?" in one glance. **Deliverable:** Observability Dashboard. → [Full guide](docs/weeks/week-14-observability.md)
 
 ## Week 15 — Advanced Agent Patterns & Safety
 
-**Objective.** Multi-agent orchestration (Graph, Swarm, and the workflow tool), A2A communication, and safety boundaries enforced outside agent code (AgentCore Policy + Gateway-level guardrails) — with coordination accuracy and boundary violations measured, not asserted.
-
-**Why it matters.** Multi-agent systems multiply the failure surface: handoffs lose context, swarms loop, and "the other agent said so" becomes a provenance hole. The eval-first stance extends naturally — coordination is just tool selection at a higher altitude, and safety controls the agent can't reason its way around beat safety instructions in prompts.
-
-**Build steps.**
-
-1. Refactor the chain into explicit orchestration and compare patterns on the same scenarios: **Graph** (deterministic DAG via `GraphBuilder` — research → review chain), **Swarm** (dynamic handoffs between a researcher/summarizer/checker), and the **workflow tool** for the fixed pipeline. Note where the model *chooses* structure vs where you impose it — that choice is itself eval-relevant.
-
-   ```python
-   from strands.multiagent import GraphBuilder
-   builder = GraphBuilder()
-   builder.add_node(research_agent, "research")
-   builder.add_node(review_agent, "review")
-   builder.add_edge("research", "review")
-   graph = builder.build()
-   ```
-
-2. A2A (v1.0): wrap one agent as an `A2AServer`, consume it from another via the A2A client tooling; inspect the Agent Card. Constraint to document: A2A agents work in Graph patterns but are **not currently supported in Swarm** — capability-check, don't assume. When deployed, note Runtime's A2A protocol contract and Gateway HTTP-passthrough as the managed fronting path.
-3. Extend evals to coordination: handoff-fidelity gates (did agent B receive what agent A produced, unmutated?), loop detection (span-count budget per session), delegation-accuracy rows (should the orchestrator have delegated at all?), and cross-agent trace stitching in the dashboard.
-4. Safety lane, outside the code: an **AgentCore Policy** allowing each agent exactly its manifest's tools under stated conditions (deny-by-default posture; the capability manifest from Week 5 becomes enforceable infrastructure), plus **Bedrock Guardrails at the Gateway layer** for prompt-injection/content screening on tool traffic. Then attack your own boundaries with the inert-canary adversarial rows: prompts that ask agents to exceed manifests, exfiltrate context, or chain into un-granted tools. Violations blocked at the policy/gateway layer — with the denial visible in traces — are the deliverable.
-
-**Deliverable checklist — Multi-Agent Orchestration.**
-
-- [ ] Graph, Swarm, and workflow implementations of the same task with comparison notes.
-- [ ] A2A server/client demo: Agent Card, task lifecycle transcript, Graph-not-Swarm constraint documented.
-- [ ] Coordination eval suite: handoff fidelity, loop budgets, delegation accuracy — with numbers.
-- [ ] Policy + Gateway-guardrail configs in repo; adversarial-probe report showing denials with trace receipts.
-
-**Success criteria.**
-
-- [ ] Coordination accuracy reported per pattern on identical scenarios (and a recommendation of which pattern for which shape of task).
-- [ ] Zero adversarial probes achieve un-manifested tool access; every block has a trace receipt.
-- [ ] A handoff-corruption bug seeded deliberately is caught by the fidelity gate.
-
-**Docs to consult.** Strands multi-agent (Graph/Swarm/workflow/A2A) docs; AgentCore Policy; Gateway guardrails integration; A2A v1.0 spec.
+Refactor the chain into Graph, Swarm, and workflow orchestration plus A2A, with coordination evals (handoff fidelity, loop budgets, delegation accuracy); enforce safety outside agent code with AgentCore Policy (Cedar at the Gateway) and Gateway-level guardrails, probed by inert adversarial rows with denial receipts. **Deliverable:** Multi-Agent Orchestration. → [Full guide](docs/weeks/week-15-multi-agent-safety.md)
 
 ## Week 16 — Production Agent Architecture Reference
 
-**Objective.** Close the loop: the complete deployed system with public demo, documented metrics, an eval-driven improvement pipeline — including the managed performance loop run under holdout discipline — and the LinkedIn-ready case study.
-
-**Why it matters.** The capstone claim is deliberately narrow and therefore credible: *a tool-calling agent system whose selection accuracy, reliability, and safety boundaries are continuously measured, with receipts.* The previous plan ended by rejecting a managed optimizer that failed its holdout; this one ends by giving AgentCore's optimization loop the same fair trial.
-
-**Build steps.**
-
-1. Assemble the reference architecture and draw it as it *is* (from configs and traces, not aspiration): Strands agents on Runtime, tools via Gateway with Policy + guardrails, Identity-managed credentials, Memory where used, OTEL → CloudWatch with online evals, two-lane CI, and the custom eval stack around it all. One Mermaid diagram, one page of honest annotations, including what's demo-grade vs production-grade.
-2. Run the **managed performance loop** as a gated experiment: enable Failure Insights / recommendations over accumulated production traces; take one proposed change (system prompt or tool description); evaluate it with batch evaluation *and* your harness on a **holdout split** (rows never used for tuning); adopt only if it beats baseline on holdout without regressing safety/no-tool rows. Publish the accept/reject decision with numbers either way — a documented rejection is as portfolio-worthy as an adoption.
-3. Public demo: a thin, rate-limited, prompt-scoped web front end on the deployed agent (the Week 12 degradation story is your outage insurance), plus a metrics page sourced from real eval receipts: tool-selection accuracy (harness + online), parameter accuracy, execution success rate, judge-agreement summary, and the red-gate history.
-4. Write the case study: the eval-first arc (contract → dataset → harness → labels → judges → gates → production loop), three failures the process caught with receipts, the judge trust policy, and what you'd do differently. Post it; pin the repo.
-
-**Deliverable checklist — Production Reference Architecture.**
-
-- [ ] Reference architecture doc + diagram matching deployed reality.
-- [ ] Performance-loop experiment report: proposal, holdout design, verdict with numbers.
-- [ ] Public demo (scoped, rate-limited) + metrics page fed by real eval artifacts.
-- [ ] LinkedIn case study published; README front page updated to capstone state.
-
-**Success criteria.**
-
-- [ ] Fresh-clone reader reaches any claimed metric's receipt within two clicks.
-- [ ] The optimization adopt/reject decision is defensible from published holdout numbers alone.
-- [ ] The demo survives an induced tool outage in public without fabricating data.
-
-**Docs to consult.** Optimization/recommendations, batch evaluations, A/B testing docs; your entire `docs/reports/` history — the case study is mostly already written.
+Close the loop: the reference architecture drawn from deployed reality (demo-grade vs production-grade, annotated honestly), the managed performance loop run as a gated experiment under holdout discipline (adopt/reject published with numbers either way), a scoped public demo with a receipts-backed metrics page, and the case study. **Deliverable:** Production Reference Architecture. → [Full guide](docs/weeks/week-16-capstone.md)
 
 ---
 
