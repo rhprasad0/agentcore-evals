@@ -426,7 +426,156 @@ Observed behavior:
 
 Evaluation note: the model consistently used `retryable=true` as a user-facing distinction. It did not actually retry, which is correct for Week 2: retry policy belongs in a later deterministic resilience layer, not in ad hoc model behavior.
 
+## Second custom tool: temperature conversion
+
+The second custom `@tool` exercise added `src/tools/temperature.py`, a deliberately small conversion tool:
+
+```python
+def convert_temperature(
+    value: float,
+    from_unit: Literal["celsius", "fahrenheit", "kelvin"],
+    to_unit: Literal["celsius", "fahrenheit", "kelvin"],
+) -> dict[str, Any]:
+    ...
+```
+
+The point was to test Ryan's observation that the weather schema did not expose the full Python constraint. In the weather tool, `VALID_UNITS = ("metric", "imperial", "standard")` is enforced by Python code and repeated in the docstring, but the generated model-facing schema only exposes `units` as a plain string with default `metric`.
+
+For the temperature tool, using `typing.Literal` changed the generated schema. Strands exposed real enum constraints:
+
+```json
+{
+  "from_unit": {
+    "type": "string",
+    "enum": ["celsius", "fahrenheit", "kelvin"]
+  },
+  "to_unit": {
+    "type": "string",
+    "enum": ["celsius", "fahrenheit", "kelvin"]
+  },
+  "value": {
+    "type": "number"
+  }
+}
+```
+
+Evaluation note:
+
+- **Schema archaeology result:** Python runtime validation alone is invisible to the model, but `Literal[...]` type hints can become model-visible enum constraints.
+- **Boundary lesson:** keep runtime validation anyway. Model-visible schema helps the model choose valid arguments, but the tool must still reject bad inputs because models and upstream callers can still send invalid values.
+- **Future contract lesson:** Week 5's explicit tool contracts should not assume code constraints automatically appear in the model-facing schema. Inspect the generated tool spec and write tests for important constraints.
+
+Verification:
+
+- `tests/test_temperature_tool.py` covers celsius/fahrenheit/kelvin conversions and bad-input envelopes.
+- A schema test asserts that `from_unit` and `to_unit` emit enum constraints in `convert_temperature.tool_spec`.
+
+## Temperature tool agent probes
+
+A temporary local probe wired only `convert_temperature` into a small Strands agent and ran four prompts. The script was removed after the run.
+
+### 14. Fahrenheit to Celsius — should call conversion tool
+
+Prompt:
+
+```text
+Convert 32 Fahrenheit to Celsius.
+```
+
+Observed tool call:
+
+```json
+{
+  "name": "convert_temperature",
+  "input": {
+    "value": 32,
+    "from_unit": "fahrenheit",
+    "to_unit": "celsius"
+  }
+}
+```
+
+Observed tool result:
+
+```json
+{
+  "ok": true,
+  "input": {"value": 32.0, "unit": "fahrenheit"},
+  "output": {"value": 0.0, "unit": "celsius"}
+}
+```
+
+Evaluation note: **tool-selection and argument mapping passed**. The model chose the conversion tool and mapped natural-language units to the enum values.
+
+### 15. Celsius to Kelvin — should call conversion tool
+
+Prompt:
+
+```text
+Convert 100 Celsius to Kelvin.
+```
+
+Observed tool call:
+
+```json
+{
+  "name": "convert_temperature",
+  "input": {
+    "value": 100,
+    "from_unit": "celsius",
+    "to_unit": "kelvin"
+  }
+}
+```
+
+Observed tool result:
+
+```json
+{
+  "ok": true,
+  "input": {"value": 100.0, "unit": "celsius"},
+  "output": {"value": 373.15, "unit": "kelvin"}
+}
+```
+
+Evaluation note: **tool-selection and argument mapping passed** for a second valid conversion.
+
+### 16. Unrelated question — should not call conversion tool
+
+Prompt:
+
+```text
+What is the capital of Norway?
+```
+
+Observed behavior:
+
+- Agent did not call `convert_temperature`.
+- Agent answered directly: Oslo.
+
+Evaluation note: **tool-selection behavior passed**. As with the weather math prompt, answering directly is separate from whether a future product contract should be conversion-only.
+
+### 17. Unsupported unit — enum helped, but response boundary leaked
+
+Prompt:
+
+```text
+Convert 10 Rankine to Celsius.
+```
+
+Observed behavior:
+
+- Agent did not call `convert_temperature`.
+- Agent recognized that Rankine is outside the supported enum values.
+- Agent then performed a manual Rankine-to-Celsius conversion in the final answer.
+
+Evaluation note:
+
+- **Tool-selection behavior:** pass — the model did not send unsupported `rankine` into the tool.
+- **Schema behavior:** useful signal — the enum was visible enough that the model knew Rankine was unsupported.
+- **Response-boundary behavior:** fail or at least questionable for a strict conversion-tool specimen. If the desired contract is “only convert via the tool,” then manually computing unsupported conversions is an overreach. This is another example of why tool-selection correctness and final-answer correctness need separate labels.
+
 ## Next probes to add
 
 - Decide whether to keep forecast prompts as strict no-call rows or as softer rows that permit current-weather context only if the final answer clearly refuses to forecast.
-- Commit the Week 2 conversation checkpoint after reviewing the doc for public-safety and scope.
+- Decide whether unsupported-unit prompts should require refusal-only behavior or allow manual explanation outside the tool.
