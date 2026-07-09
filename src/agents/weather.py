@@ -21,17 +21,10 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from src.tools.weather import get_current_weather
+from weatheragent.app.weather_agent.weather_contract import SYSTEM_PROMPT
 
 APPID_RE = re.compile(r"([?&]appid=)[^&\s]+")
 OWM_KEY_RE = re.compile(r"\b[a-f0-9]{32}\b", re.IGNORECASE)
-
-SYSTEM_PROMPT = """You are a weather assistant for an evaluation lab.
-Use the weather tool only for current weather in a named city.
-Do not use the weather tool for forecasts, historical weather, climate averages,
-math, geography trivia, or unrelated questions.
-If the tool returns {ok: false}, explain the failure honestly and do not invent
-weather conditions or temperatures.
-"""
 
 
 def scrub(value: Any) -> Any:
