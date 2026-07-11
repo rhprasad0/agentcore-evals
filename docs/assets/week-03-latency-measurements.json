@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "measured_at": "2026-07-10T23:33:58+00:00",
+  "region": "us-east-1",
+  "sample_count_per_lane": 5,
+  "model": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+  "method": {
+    "managed_cold": "Five sequential AgentCore CLI invocations, each using a fresh Runtime session ID.",
+    "managed_warm": "A second invocation in each of the five managed sessions.",
+    "local_cold": "Five direct local Python invocations, constructing a fresh Strands Agent for each pair.",
+    "local_warm": "A second invocation on each of the five local Agent instances.",
+    "prompt_pair": [
+      "Fresh Seattle weather request with an explicit tool-use instruction.",
+      "Fresh Boston weather request with an explicit second tool-use instruction."
+    ],
+    "timing_boundary": "Local timings cover Agent invocation. Managed end-to-end timings cover the AgentCore CLI call through receipt of the final response. Managed trace timings cover the Runtime POST /invocations span and its child spans."
+  },
+  "seconds": {
+    "managed_end_to_end": {
+      "cold": [12.045, 14.65, 11.326, 12.937, 12.106],
+      "warm": [5.967, 5.97, 5.918, 6.283, 5.868],
+      "cold_median": 12.106,
+      "warm_median": 5.967
+    },
+    "local": {
+      "cold": [4.437, 3.385, 3.432, 4.255, 3.853],
+      "warm": [2.873, 3.791, 3.481, 3.111, 3.498],
+      "cold_median": 3.853,
+      "warm_median": 3.481
+    },
+    "managed_trace": {
+      "cold": {
+        "root": [4.09, 3.467, 3.313, 4.174, 3.627],
+        "model_total": [3.94, 3.244, 3.149, 3.98, 3.465],
+        "weather_tool": [0.037, 0.071, 0.049, 0.045, 0.047],
+        "root_median": 3.627,
+        "model_median": 3.465,
+        "weather_tool_median": 0.047
+      },
+      "warm": {
+        "root": [3.178, 3.257, 3.238, 3.212, 3.294],
+        "model_total": [3.13, 3.207, 3.188, 3.161, 3.25],
+        "weather_tool": [0.04, 0.04, 0.041, 0.042, 0.037],
+        "root_median": 3.238,
+        "model_median": 3.188,
+        "weather_tool_median": 0.04
+      }
+    }
+  },
+  "derived": {
+    "managed_vs_local_cold_ratio": 3.14,
+    "managed_vs_local_warm_ratio": 1.71,
+    "managed_cold_outside_root_span_seconds": 8.479,
+    "managed_warm_outside_root_span_seconds": 2.729,
+    "cold_model_share_of_root_percent": 95.5,
+    "cold_weather_tool_share_of_root_percent": 1.3,
+    "warm_model_share_of_root_percent": 98.5,
+    "warm_weather_tool_share_of_root_percent": 1.2
+  },
+  "claim_limits": [
+    "N=5 per lane is a learning benchmark, not a performance guarantee.",
+    "Measurements were sequential and represent one account, Region, model, tool, prompt pair, and time window.",
+    "Managed CLI timings include client startup, authentication, network transit, and any Runtime session startup outside the traced application span.",
+    "The difference between CLI end-to-end time and the Runtime root span is unattributed overhead, not a direct microVM cold-start measurement.",
+    "Tool-span duration represents the instrumented weather tool call observed in these traces; it does not establish general OpenWeather latency."
+  ]
+}

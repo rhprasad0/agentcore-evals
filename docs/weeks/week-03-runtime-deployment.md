@@ -43,7 +43,7 @@ The isolation demo in build step 3 is not busywork: "state does not leak between
 - **CodeZip** — direct code deploy of your Python (supported up to Python 3.14): fast, no Docker, the default for this plan.
 - **Container** — you control the image: needed for exotic dependencies, at the cost of build time and a registry.
 
-The strategic point is not which you pick — it's that **the repo becomes the source of truth for the deployed thing**. The CLI writes config (`agentcore/` directory, validated by `agentcore validate`) that lives in git; `agentcore deploy --plan` previews the CDK change set before you apply it, exactly like reviewing a diff. Build step 5's teardown-and-redeploy exists to *prove* the source-of-truth claim: if a fresh deploy from the committed repo doesn't reproduce the agent, something lives only in the console, and that something will bite Week 13's CI.
+The strategic point is not which you pick — it's that **the repo becomes the source of truth for the deployed thing**. The CLI writes config (`agentcore/` directory, validated by `agentcore validate`) that lives in git; `agentcore deploy --dry-run` previews the deployment before you apply it, exactly like reviewing a diff. Build step 5's teardown-and-redeploy exists to *prove* the source-of-truth claim: if a fresh deploy from the committed repo doesn't reproduce the agent, something lives only in the console, and that something will bite Week 13's CI.
 
 ### The credential model flips
 
@@ -75,7 +75,7 @@ Expect integration friction here, not magic: the scaffold generates its own entr
 ### 2. Deploy and invoke
 
 ```bash
-agentcore deploy --plan   # preview the CDK changes first
+agentcore deploy --dry-run # preview the CDK changes first
 agentcore deploy          # CodeZip direct-code deploy; container build is the alternative
 agentcore status
 agentcore invoke --prompt "What's the weather in Seattle?"
@@ -83,7 +83,7 @@ agentcore logs --since 30m
 agentcore traces list && agentcore traces get <trace-id>
 ```
 
-Read the `--plan` output before the first real deploy — it's the complete inventory of what this project puts in your account (and therefore the checklist for verifying teardown later). First deploys may also require CDK bootstrap in the account/Region; that's one-time.
+Read the `--dry-run` output before the first real deploy — it's the complete inventory of what this project puts in your account (and therefore the checklist for verifying teardown later). First deploys may also require CDK bootstrap in the account/Region; that's one-time.
 
 ### 3. Prove session isolation to yourself
 
@@ -110,7 +110,7 @@ Cold start, latency, credential model (local env vars vs execution role), failur
 - *Hint 3:* A negative result ("B couldn't see it") is only meaningful if the positive control passes — first prove A *can* see its own state on a second invocation in-session.
 
 **3. Read the execution role.** Find the IAM role your deployed agent runs as. What did the scaffold grant it? What's the *smallest* set of permissions the weather agent actually needs?
-- *Hint 1:* `agentcore status` and the `--plan` output both leak the role's identity; so does the console's agent detail page.
+- *Hint 1:* `agentcore status` and the `--dry-run` output both leak the role's identity; so does the console's agent detail page.
 - *Hint 2:* List what the agent actually touches: Bedrock model invocation, logs/traces emission... and? Anything else is candidate for removal.
 - *Hint 3:* Don't tighten it yet — Week 5 does least-privilege with a denial receipt. This week you're building the "before" picture.
 
@@ -119,7 +119,7 @@ Cold start, latency, credential model (local env vars vs execution role), failur
 - *Hint 2:* Raw traces don't go in git. Where will your public-safe summary of this exercise live? ([Working assumptions](../../LEARNING_PLAN.md#working-assumptions).)
 
 **5. Audit the teardown.** After `agentcore remove all` + deploy of the removal, verify the account is actually clean — without trusting the CLI's word for it.
-- *Hint 1:* The `--plan` output from step 2 was the inventory. What does CloudFormation say about the stack now?
+- *Hint 1:* The `--dry-run` output from step 2 was the inventory. What does CloudFormation say about the stack now?
 - *Hint 2:* Common stragglers across IaC tools: log groups, ECR images (container path), bootstrap artifacts. Which apply to a CodeZip deploy?
 
 **6. Price one invocation.** From the pricing model (per-second CPU/memory per session) and your measured numbers, estimate the cost of one warm invocation and one full session. Show the arithmetic in the comparison doc.
@@ -135,21 +135,34 @@ Cold start, latency, credential model (local env vars vs execution role), failur
 - **Model access is per-Region and per-principal reality-check:** the deployed agent calling Bedrock in `us-east-1` under its execution role is a different auth path than your laptop; if `invoke` fails with access errors while local runs fine, start there.
 - **Idle sessions may still bill** (memory-seconds while the microVM lingers to timeout) — verify current semantics on the pricing page and fold into Exercise 6.
 - **Teardown after every deployed-lane session** (`agentcore remove all` + deploy). The plan's cost guardrails assume the habit; the budget alarm from Week 1 is the backstop, not the plan.
-- **CLI drift:** command surface verified 2026-07-07 (`create`, `dev`, `deploy --plan`, `status`, `invoke`, `logs --since`, `traces list/get`, `remove`). When `agentcore --help` disagrees with this file, the binary wins; fix the doc.
+- **Deployment targets are local state.** `agentcore deploy --yes` may populate tracked `agentcore/aws-targets.json` with a real account ID. Do not commit it; inspect `git status` after every deployment command and restore the public-safe tracked version before committing.
+- **CLI drift:** command surface verified 2026-07-10 (`create`, `dev`, `deploy --dry-run`, `status`, `invoke`, `logs --since`, `traces list/get`, `remove`). When `agentcore --help` disagrees with this file, the binary wins; fix the doc.
 
 ## Deliverable checklist — AgentCore Deployment Proof
 
-- [ ] Weather agent live on AgentCore Runtime, deployed via committed CLI/CDK config.
-- [ ] `docs/local-vs-agentcore.md` comparison with measured (not vibes) latency numbers.
-- [ ] Console screenshots: agent resource + execution trace with tool-call span visible.
-- [ ] Session isolation demo transcript.
-- [ ] Teardown/re-deploy runbook proving reproducibility.
+- [x] Weather agent was deployed live on AgentCore Runtime via committed CLI/CDK config.
+- [x] `docs/local-vs-agentcore.md` comparison with measured (not vibes) latency numbers.
+- [x] Console trace inspected; a standalone screenshot was intentionally omitted at closeout.
+- [x] Session isolation demonstrated; a standalone A→A→B transcript was intentionally omitted at closeout.
+- [x] Final teardown verified; the teardown/re-deploy runbook was intentionally dropped from scope.
 
 ## Success criteria
 
-- [ ] `agentcore invoke` returns a tool-backed answer with the tool-call span visible in `agentcore traces`.
-- [ ] Fresh-clone → deployed agent works following only your runbook.
-- [ ] Account returns to zero deployed agent resources after teardown.
+- [x] `agentcore invoke` returned a tool-backed answer with the tool-call span visible in traces.
+- [x] Fresh-clone/re-deploy proof was explicitly removed from scope at closeout.
+- [x] Account returned to zero deployed agent resources after teardown.
+
+### Closeout — 2026-07-11
+
+The managed Runtime was removed after the latency, cost, trace, session, and execution-role exercises were complete. Independent AWS checks found:
+
+- zero matching AgentCore Runtimes;
+- no AgentCore application CloudFormation stack;
+- no generated weather-agent execution role;
+- zero remaining AgentCore Runtime log groups after deleting the unretained historical group;
+- the shared `CDKToolkit` bootstrap stack still at `CREATE_COMPLETE`, intentionally retained for other CDK work.
+
+Tracked project configuration was restored after teardown. Private deployment state, the private console URL, generated deployment logs, and synthesized `cdk.out` artifacts were removed locally.
 
 ## Docs to consult
 
@@ -164,7 +177,7 @@ Verified via the AWS docs MCP server, 2026-07-07.
 
 1. Two `invoke` calls arrive with the same session ID; two more with different session IDs. Describe exactly what each pair shares — compute, filesystem, conversation state.
 2. Your deployed agent suddenly can't call Bedrock, but local runs fine. Name the two most likely principals/config points, in the order you'd check them.
-3. What does `agentcore deploy --plan` show, and which later week's discipline does reviewing it rehearse?
+3. What does `agentcore deploy --dry-run` show, and which later week's discipline does reviewing it rehearse?
 4. Why does this plan use CodeZip rather than containers, and what would force the switch?
 5. State the difference between Runtime session state and AgentCore Memory in one sentence each.
 6. What, concretely, proves your teardown worked — name the checks beyond the CLI's exit code.

@@ -192,6 +192,8 @@ Build the first real Strands agent — the weather specimen — with a typed fai
 
 Deploy the weather agent to AgentCore Runtime via the CLI; understand per-session microVM isolation and the credential flip to execution roles; write a measured (not vibes) local-vs-managed comparison and prove teardown/re-deploy reproducibility. **Deliverable:** AgentCore Deployment Proof. → [Full guide](docs/weeks/week-03-runtime-deployment.md)
 
+**Closeout (2026-07-11):** Runtime deployment, managed invocation, session-isolation probing, latency/cost measurement, trace anatomy, execution-role inspection, and final teardown were completed. A standalone screenshot, A→A→B transcript, and teardown/re-deploy runbook were intentionally omitted when this specimen was closed rather than redeployed.
+
 ## Week 4 — Tool Integration Patterns
 
 Integrate tools three ways — direct `@tool`, external MCP servers, and AgentCore Gateway (Lambda target + built-in Web Search connector) — and commit in writing to explicit tool registration over semantic discovery. **Deliverable:** Multi-Tool Agent Portfolio. → [Full guide](docs/weeks/week-04-tool-integration.md)
