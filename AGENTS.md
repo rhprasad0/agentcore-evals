@@ -27,3 +27,4 @@ Use placeholders such as `<AWS_ACCOUNT_ID>`; `us-east-1` is the example region. 
 - `LEARNING_PLAN.md` sets the order of work: don't build ahead of the current week's contract, and each week's success criteria are the exit gate.
 - When this repo's paraphrase and the AWS/Strands docs disagree, the docs win — verify before wiring anything up.
 - Design decisions (eval targets, schema boundaries, labeling workflow, success criteria, AWS service paths, product direction) are Ryan's: ask first.
+- Suggest sanitized AWS Console screenshots when a learning-plan moment would make a strong LinkedIn receipt for an AI Engineering hiring manager.
