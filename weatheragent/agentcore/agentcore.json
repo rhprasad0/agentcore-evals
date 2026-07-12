@@ -23,7 +23,31 @@
   "credentials": [],
   "evaluators": [],
   "onlineEvalConfigs": [],
-  "agentCoreGateways": [],
+  "agentCoreGateways": [
+    {
+      "name": "eval-gateway",
+      "protocolType": "MCP",
+      "description": "Week 4 explicit-registration MCP gateway for evaluated tools",
+      "targets": [
+        {
+          "name": "web-search",
+          "targetType": "connector",
+          "connectorId": "web-search",
+          "configurations": [
+            {
+              "name": "WebSearch",
+              "description": "",
+              "parameterValues": {},
+              "parameterOverrides": []
+            }
+          ]
+        }
+      ],
+      "authorizerType": "AWS_IAM",
+      "enableSemanticSearch": false,
+      "exceptionLevel": "NONE"
+    }
+  ],
   "policyEngines": [],
   "configBundles": [],
   "abTests": [],
