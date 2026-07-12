@@ -24,7 +24,7 @@ Note the sequencing logic baked into that sentence. The write action (`notify.se
 
 Swapping the mock registry for OpenWeatherMap, a real search API, and real HTTP fetch should change **nothing** about the contracts: same envelopes, same failure kinds, same schemas. That's the test of whether Week 5's contracts described the tools or merely the mocks. Where reality disagrees — an API returns a status you never mapped, a payload shape the contract didn't admit — the discrepancy is a contract bug to fix *with a version bump*, not a special case to bury in tool code.
 
-One decision you deferred in Week 2 now comes due: **where does HTTP 429 (rate-limited) live in the taxonomy?** As written, `upstream_4xx` is non-retryable — but 429 is the canonical *retryable* client error. Your options: add a `rate_limited` kind (schema + taxonomy version bump, new required behavior, new dataset rows) or special-case 429's retryability inside `upstream_4xx` (cheaper, muddier). This is a design decision that's yours — but the taxonomy's "one kind, one behavior" rule from Week 5 makes one of these options hard to defend. Decide in writing.
+Week 5 already made the 429 decision explicit: `upstream_4xx` is the normalized kind, while each occurrence carries `retryable`; 404 is false and 429 is true. Week 12 must now turn that qualifier into bounded attempts and backoff without changing the baseline user-facing degradation contract. Split out a `rate_limited` kind only if live behavior requires a different user-facing truthfulness/degradation contract, not merely because retry eligibility differs.
 
 ### Credentials become infrastructure
 
@@ -36,7 +36,7 @@ The eval-relevant angle: a credential failure is now a *reachable production fai
 
 The principle, from the plan: **agents reason; tools defend.** Retry loops, backoff, and breakers belong in tool code, not in prompts, for three reasons: prompts produce *probabilistic* retry behavior (the one thing a retry policy must not be), tool-layer resilience is unit-testable and trace-visible, and the model's context shouldn't fill with retry noise — it should receive either a success or a final, honest failure envelope. The components:
 
-- **Retry policy, derived from the taxonomy:** only retryable kinds retry (`timeout`, `network`, `upstream_5xx`, and your 429 decision); exponential backoff **with jitter** (deterministic backoff synchronizes clients into thundering herds); a **budget cap** that composes with the contract's `latencyBudgetMs` — retries spend the same budget the contract promised, so max attempts × backoff must fit inside it. Policy is *config data* per tool, not constants in code: Week 8's gates will read the declared policy and check traces against it.
+- **Retry policy, derived from the taxonomy:** only occurrences with `retryable: true` may retry (currently timeout, network, upstream 5xx, and 429); exponential backoff **with jitter** prevents deterministic clients from synchronizing into thundering herds; a **budget cap** composes with the contract's `latencyBudgetMs` — attempts plus backoff spend the same total budget the contract promised. Policy is *config data* per tool, not constants in code: Week 8's gates read the decision from traces, so a hard-coded invisible retry is as bad as none.
 - **Circuit breaker:** closed → open after N consecutive upstream failures → half-open probe → closed on success. Breakers exist to fail *fast* during a real outage (no user waits through five retry cycles), to stop hammering a struggling upstream, and to make recovery observable (the half-open probe). Two requirements beyond the textbook: **state transitions must be trace-visible** (Week 8's gates and Week 14's dashboard both read them), and you must decide breaker *scope* — per-tool per-process is simple; but on Runtime, each session is its own microVM, so a "global" breaker doesn't exist without external state. Per-session breakers are an honest, documented limitation at this scale.
 - **Degradation responses:** when defense fails, the tool's final envelope powers an agent response that says **what failed, what's stale, and what still worked**. The taxonomy's required behaviors (Week 5) are the spec; the calibrated judge (Week 10) scores the wording against a rubric you pre-stated.
 
@@ -61,7 +61,7 @@ OpenWeatherMap, a real search API, real HTTP fetch. Keys live in AgentCore Ident
 
 ### 2. Build the resilience layer inside the tool boundary
 
-Per-tool retry policy from the failure taxonomy (retryable kinds only, exponential backoff + jitter, budget-capped), a small circuit breaker (closed → open on N consecutive upstream failures → half-open probe), and degradation responses that tell the user what failed, what's stale, and what still worked. Policies as config; transitions in traces; unit tests for the state machine.
+Per-tool retry policy from the failure taxonomy (`retryable: true` occurrences only, exponential backoff + jitter, budget-capped), a small circuit breaker (closed → open on N consecutive upstream failures → half-open probe), and degradation responses that tell the user what failed, what's stale, and what still worked. Policies as config; transitions in traces; unit tests for the state machine.
 
 ### 3. Evaluate it
 
@@ -81,9 +81,9 @@ The agent answering during an induced outage, degrading honestly, recovering whe
 - *Hint 1:* Work the budget backward: 5000ms budget, first attempt takes up to 5s... wait. Does the *contract's* budget bound the attempt or the total? Your Week 5 reading of `latencyBudgetMs` decides — and may need a clarifying version note.
 - *Hint 2:* Why jitter, in one sentence, and what trace evidence distinguishes jittered backoff from fixed?
 
-**2. Settle the 429 question.** Write the decision memo: new `rate_limited` kind vs special-cased `upstream_4xx`, with the downstream costs of each (schema, dataset rows, gates, labels).
-- *Hint 1:* Apply Week 5's own rule: one kind, one required behavior. Can `upstream_4xx` have one behavior if 429 retries and 404 doesn't?
-- *Hint 2:* Whichever you choose, which existing dataset rows and fixtures does it touch? (The errata discipline from Week 7 applies to taxonomy changes too.)
+**2. Prove the settled 429 behavior.** Implement and test 404 → no retry and 429 → bounded retry/backoff, while both retain the `upstream_4xx` baseline degradation contract after attempts end.
+- *Hint 1:* Which trace assertions prove that retry eligibility differed without inventing two user-facing failure contracts?
+- *Hint 2:* What observed user-facing truthfulness or degradation difference—not merely retry timing—would justify a future `rate_limited` kind, version bump, dataset update, and relabeling?
 
 **3. Design the breaker as a testable state machine.** States, transition triggers, probe policy, scope (per-tool? per-endpoint? per-session?) — then the unit tests that walk every transition.
 - *Hint 1:* What counts as "consecutive failures" — all kinds, or only kinds that indicate the *upstream* is sick? (Does a `bad_input` open the breaker? Should it?)
@@ -136,7 +136,7 @@ Verified via the AWS docs MCP server, 2026-07-07, except where marked.
 
 1. Why do retries and breakers live in tool code rather than prompts? Give all three reasons and the eval consequence of each.
 2. Walk the breaker's full state path during the 30-minute outage scenario: what opens it, what the user experiences while open, what the half-open probe does, and what trace evidence each phase leaves.
-3. State your 429 decision and defend it against the Week 5 "one kind, one behavior" rule.
+3. Explain why 404 and 429 share a normalized kind but differ in `retryable`, and state what observed user-facing difference would justify splitting out `rate_limited` with a version bump.
 4. Why is "no fabricated data during outages" deterministically checkable when general hallucination isn't? What makes the outage window special?
 5. Explain how the retry layer and the idempotent write action protect each other — and what specifically goes wrong if either exists without the other.
 6. What claim does the live outage demo support that the gate report alone doesn't — and for which future audience?

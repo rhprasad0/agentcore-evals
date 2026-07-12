@@ -54,9 +54,9 @@ The constraint, verified in current docs (2026-07-08): **A2A agents work in Grap
 - **Delegation accuracy** — rows where the orchestrator *should not* delegate (answer directly, or decline) — the no-tool row analogue, guarding against the multi-agent demo bias that more handoffs look more impressive.
 - **Cross-agent trace stitching** — one user request through three agents must be *one* trace, not three fragments. That requires trace-context propagation across agent boundaries (W3C trace context; verify what Strands' A2A client propagates vs what you must carry manually). Week 14's dashboard grows a cross-agent view; debugging multi-agent systems without stitching is timestamp archaeology.
 
-### Policy: the manifest becomes infrastructure
+### Policy: map the manifest into Gateway infrastructure
 
-AgentCore Policy, verified against current docs (2026-07-08), works like this: you create a **policy engine**, author **deterministic policies in Cedar** (the open-source authorization language), and **attach the engine to a Gateway**. From then on, every tool request through that gateway is evaluated against the policies *before* tool access — deny-by-default once an engine is attached: if nothing permits a request, it's denied. Cedar's semantics fit the manifest model exactly: baseline `permit` statements grant the manifest, targeted `forbid` statements carve out refusals (forbid always overrides permit), and conditions can key on **user identity and tool input parameters** — finer than the manifest ever was.
+AgentCore Policy, verified against current docs (2026-07-08), works like this: you create a **policy engine**, author **deterministic policies in Cedar** (the open-source authorization language), and **attach the engine to a Gateway**. From then on, every tool request through that gateway is evaluated against the policies *before* tool access — deny-by-default once an engine is attached: if nothing permits a request, it's denied. The Week 5 manifest is a reviewed input, not source code that compiles losslessly. Gateway tool grants can map to Cedar `permit` statements; targeted `forbid` statements carve out refusals; conditions can key on **user identity and tool input parameters**. Side-effect ceilings, `resultTrust`, out-of-scope declarations, direct tools, and in-process MCP paths may remain residue for other controls.
 
 Three operational facts worth their weight:
 
@@ -67,6 +67,8 @@ Three operational facts worth their weight:
 ### Guardrails at the gateway: probabilistic detection, deterministic enforcement
 
 The division of labor, verified: **Bedrock Guardrails detect** (prompt injection, sensitive-information exposure — probabilistic, model-based screening of tool traffic), and when they flag, they **signal Policy, which enforces** — the deterministic allow/deny at the gateway layer, outside agent code, where the agent "cannot see or reason around" the check. Keep the epistemics straight in your evals: detection is probabilistic (don't build a deterministic CI gate on whether Guardrails fires — that's judge-shaped), but *enforcement given detection* is deterministic (the denial and its trace receipt are gateable facts).
+
+Use Week 5's `resultTrust` mechanically: for every `untrusted_external` contract, record whether its result transits the screened Gateway path and which Guardrail/Policy control applies. An `untrusted_external` direct tool or in-process MCP result is explicitly outside Gateway screening until rerouted; its Week 6 adversarial result-content coverage remains evidence about behavior, not infrastructure enforcement.
 
 ### Attack your own boundaries — with inert ammunition
 
@@ -88,7 +90,7 @@ Handoff-fidelity gates (sentinels across boundaries), loop detection (span-count
 
 ### 4. Build the safety lane outside the code
 
-An AgentCore Policy engine allowing each agent exactly its manifest's tools under stated conditions (deny-by-default posture; the Week 5 capability manifest becomes enforceable infrastructure), plus Bedrock Guardrails at the Gateway layer for prompt-injection/content screening on tool traffic. Then attack your own boundaries with the inert-canary adversarial rows. Violations blocked at the policy/gateway layer — with the denial visible in traces — are the deliverable.
+Build a mapping/residue table from each Week 5 manifest: Gateway tool grant → Cedar action/resource/condition; unmapped manifest fields → their actual enforcer; non-Gateway paths → manifest/IAM coverage or a routing change. Use that reviewed mapping to author a deny-by-default AgentCore Policy engine for Gateway-transiting tools, plus Bedrock Guardrails for screened `untrusted_external` Gateway results. Then attack the mapped boundaries with inert-canary adversarial rows. Violations blocked at the policy/gateway layer — with the denial visible in traces — are the deliverable; non-Gateway surfaces retain their separately named controls and claim limits.
 
 ## Exercises — guided discovery
 
@@ -96,8 +98,8 @@ An AgentCore Policy engine allowing each agent exactly its manifest's tools unde
 - *Hint 1:* Design scenarios that *discriminate*: one with a genuinely fixed sequence (workflow's home turf), one needing runtime judgment about routing (Swarm's pitch), one in between.
 - *Hint 2:* The recommendation sentence has the form "for tasks shaped like X, use Y, because measured Z." If your numbers don't support such a sentence, which scenario is missing?
 
-**2. Compile the manifest to Cedar.** Take one agent's Week 5 capability manifest and hand-translate it: baseline permit, forbid carve-outs, conditions.
-- *Hint 1:* Which manifest fields map cleanly (toolIds → actions on the gateway resource) and which don't (sideEffects ceiling — is that expressible as a Cedar condition, or does it stay an in-code check)? The residue *defines* the two-layer boundary.
+**2. Map the manifest to Cedar and record the residue.** Take one agent's Week 5 capability manifest and hand-translate only the Gateway-relevant grants and conditions; produce a table of mapped fields, unmapped fields, non-Gateway paths, and their actual enforcers.
+- *Hint 1:* Which manifest fields map cleanly (Gateway toolIds → actions on the Gateway resource) and which don't (`sideEffects`, `resultTrust`, out-of-scope declarations, direct tools, in-process MCP)? The residue *defines* the multi-layer boundary.
 - *Hint 2:* Feed your English version of one rule to the natural-language authoring path and diff its Cedar against yours. Who missed a case? (Check with the validator's automated reasoning — an unsatisfiable-condition finding on either version is a lesson.)
 
 **3. Build the handoff-fidelity gate, then seed the bug.** Sentinel through the Graph; gate on intact arrival; then deliberately corrupt a handoff (truncate A's output in the edge plumbing) and confirm the gate catches it — that's a success criterion, not an option.
@@ -121,7 +123,7 @@ An AgentCore Policy engine allowing each agent exactly its manifest's tools unde
 - **Policy's scope is the gateway, full stop.** Any tool reachable without transiting the governed gateway is ungoverned by Policy — audit the final architecture for bypass paths (direct `@tool`s, MCP servers consumed in-process) and either route them through Gateway or explicitly document them as manifest-only surfaces. An unnoticed bypass path turns the safety story into safety theater.
 - **Swarm costs compound.** Dynamic handoffs mean unbounded model calls until something stops them — run Swarm experiments with the loop budget *and* a hard token ceiling from day one; the first runaway shouldn't be discovered on the bill.
 - **A2A-in-Swarm is unsupported *today*** (verified 2026-07-08) — the docs are explicit, and the reason (tool-based handoffs the protocol can't express) tells you what to re-check in release notes later. Capability-check, don't assume — in both directions.
-- **Cedar is code.** Version policies like schemas (they *are* the manifest, compiled); test them (the validator's findings are your unit tests); and keep `LOG_ONLY` runs in the history as the evidence the ENFORCE flip was informed, not hopeful.
+- **Cedar is code, but not compiled manifest code.** Version and test policies against the Gateway-generated Cedar schema; preserve the mapping/residue table that explains which manifest claims they implement and which remain under other controls. Keep `LOG_ONLY` runs as evidence that the ENFORCE flip was informed, not hopeful.
 - **Guardrails add latency and cost per screened call** — screening tool traffic is inference. Note the per-call overhead in the comparison table; safety layers get costed like everything else here.
 - **Denial receipts are public-safe by construction only if you make them so** — policy logs can embed principal identifiers and raw arguments. The committed receipts follow the Week 5 pattern: action + resource shape + decision, identifiers scrubbed.
 - **Multi-agent traces strain the Week 6 schema.** Agent identity per span, handoff edges, task lifecycle states — check whether the schema needs another versioned extension (the Week 11 `parentSpanId` precedent) before the coordination gates try to read fields that aren't there.

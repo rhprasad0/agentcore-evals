@@ -22,12 +22,14 @@ The move deserves a name: you are building a **scientific instrument**, and inst
 
 ### Pinning, and the run manifest as the join key
 
-A measurement you can't reproduce is an anecdote. The specimen pins every input that influences behavior — **model ID, system prompt, tool set (one), tool descriptions, mock fixture version, dataset version, temperature (low)** — and records them in a **run manifest** (`runId`, plus each pin, plus date). Two properties to design for:
+A measurement you can't reproduce is an anecdote. The specimen pins every input that influences behavior — **model ID, system prompt, tool set (one), exact (`toolId`, contract version) references, exact capability-manifest ID/version, tool descriptions, mock fixture version, dataset version, temperature (low)** — and records them in a **run manifest** (`runId`, plus each pin, plus date). Readable canonical IDs and exact versions are the join keys; hashes supplement them for integrity and change detection. Two properties to design for:
 
 1. **The manifest is the identity of the run.** Same manifest ⇒ comparable numbers; any pin differs ⇒ different experiment, different baseline. Week 8's "flip one word and watch gates move" and Week 13's "regression, not noise" both *are* manifest comparisons.
 2. **The manifest is the join key for everything downstream.** Human labels (Week 9) label traces from a specific run; judge verdicts (Week 10) attach to the same; managed-lane scores (Weeks 10+) get manifest fields recorded alongside — including evaluator IDs and dates, per the plan's [managed-evaluation boundaries](../../LEARNING_PLAN.md#managed-evaluation-boundaries-read-before-week-8). If a score can't name its manifest, it isn't evidence.
 
 Subtle but important: the **prompt hash must cover the tool descriptions**, not just the system prompt. Week 2 established that descriptions steer selection; a manifest that lets a description change slip through unhashed will happily "reproduce" a different agent.
+
+A contract or capability-manifest version change produces a different run identity. Revalidate the dataset and mock fixtures against the new exact versions; do not silently retarget old runs or migrate labels. Existing labels remain attached to the dataset, contract, and manifest versions they actually judged.
 
 ### Instrumentation: capture raw, normalize once, test the adapter
 
@@ -56,7 +58,7 @@ If you can't decide which kind a surprise is, that's usually a third finding: th
 
 ### 1. Configure the specimen
 
-Weather agent, weather tool only (mock registry from Week 6 behind it), pinned model ID, pinned system prompt, temperature pinned low. Record all pins in a run manifest (`runId`, model, prompt hash, dataset version, mock fixture version, date). Design the manifest schema first (Exercise 1) — it's a schema like any other, with fixtures.
+Weather agent, weather tool only (mock registry from Week 6 behind it), pinned model ID, pinned system prompt, temperature pinned low. Record all pins in a run manifest (`runId`, model, prompt hash, exact (`toolId`, contract version) references, exact capability-manifest ID/version, dataset version, mock fixture version, date). Design the manifest schema first (Exercise 1) — it's a schema like any other, with fixtures.
 
 ### 2. Instrument and normalize
 
@@ -73,8 +75,9 @@ Annotate surprises. Mislabeled expectations in the dataset get fixed *now*, with
 ## Exercises — guided discovery
 
 **1. Design the run-manifest schema.** Decide every field, and for each: is it a *pin* (input you fixed) or a *record* (output you observed)?
-- *Hint 1:* Candidate pins: model ID, prompt hash, tool-description hashes, dataset version, mock fixture version, temperature, SDK versions. Which of these actually change behavior? (All of them. Which did you almost leave out?)
+- *Hint 1:* Candidate pins: model ID, prompt hash, exact (`toolId`, contract version) references, exact capability-manifest ID/version, tool-description hashes, dataset version, mock fixture version, temperature, SDK versions. Which of these actually change behavior? (All of them. Which did you almost leave out?)
 - *Hint 2:* What does the prompt hash hash, exactly — and does a whitespace-only edit to a docstring change your agent's behavior? Should it change the hash?
+- *Hint 3:* Why keep readable versions when hashes already detect changes? Which downstream human or artifact needs to join without reverse-engineering a hash?
 
 **2. Adapter edge cases first.** Before writing the happy path, list the raw-trace shapes that could break normalization, and write failing tests for them.
 - *Hint 1:* Multiple tool calls in one assistant message; a tool result with no matching call visible; a run that ends mid-loop; a `toolUse` with no preceding text (null reasoning).
@@ -95,6 +98,7 @@ Annotate surprises. Mislabeled expectations in the dataset get fixed *now*, with
 ## Gotchas & drift watch
 
 - **Temperature low ≠ deterministic.** Provider-side sampling, batching, and numerical nondeterminism can vary output at temperature 0. The honest claim is the Week 6 formulation: canonical-field identity over mocked runs under a fixed manifest — say that, not "fully deterministic."
+- **Versions and hashes answer different questions.** Exact contract/manifest versions say which reviewed promises governed the run; hashes prove the actual prompt/spec bytes did not drift. Keep both. A changed version creates a new run identity and triggers dataset/mock revalidation; no automatic migration is promised.
 - **Hooks/telemetry APIs are the fastest-moving part of Strands.** Some hook and telemetry interfaces live in experimental namespaces; verify current names in the docs before wiring, and pin SDK versions in the manifest so an upgrade is a *decision*, not ambient drift.
 - **Scrub the committed raw *fixtures* too.** The adapter's test fixtures are raw traces in git — the one place raw shapes are allowed in the repo. They must be from mock runs with placeholder identifiers, no exceptions; run the safety scan over `tests/` as well as `datasets/`.
 - **Errata cutoff is real.** After Week 9's labels exist, dataset expectation edits invalidate the affected labels (and any calibration built on them). Date the errata window's close in the changelog; late-found bugs get logged and batch-fixed with explicit relabeling, not quietly patched.

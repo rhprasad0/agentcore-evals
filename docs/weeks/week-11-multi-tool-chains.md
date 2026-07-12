@@ -97,7 +97,7 @@ Generate a Mermaid execution-flow diagram *from trace data* per scenario (a `scr
 - *Hint 2:* Watch the gate's failure evidence: "observed [search, summarize], no legal path visits summarize before fetch" beats "sequence invalid."
 
 **4. Specify the cascade gate.** For a fetch-403 injection at step 2 of a 5-step scenario: enumerate what the final response must contain, must not contain, and what downstream spans must show.
-- *Hint 1:* Your Week 5 taxonomy already answers the response-content half (upstream_4xx, non-retryable → which required behavior?). The span half is new: what does "summarize must not have run *as if* fetch succeeded" look like in trace terms?
+- *Hint 1:* Your Week 5 taxonomy already answers the response-content half (`upstream_4xx` with `retryable: false` for this 403 → which baseline degradation behavior?). The span half is new: what does "summarize must not have run *as if* fetch succeeded" look like in trace terms?
 - *Hint 2:* "Zero silent cascade failures" is the success criterion — write the gate so *silence* is the thing it detects (failure mentioned nowhere in the final response), not some specific wording.
 
 **5. Calibrate the trajectory judge before believing it.** Run TrajectoryEvaluator over all rows where DAG gates produced verdicts; compute agreement; then — only then — read its verdicts on the open rows.

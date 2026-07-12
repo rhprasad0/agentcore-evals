@@ -124,6 +124,22 @@ A safe least-privilege change should produce both green and red evidence:
 
 The policy should not be declared least-privilege merely because one happy-path prompt still works. One green request proves less than IAM marketing departments would like.
 
+Run each probe under the actual scratch/deployed Runtime execution role and record the principal/session context privately. An operator identity or a separately assumed lookalike role does not prove the Runtime's effective permissions. Raw CloudTrail events, logs, policies, identifiers, and requests remain local and untracked.
+
+The committed artifact is a synthetic public receipt derived from that private observation. It contains only:
+
+- probe name
+- tested principal class (`deployed Runtime execution role`)
+- action under test
+- synthetic resource shape, never a live ARN
+- expected decision
+- observed allow/deny or error class
+- bounded interpretation and claim limit
+
+It excludes account IDs, ARNs, role and session names, request IDs, raw policy documents, raw CloudTrail/log events, prompts, and arguments. Run the repository public-safety scan and Gitleaks over the final receipt before committing it.
+
+Each denial proves only the tested action, resource shape, principal, and session context. The red probes should correspond to permissions removed from this baseline—an unapproved model/profile, configuration-bundle mutation, and removed CloudWatch read/admin actions—not an unrelated denial selected because it is easy to stage. Pair them with the green model/tool/telemetry evidence above.
+
 ## Claim limits
 
 - This inspection covered the Runtime execution role, not the developer/deployer identity.
@@ -131,6 +147,7 @@ The policy should not be declared least-privilege merely because one happy-path 
 - A permission marked "not observed" may still support framework or service initialization. Week 5 denial tests decide removal.
 - No IAM Access Analyzer validation or policy simulation was run in Week 3.
 - Live role names, account IDs, ARNs, Runtime IDs, and policy documents are intentionally absent from this public baseline.
+- A successful or denied probe is scoped evidence, not proof that every effective permission path was enumerated.
 
 ## Sources
 
