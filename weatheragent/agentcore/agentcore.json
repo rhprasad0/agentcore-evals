@@ -44,7 +44,6 @@
         }
       ],
       "authorizerType": "AWS_IAM",
-      "enableSemanticSearch": false,
       "exceptionLevel": "NONE"
     }
   ],
