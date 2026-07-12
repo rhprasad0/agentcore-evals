@@ -15,8 +15,13 @@ dependencies = [
     "mcp >= 1.19.0",
     "requests >= 2.32.0",
     "strands-agents >= 1.15.0",
-
 ]
 
 [tool.hatch.build.targets.wheel]
 packages = ["."]
+
+[dependency-groups]
+dev = [
+    "mcp-proxy-for-aws>=1.6.3",
+    "strands-agents-tools>=0.8.3",
+]
