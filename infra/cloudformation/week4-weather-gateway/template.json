@@ -1,0 +1,162 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Week 4 weather Lambda exposed through an existing AgentCore Gateway.",
+  "Parameters": {
+    "GatewayIdentifier": {
+      "Type": "String",
+      "Description": "Existing AgentCore Gateway identifier."
+    },
+    "GatewayRoleName": {
+      "Type": "String",
+      "Description": "Existing AgentCore Gateway execution role name."
+    },
+    "OpenWeatherApiKey": {
+      "Type": "String",
+      "NoEcho": true,
+      "Description": "Transitional Week 4 OpenWeather key; migrate to managed credentials in Week 12."
+    }
+  },
+  "Resources": {
+    "WeatherLambdaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "write-scoped-weather-logs",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/weatheragent-week4-weather:*"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "WeatherFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "weatheragent-week4-weather",
+        "Description": "Week 4 typed current-weather tool behind AgentCore Gateway.",
+        "Runtime": "python3.12",
+        "Handler": "lambda_function.lambda_handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "WeatherLambdaRole",
+            "Arn"
+          ]
+        },
+        "Code": {
+          "S3Bucket": "DEPLOY_SCRIPT_REPLACES",
+          "S3Key": "DEPLOY_SCRIPT_REPLACES"
+        },
+        "MemorySize": 128,
+        "Timeout": 10,
+        "Environment": {
+          "Variables": {
+            "OWM_API_KEY": {
+              "Ref": "OpenWeatherApiKey"
+            }
+          }
+        },
+        "Tags": [
+          {
+            "Key": "agentcore-evals:week",
+            "Value": "4"
+          },
+          {
+            "Key": "agentcore-evals:purpose",
+            "Value": "gateway-weather-seam"
+          }
+        ]
+      }
+    },
+    "WeatherLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/weatheragent-week4-weather",
+        "RetentionInDays": 7
+      },
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Delete"
+    },
+    "GatewayInvokePolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "invoke-week4-weather-lambda",
+        "Roles": [
+          {
+            "Ref": "GatewayRoleName"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "lambda:InvokeFunction",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "WeatherFunction",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "WeatherGatewayTarget": {
+      "Type": "AWS::BedrockAgentCore::GatewayTarget",
+      "DependsOn": "GatewayInvokePolicy",
+      "Properties": {
+        "GatewayIdentifier": {
+          "Ref": "GatewayIdentifier"
+        },
+        "Name": "weather-lambda",
+        "Description": "Typed current-weather Lambda exposed as one explicit MCP tool.",
+        "CredentialProviderConfigurations": [
+          {
+            "CredentialProviderType": "GATEWAY_IAM_ROLE"
+          }
+        ],
+        "TargetConfiguration": {
+          "Mcp": {
+            "Lambda": {
+              "LambdaArn": {
+                "Fn::GetAtt": [
+                  "WeatherFunction",
+                  "Arn"
+                ]
+              },
+              "ToolSchema": {
+                "InlinePayload": []
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

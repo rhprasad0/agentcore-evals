@@ -3,6 +3,7 @@
 **Phase:** Foundations (Weeks 1–4) · **Specimen:** three-tool agent (weather, calculator, web search)
 **Lanes touched:** agent build (primary), Gateway + MCP (primary), Identity (first contact via credential providers)
 **Prerequisites:** Week 3 exit gate closed — deployed weather agent, teardown runbook proven.
+**Status:** Closed 2026-07-12 with live Gateway, MCP trust, ambiguity, and direct-versus-Gateway seam receipts.
 
 [← Week 3](week-03-runtime-deployment.md) · [Week index](README.md) · [Next: Week 5 →](week-05-tool-contracts.md)
 
@@ -126,18 +127,35 @@ This repo uses **explicit registration** — a checked-in tool list per agent �
 - **Keep the agent's tool list explicit even for MCP.** `list_tools_sync()` returning ten tools doesn't mean the agent gets ten tools — filter to the ones you chose. Discovery informs; registration decides.
 - **Three tools ≠ three times the eval surface — it's worse.** Selection is now a choice among alternatives *plus* "none of the above." Every tool you're tempted to add this week (it's tempting) enlarges Week 6's dataset and Week 9's labeling burden. The portfolio grows again in Week 11, under contract, not before.
 
+## Completed implementation and evidence
+
+The final agent keeps one explicit three-tool surface: direct weather, calculator, and exact-name Gateway Web Search. Gateway discovery also advertises a semantic-search helper and the comparison-only weather Lambda; neither is automatically registered.
+
+The Lambda path uses a dedicated CloudFormation stack rather than committing a concrete Lambda ARN into `agentcore.json`. The stack discovers the existing Gateway at deploy time and owns the Lambda, role, seven-day log group, scoped Gateway invoke policy, and Gateway target. Direct and Lambda transports package the same pure weather contract core.
+
+The authored weather schema required a mechanical lower-camel MCP → PascalCase CloudFormation adapter. Gateway preserved the description exactly and preserved `city` as required, but its model-facing schema omitted the direct tool's `units=metric` default. Three controlled success samples measured medians of 83.9 ms direct and 217.5 ms through Gateway/Lambda, with one 972.8 ms cold-start-shaped Gateway outlier. An invalid-city failure survived the hop exactly as the typed `upstream_4xx` envelope while MCP correctly reported transport success.
+
+Evidence:
+
+- [`week-04-live-three-tool-runs.md`](../reports/week-04-live-three-tool-runs.md)
+- [`week-04-ambiguity-battery.md`](../reports/week-04-ambiguity-battery.md)
+- [`week-04-external-mcp-trust-audit.md`](../reports/week-04-external-mcp-trust-audit.md)
+- [`week-04-weather-seam-comparison.md`](../reports/week-04-weather-seam-comparison.md)
+- [`ADR 0001: Explicit tool registration`](../decisions/0001-explicit-tool-registration.md)
+- [`week4-weather-gateway` operator note](../../infra/cloudformation/week4-weather-gateway/README.md)
+
 ## Deliverable checklist — Multi-Tool Agent Portfolio
 
-- [ ] Agent with three working tools and clear capability boundaries documented per tool.
-- [ ] MCP client integration example with advertised-tool listing and trust notes.
-- [ ] Gateway with Lambda target: schema file, creation commands, before/after transformation notes.
-- [ ] `docs/` note on integration seams: when `@tool` vs MCP vs Gateway, and the explicit-registration decision.
+- [x] Agent with three working tools and clear capability boundaries documented per tool.
+- [x] MCP client integration example with advertised-tool listing and trust notes.
+- [x] Gateway with Lambda target: schema file, creation commands, before/after transformation notes.
+- [x] `docs/` note on integration seams: when `@tool` vs MCP vs Gateway, and the explicit-registration decision.
 
 ## Success criteria
 
-- [ ] One conversation exercises all three tools correctly with no misfires (transcript committed).
-- [ ] The same weather capability is reachable via direct `@tool` *and* via Gateway — and you can articulate the operational difference.
-- [ ] Ambiguous prompts ("what's 30% of the temperature in Oslo?") produce defensible tool sequences — noted as future eval rows.
+- [x] One conversation exercises all three tools correctly with no misfires (sanitized receipt committed; raw provider transcript intentionally excluded).
+- [x] The same weather capability is reachable via direct `@tool` *and* via Gateway — with measured schema, latency, and failure differences.
+- [x] Ambiguous prompts ("what's 30% of the temperature in Oslo?") produce defensible tool sequences — noted as future eval rows, with two genuine failures retained.
 
 ## Docs to consult
 

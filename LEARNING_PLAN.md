@@ -198,6 +198,8 @@ Deploy the weather agent to AgentCore Runtime via the CLI; understand per-sessio
 
 Integrate tools three ways — direct `@tool`, external MCP servers, and AgentCore Gateway (Lambda target + built-in Web Search connector) — and commit in writing to explicit tool registration over semantic discovery. **Deliverable:** Multi-Tool Agent Portfolio. → [Full guide](docs/weeks/week-04-tool-integration.md)
 
+**Closeout (2026-07-12):** The explicit three-tool portfolio, controlled live runs, five-row ambiguity battery, external MCP description audit, discovery ADR, and same-capability direct-versus-Lambda/Gateway comparison were completed. Gateway preserved the weather description and typed domain-failure envelope but omitted the direct schema's model-visible default; the measured three-sample median added 133.6 ms through the governed seam. Two ambiguity failures and the managed Web Search description gap remain intentionally visible as Week 5–6 contract and dataset inputs.
+
 ## Week 5 — Agent/Tool Contract Architecture
 
 Freeze the informal patterns into contracts: tool-contract and capability-manifest schemas with valid/invalid fixtures, manifest-enforced registration that fails loudly, a two-layer isolation proof (microVM + IAM denial receipt), and a failure taxonomy mapping every kind to exactly one required behavior. **Deliverable:** Tool Contract Specification. → [Full guide](docs/weeks/week-05-tool-contracts.md)

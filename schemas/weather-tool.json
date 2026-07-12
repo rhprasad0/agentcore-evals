@@ -1,0 +1,23 @@
+[
+  {
+    "name": "get_current_weather",
+    "description": "Get current weather for a city. Not forecasts, history, or climate averages.\n\nunits must be 'metric', 'imperial', or 'standard'. Returns {ok, city, temp,\nunits, conditions} on success or {ok: False, error: {kind, message,\nretryable}} on failure.",
+    "inputSchema": {
+      "type": "object",
+      "description": "Current-weather lookup arguments.",
+      "properties": {
+        "city": {
+          "type": "string",
+          "description": "Non-empty city name, optionally including region or country for disambiguation."
+        },
+        "units": {
+          "type": "string",
+          "description": "One of metric, imperial, or standard. Defaults to metric when omitted."
+        }
+      },
+      "required": [
+        "city"
+      ]
+    }
+  }
+]

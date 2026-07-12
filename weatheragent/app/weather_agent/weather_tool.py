@@ -13,26 +13,15 @@ from typing import Any
 import requests
 from strands import tool
 
-FAILURE_KINDS = (
-    "bad_input",
-    "auth",
-    "upstream_4xx",
-    "upstream_5xx",
-    "timeout",
-    "network",
+from .weather_core import (
+    FAILURE_KINDS,
+    VALID_UNITS,
+    failure,
+    normalize_arguments,
+    result_from_payload,
+    status_failure,
 )
-
-VALID_UNITS = ("metric", "imperial", "standard")
 OWM_URL = "https://api.openweathermap.org/data/2.5/weather"
-
-
-def _fail(kind: str, message: str, *, retryable: bool) -> dict[str, Any]:
-    """Build a validated failure envelope for the agent/tool boundary."""
-    if kind not in FAILURE_KINDS:
-        raise ValueError(f"unknown failure kind: {kind}")
-    if not message:
-        raise ValueError("failure message must be non-empty")
-    return {"ok": False, "error": {"kind": kind, "message": message, "retryable": retryable}}
 
 
 def fetch_current_weather(
@@ -43,21 +32,13 @@ def fetch_current_weather(
     http_get: Callable[..., Any] = requests.get,
 ) -> dict[str, Any]:
     """Fetch current weather and return either a success or failure envelope."""
-    city = city.strip() if isinstance(city, str) else ""
-    units = units.strip().lower() if isinstance(units, str) else ""
-
-    if not city:
-        return _fail("bad_input", "city must be non-empty", retryable=False)
-    if units not in VALID_UNITS:
-        return _fail(
-            "bad_input",
-            f"units must be one of: {', '.join(VALID_UNITS)}",
-            retryable=False,
-        )
+    city, units, validation_failure = normalize_arguments(city, units)
+    if validation_failure is not None:
+        return validation_failure
 
     resolved_api_key = api_key if api_key is not None else os.environ.get("OWM_API_KEY")
     if not resolved_api_key:
-        return _fail("auth", "OWM_API_KEY is not set", retryable=False)
+        return failure("auth", "OWM_API_KEY is not set", retryable=False)
 
     try:
         response = http_get(
@@ -66,34 +47,19 @@ def fetch_current_weather(
             timeout=5,
         )
     except requests.Timeout:
-        return _fail("timeout", "upstream exceeded 5s", retryable=True)
+        return failure("timeout", "upstream exceeded 5s", retryable=True)
     except requests.RequestException as exc:
-        return _fail("network", exc.__class__.__name__, retryable=True)
+        return failure("network", exc.__class__.__name__, retryable=True)
 
     status_code = getattr(response, "status_code", None)
-    if status_code in (401, 403):
-        return _fail("auth", f"weather API rejected credentials with status {status_code}", retryable=False)
-    if status_code == 429:
-        return _fail("upstream_4xx", "weather API rate limited the request", retryable=True)
-    if status_code is not None and status_code >= 500:
-        return _fail("upstream_5xx", f"weather API returned status {status_code}", retryable=True)
     if status_code is not None and status_code >= 400:
-        return _fail("upstream_4xx", f"weather API returned status {status_code}", retryable=False)
+        return status_failure(status_code)
 
     try:
         data = response.json()
-        temp = data["main"]["temp"]
-        conditions = data["weather"][0]["description"]
-    except (KeyError, IndexError, TypeError, ValueError):
-        return _fail("upstream_5xx", "weather API returned an unexpected response shape", retryable=True)
-
-    return {
-        "ok": True,
-        "city": data.get("name") or city,
-        "temp": temp,
-        "units": units,
-        "conditions": conditions,
-    }
+    except (TypeError, ValueError):
+        return failure("upstream_5xx", "weather API returned an unexpected response shape", retryable=True)
+    return result_from_payload(data, city, units)
 
 
 @tool
