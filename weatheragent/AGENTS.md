@@ -31,7 +31,9 @@ myProject/
 ├── AGENTS.md               # This file — AI coding assistant context
 ├── agentcore/
 │   ├── agentcore.json      # Main project config (AgentCoreProjectSpec)
-│   ├── aws-targets.json    # Deployment targets (account + region)
+│   ├── aws-targets.example.json # Public-safe deployment target template
+│   ├── aws-targets.json    # Local account + Region target (gitignored)
+│   ├── .cli/               # Local AgentCore deployment state (gitignored)
 │   ├── .env.local          # Secrets — API keys (gitignored)
 │   ├── .llm-context/       # TypeScript type definitions for AI assistants
 │   │   ├── README.md       # Guide to using schema files
@@ -53,6 +55,8 @@ file maps to a JSON config file and includes validation constraints as comments 
 | `agentcore/agentcore.json` | `agentcore/.llm-context/agentcore.ts` | `AgentCoreProjectSpec` |
 | `agentcore/agentcore.json` (gateways) | `agentcore/.llm-context/mcp.ts` | `AgentCoreMcpSpec` |
 | `agentcore/aws-targets.json` | `agentcore/.llm-context/aws-targets.ts` | `AwsDeploymentTarget[]` |
+
+`aws-targets.example.json` is the tracked public-safe template. The CLI and CDK read the ignored local `aws-targets.json`, so copy the template and replace `<AWS_ACCOUNT_ID>` before deployment. The generated `.cli/deployed-state.json` may contain resource identifiers or credential ARNs. Never stage, force-add, or commit either local file.
 
 ### Key Types
 
@@ -110,9 +114,12 @@ file maps to a JSON config file and includes validation constraints as comments 
 Deployments are orchestrated through the CLI:
 
 ```bash
+cp agentcore/aws-targets.example.json agentcore/aws-targets.json  # once per clone; then edit account + Region
 agentcore deploy    # Synthesizes CDK and deploys to AWS
 agentcore status    # Shows deployment status
 ```
+
+The copy command intentionally produces a file that fails account validation until `<AWS_ACCOUNT_ID>` is replaced. Direct CDK use also requires this populated local target file. Keep `agentcore/aws-targets.json` and `agentcore/.cli/deployed-state.json` local; inspect `git status` after deployment commands and never bypass their ignore rules.
 
 Alternatively, deploy directly via CDK:
 

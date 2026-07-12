@@ -135,7 +135,7 @@ Cold start, latency, credential model (local env vars vs execution role), failur
 - **Model access is per-Region and per-principal reality-check:** the deployed agent calling Bedrock in `us-east-1` under its execution role is a different auth path than your laptop; if `invoke` fails with access errors while local runs fine, start there.
 - **Idle sessions may still bill** (memory-seconds while the microVM lingers to timeout) — verify current semantics on the pricing page and fold into Exercise 6.
 - **Teardown after every deployed-lane session** (`agentcore remove all` + deploy). The plan's cost guardrails assume the habit; the budget alarm from Week 1 is the backstop, not the plan.
-- **Deployment targets are local state.** `agentcore deploy --yes` may populate tracked `agentcore/aws-targets.json` with a real account ID. Do not commit it; inspect `git status` after every deployment command and restore the public-safe tracked version before committing.
+- **Deployment targets and CLI state are local.** Initialize `agentcore/aws-targets.json` from `aws-targets.example.json`; deployments may update it and `.cli/deployed-state.json` with account-specific resource state. Both are gitignored. Never force-add them, and still inspect `git status` after deployment commands.
 - **CLI drift:** command surface verified 2026-07-10 (`create`, `dev`, `deploy --dry-run`, `status`, `invoke`, `logs --since`, `traces list/get`, `remove`). When `agentcore --help` disagrees with this file, the binary wins; fix the doc.
 
 ## Deliverable checklist — AgentCore Deployment Proof
@@ -162,7 +162,7 @@ The managed Runtime was removed after the latency, cost, trace, session, and exe
 - zero remaining AgentCore Runtime log groups after deleting the unretained historical group;
 - the shared `CDKToolkit` bootstrap stack still at `CREATE_COMPLETE`, intentionally retained for other CDK work.
 
-Tracked project configuration was restored after teardown. Private deployment state, the private console URL, generated deployment logs, and synthesized `cdk.out` artifacts were removed locally.
+Public project configuration remained tracked while account-specific target and deployment state stayed local and ignored. Private console URLs, generated deployment logs, and synthesized `cdk.out` artifacts were not retained.
 
 ## Docs to consult
 

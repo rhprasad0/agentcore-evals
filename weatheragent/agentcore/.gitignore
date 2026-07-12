@@ -5,13 +5,11 @@
 cdk/cdk.out/
 cdk/node_modules/
 
-# CLI Internals
+# CLI local state
 .cli/*
+aws-targets.json
 
 # Ephemeral Staging
 .cache/*
 *.zip
 */staging/
-
-# Exception: Commit the State
-!.cli/deployed-state.json

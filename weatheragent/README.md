@@ -9,7 +9,9 @@ my-project/
 ├── AGENTS.md               # AI coding assistant context
 ├── agentcore/
 │   ├── agentcore.json      # Project config (agents, memories, credentials, gateways, evaluators)
-│   ├── aws-targets.json    # Deployment targets (account + region)
+│   ├── aws-targets.example.json # Public-safe deployment target template
+│   ├── aws-targets.json    # Local account + Region target (gitignored)
+│   ├── .cli/               # Local AgentCore deployment state (gitignored)
 │   ├── .env.local          # Secrets — API keys (gitignored)
 │   ├── .llm-context/       # TypeScript type definitions for AI assistants
 │   │   ├── agentcore.ts    # AgentCoreProjectSpec types
@@ -38,6 +40,14 @@ agentcore dev
 ```
 
 ### Deployment
+
+Create the local deployment target file once per clone:
+
+```bash
+cp agentcore/aws-targets.example.json agentcore/aws-targets.json
+```
+
+Replace `<AWS_ACCOUNT_ID>` and confirm the Region before deploying. Both `agentcore/aws-targets.json` and `agentcore/.cli/deployed-state.json` are local operational state and must not be committed.
 
 Deploy to AWS:
 
@@ -69,7 +79,7 @@ agentcore deploy
 
 ## Configuration
 
-Edit the JSON files in `agentcore/` to configure your project. See `agentcore/.llm-context/` for type definitions and validation constraints.
+Edit the tracked `agentcore/agentcore.json` to configure project resources. Deployment targets live in the ignored `agentcore/aws-targets.json`; initialize it from `agentcore/aws-targets.example.json`. See `agentcore/.llm-context/` for type definitions and validation constraints.
 
 The project uses a **flat resource model** — agents, memories, credentials, gateways, evaluators, and policies are top-level arrays in `agentcore.json`. Resources are independent; agents discover memories and credentials at runtime via environment variables or SDK calls.
 
