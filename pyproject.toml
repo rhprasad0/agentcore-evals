@@ -1,0 +1,14 @@
+[project]
+name = "agentcore-evals"
+version = "0.1.0"
+description = "Repository-level tooling for AgentCore contract and evaluation artifacts"
+requires-python = ">=3.10"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "jsonschema==4.26.0",
+]
+
+[tool.uv]
+package = false
