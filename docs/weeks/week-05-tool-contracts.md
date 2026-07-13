@@ -46,7 +46,7 @@ The shape every tool in this repo must satisfy:
 {
   "toolId": "weather.get_current_weather",
   "name": "get_current_weather",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Current weather for a city. Not forecasts, not history.",
   "inputSchema": { "...": "JSON Schema for arguments" },
   "outputSchema": { "...": "success + failure envelope shapes" },
@@ -54,7 +54,7 @@ The shape every tool in this repo must satisfy:
   "sideEffects": "none | read_external | write_external",
   "resultTrust": "trusted_structured | untrusted_external",
   "authScope": "owm:read",
-  "latencyBudgetMs": 5000
+  "latencyBudgetMs": 10000
 }
 ```
 

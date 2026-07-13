@@ -13,6 +13,7 @@ FAILURE_KINDS = (
     "network",
 )
 VALID_UNITS = ("metric", "imperial", "standard")
+UPSTREAM_TIMEOUT_SECONDS = 10
 
 
 def failure(kind: str, message: str, *, retryable: bool) -> dict[str, Any]:

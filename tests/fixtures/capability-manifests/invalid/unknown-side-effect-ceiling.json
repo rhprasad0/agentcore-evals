@@ -1,10 +1,10 @@
 {
   "manifestId": "agents.weather",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "toolGrants": {
-    "weather.get_current_weather": "1.2.0",
+    "weather.get_current_weather": "2.0.0",
     "calculator.calculate": "2.0.0",
-    "search.web_search": "1.0.0"
+    "search.web_search": "2.0.0"
   },
   "sideEffectCeiling": "filesystem",
   "outOfScope": {

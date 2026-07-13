@@ -15,6 +15,7 @@ from strands import tool
 
 from .weather_core import (
     FAILURE_KINDS,
+    UPSTREAM_TIMEOUT_SECONDS,
     VALID_UNITS,
     failure,
     normalize_arguments,
@@ -45,10 +46,10 @@ def fetch_current_weather(
         response = http_get(
             OWM_URL,
             params={"q": city, "units": units, "appid": resolved_api_key},
-            timeout=5,
+            timeout=UPSTREAM_TIMEOUT_SECONDS,
         )
     except requests.Timeout:
-        return failure("timeout", "upstream exceeded 5s", retryable=True)
+        return failure("timeout", f"upstream exceeded {UPSTREAM_TIMEOUT_SECONDS}s", retryable=True)
     except requests.RequestException as exc:
         return failure("network", exc.__class__.__name__, retryable=True)
 

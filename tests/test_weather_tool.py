@@ -54,6 +54,21 @@ class WeatherToolTests(unittest.TestCase):
         self.assertEqual(["metric", "imperial", "standard"], units_schema["enum"])
         self.assertEqual("metric", units_schema["default"])
 
+    def test_http_timeout_is_ten_seconds(self) -> None:
+        observed: dict[str, object] = {}
+
+        def recording_get(*args, **kwargs):
+            observed.update(kwargs)
+            return FakeResponse(
+                200,
+                {"name": "Seattle", "main": {"temp": 12.5}, "weather": [{"description": "cloudy"}]},
+            )
+
+        result = fetch_current_weather("Seattle", api_key="test-key", http_get=recording_get)
+
+        self.assertEqual(True, result["ok"])
+        self.assertEqual(10, observed["timeout"])
+
     def test_bad_input_empty_city(self) -> None:
         result = fetch_current_weather(" ", api_key="test-key", http_get=fake_get_response(200))
 

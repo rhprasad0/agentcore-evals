@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import unittest
+from datetime import timedelta
 from typing import Any
 
 from src.tools.web_search import build_web_search_tool, search_web
@@ -136,6 +137,15 @@ class WebSearchToolTests(unittest.TestCase):
         self.assertEqual("web-search___WebSearch", backend.mcp_client.calls[0]["name"])
         self.assertEqual({"query": "AgentCore Gateway", "maxResults": 1}, backend.mcp_client.calls[0]["arguments"])
         self.assertTrue(backend.mcp_client.calls[0]["tool_use_id"].startswith("web-search-wrapper-"))
+
+    def test_wrapper_uses_ten_second_read_timeout(self) -> None:
+        backend = FakeBackend(SUCCESS_RESULT)
+        wrapper = build_web_search_tool(backend)
+
+        result = wrapper(query="AgentCore Gateway", max_results=1)
+
+        self.assertEqual(True, result["ok"])
+        self.assertEqual(timedelta(seconds=10), backend.mcp_client.calls[0]["read_timeout_seconds"])
 
 
 if __name__ == "__main__":

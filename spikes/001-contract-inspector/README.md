@@ -49,7 +49,7 @@ The generated file is self-contained and can be opened directly; it does not fet
 ## Verification
 
 - Generator compiled and executed successfully.
-- Generated artifact contains all four exact-version contract artifacts across three tool identities.
+- Generated artifact contains all six exact-version contract artifacts across three tool identities.
 - Chromium exercised tool selection, natural-language search, input/output/raw tabs, hash routing, and hover/focus field descriptions with no runtime errors.
 - Chromium rendered at 1440×960 with no console errors or document-level horizontal overflow.
 - A desktop screenshot with a representative tooltip open is saved beside the artifact.

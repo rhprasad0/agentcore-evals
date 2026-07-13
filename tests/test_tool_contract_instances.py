@@ -28,12 +28,12 @@ CONTRACT_PATHS = {
     / "contracts"
     / "tools"
     / "search.web_search"
-    / "1.0.0.json",
+    / "2.0.0.json",
     "weather.get_current_weather": REPO_ROOT
     / "contracts"
     / "tools"
     / "weather.get_current_weather"
-    / "1.2.0.json",
+    / "2.0.0.json",
 }
 WEB_SEARCH_TOOL = build_web_search_tool(
     SimpleNamespace(
@@ -88,7 +88,7 @@ class ToolContractInstanceTests(unittest.TestCase):
             "Example City",
             "metric",
         )
-        failed = failure("timeout", "upstream exceeded 5s", retryable=True)
+        failed = failure("timeout", "upstream exceeded 10s", retryable=True)
 
         for result in (success, failed):
             with self.subTest(result=result):

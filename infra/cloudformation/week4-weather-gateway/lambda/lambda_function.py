@@ -13,6 +13,7 @@ from urllib.request import Request, urlopen
 
 try:
     from weather_core import (  # pyright: ignore[reportMissingImports]
+        UPSTREAM_TIMEOUT_SECONDS,
         failure,
         normalize_arguments,
         result_from_payload,
@@ -20,6 +21,7 @@ try:
     )
 except ModuleNotFoundError:
     from weatheragent.app.weather_agent.weather_core import (
+        UPSTREAM_TIMEOUT_SECONDS,
         failure,
         normalize_arguments,
         result_from_payload,
@@ -49,7 +51,7 @@ def fetch_current_weather(
     request = Request(f"{OWM_URL}?{query}", headers={"User-Agent": "weatheragent-week4/1.0"})
 
     try:
-        with http_open(request, timeout=5) as response:
+        with http_open(request, timeout=UPSTREAM_TIMEOUT_SECONDS) as response:
             status_code = getattr(response, "status", 200)
             if status_code >= 400:
                 return status_failure(status_code)
@@ -57,7 +59,7 @@ def fetch_current_weather(
     except HTTPError as error:
         return status_failure(error.code)
     except (TimeoutError, socket.timeout):
-        return failure("timeout", "upstream exceeded 5s", retryable=True)
+        return failure("timeout", f"upstream exceeded {UPSTREAM_TIMEOUT_SECONDS}s", retryable=True)
     except URLError as error:
         reason = getattr(error, "reason", error)
         return failure("network", reason.__class__.__name__, retryable=True)

@@ -73,6 +73,29 @@ class GatewayWeatherLambdaTests(unittest.TestCase):
             {"ok": True, "city": "Seattle", "temp": 52.5, "units": "imperial", "conditions": "rain"},
         )
 
+    def test_http_timeout_is_ten_seconds(self) -> None:
+        observed: dict[str, object] = {}
+
+        def recording_open(*args, **kwargs):
+            observed.update(kwargs)
+            return FakeResponse(
+                {"name": "Seattle", "main": {"temp": 12.5}, "weather": [{"description": "cloudy"}]}
+            )
+
+        result = weather_lambda.fetch_current_weather(
+            "Seattle",
+            api_key="test-key",
+            http_open=recording_open,
+        )
+
+        self.assertEqual(True, result["ok"])
+        self.assertEqual(10, observed["timeout"])
+
+    def test_lambda_outer_timeout_exceeds_upstream_timeout(self) -> None:
+        template = json.loads(TEMPLATE_PATH.read_text())
+
+        self.assertEqual(15, template["Resources"]["WeatherFunction"]["Properties"]["Timeout"])
+
     def test_bad_input_and_auth_use_typed_envelopes(self) -> None:
         self.assert_failure(weather_lambda.fetch_current_weather("", api_key="test-key"), "bad_input", False)
         self.assert_failure(

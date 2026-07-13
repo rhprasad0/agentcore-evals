@@ -1,0 +1,121 @@
+{
+  "toolId": "weather.get_current_weather",
+  "name": "get_current_weather",
+  "version": "2.0.0",
+  "description": "Get current weather for a city. Not forecasts, history, or climate averages.\n\nunits must be 'metric', 'imperial', or 'standard'. Returns {ok, city, temp,\nunits, conditions} on success or {ok: False, error: {kind, message,\nretryable}} on failure.",
+  "inputSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+      "city": {
+        "description": "Parameter city",
+        "type": "string"
+      },
+      "units": {
+        "default": "metric",
+        "description": "Parameter units",
+        "enum": [
+          "metric",
+          "imperial",
+          "standard"
+        ],
+        "type": "string"
+      }
+    },
+    "required": [
+      "city"
+    ],
+    "type": "object"
+  },
+  "outputSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true
+          },
+          "city": {
+            "type": "string",
+            "minLength": 1
+          },
+          "temp": {
+            "type": "number"
+          },
+          "units": {
+            "enum": [
+              "metric",
+              "imperial",
+              "standard"
+            ]
+          },
+          "conditions": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "ok",
+          "city",
+          "temp",
+          "units",
+          "conditions"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "bad_input",
+                  "auth",
+                  "upstream_4xx",
+                  "upstream_5xx",
+                  "timeout",
+                  "network"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "retryable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "kind",
+              "message",
+              "retryable"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "failureModes": [
+    "bad_input",
+    "auth",
+    "upstream_4xx",
+    "upstream_5xx",
+    "timeout",
+    "network"
+  ],
+  "sideEffects": "read_external",
+  "resultTrust": "trusted_structured",
+  "authScope": "owm:read",
+  "latencyBudgetMs": 10000
+}

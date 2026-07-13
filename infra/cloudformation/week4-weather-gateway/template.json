@@ -72,7 +72,7 @@
           "S3Key": "DEPLOY_SCRIPT_REPLACES"
         },
         "MemorySize": 128,
-        "Timeout": 10,
+        "Timeout": 15,
         "Environment": {
           "Variables": {
             "OWM_API_KEY": {

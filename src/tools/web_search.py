@@ -5,12 +5,14 @@ from __future__ import annotations
 import json
 import uuid
 from collections.abc import Callable
+from datetime import timedelta
 from typing import Any
 
 from strands import tool
 
 
 InvokeWebSearch = Callable[[dict[str, Any]], Any]
+WEB_SEARCH_TIMEOUT_SECONDS = 10
 WEB_SEARCH_INPUT_SCHEMA = {
     "json": {
         "type": "object",
@@ -128,6 +130,7 @@ def build_web_search_tool(backend: Any) -> Any:
             tool_use_id=f"web-search-wrapper-{uuid.uuid4()}",
             name=backend.mcp_tool.name,
             arguments=arguments,
+            read_timeout_seconds=timedelta(seconds=WEB_SEARCH_TIMEOUT_SECONDS),
         )
 
     @tool(name="web_search", inputSchema=WEB_SEARCH_INPUT_SCHEMA)
