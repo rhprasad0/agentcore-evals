@@ -24,6 +24,7 @@ DEPLOYED_STATE_PATH = REPO_ROOT / "weatheragent" / "agentcore" / ".cli" / "deplo
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from src.contracts import validate_tool_portfolio
 from src.tools.calculator import calculator
 from src.tools.web_search import build_web_search_tool
 from src.tools.weather import get_current_weather
@@ -86,8 +87,13 @@ def scrub(value: Any) -> Any:
 
 
 def build_agent(tools: list[Any]) -> Agent:
-    """Build the Week 4 agent with its explicit fixed tool portfolio."""
-    return Agent(system_prompt=PORTFOLIO_SYSTEM_PROMPT, tools=tools, callback_handler=None)
+    """Build the agent only after its fixed tool portfolio passes manifest enforcement."""
+    validated_tools = validate_tool_portfolio(tools)
+    return Agent(
+        system_prompt=PORTFOLIO_SYSTEM_PROMPT,
+        tools=validated_tools,
+        callback_handler=None,
+    )
 
 
 def print_tool_specs(tools: list[Any]) -> None:

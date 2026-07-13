@@ -3917,6 +3917,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "jsonschema" },
     { name = "mcp-proxy-for-aws" },
     { name = "strands-agents-tools" },
 ]
@@ -3933,6 +3934,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "jsonschema", specifier = "==4.26.0" },
     { name = "mcp-proxy-for-aws", specifier = ">=1.6.3" },
     { name = "strands-agents-tools", specifier = ">=0.8.3" },
 ]

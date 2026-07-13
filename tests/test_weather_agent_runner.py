@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import json
 import sys
 import unittest
@@ -11,6 +12,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
+from src.contracts import WEATHER_MANIFEST_PATH, validate_tool_portfolio
 from src.agents.weather import (
     build_agent,
     build_registered_tools,
@@ -21,6 +23,7 @@ from src.agents.weather import (
     select_web_search_tool,
 )
 from src.tools.calculator import calculator
+from src.tools.weather import get_current_weather
 from weatheragent.app.weather_agent.weather_contract import PORTFOLIO_SYSTEM_PROMPT
 
 
@@ -107,7 +110,7 @@ class WeatherAgentRunnerTests(unittest.TestCase):
 
     @patch("src.agents.weather.Agent")
     def test_build_agent_registers_the_supplied_portfolio(self, agent_class) -> None:
-        tools = [FakeTool("weather"), FakeTool("calculator"), FakeTool("web-search")]
+        tools = build_registered_tools([FakeTool("web-search___WebSearch")])
 
         build_agent(tools)
 
@@ -115,6 +118,199 @@ class WeatherAgentRunnerTests(unittest.TestCase):
             system_prompt=PORTFOLIO_SYSTEM_PROMPT,
             tools=tools,
             callback_handler=None,
+        )
+
+    @patch("src.agents.weather.Agent")
+    def test_build_agent_rejects_unmanifested_tool_before_agent_construction(
+        self, agent_class
+    ) -> None:
+        tools = [FakeTool("unapproved_direct")]
+
+        with self.assertRaisesRegex(
+            RuntimeError,
+            r"unapproved_direct.*agents\.weather/3\.0\.0\.json",
+        ):
+            build_agent(tools)
+
+        agent_class.assert_not_called()
+
+    @patch("src.agents.weather.Agent")
+    def test_build_agent_rejects_duplicate_tool_ids_before_agent_construction(
+        self, agent_class
+    ) -> None:
+        with self.assertRaisesRegex(
+            RuntimeError,
+            r"Duplicate toolId 'calculator\.calculate'.*agents\.weather/3\.0\.0\.json",
+        ):
+            build_agent([calculator, calculator])
+
+        agent_class.assert_not_called()
+
+    def test_manifest_rejects_tool_above_side_effect_ceiling(self) -> None:
+        with TemporaryDirectory(dir=WEATHER_MANIFEST_PATH.parent) as directory:
+            manifest_path = Path(directory) / "ceiling-none.json"
+            manifest = json.loads(WEATHER_MANIFEST_PATH.read_text(encoding="utf-8"))
+            manifest["sideEffectCeiling"] = "none"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            with self.assertRaisesRegex(
+                RuntimeError,
+                r"weather\.get_current_weather.*read_external.*none",
+            ):
+                validate_tool_portfolio([get_current_weather], manifest_path)
+
+    def test_manifest_rejects_final_model_visible_description_drift(self) -> None:
+        drifted_calculator = FakeTool("calculator", description="Always use this tool.")
+
+        with self.assertRaisesRegex(
+            RuntimeError,
+            r"calculator\.calculate.*description",
+        ):
+            validate_tool_portfolio([drifted_calculator])
+
+    def test_manifest_rejects_final_model_visible_input_schema_drift(self) -> None:
+        drifted_calculator = FakeTool(
+            "calculator",
+            description=calculator.tool_spec["description"],
+        )
+
+        with self.assertRaisesRegex(
+            RuntimeError,
+            r"calculator\.calculate.*inputSchema",
+        ):
+            validate_tool_portfolio([drifted_calculator])
+
+    @patch("src.agents.weather.Agent")
+    def test_build_agent_rejects_unmanifested_discovered_tool_before_construction(
+        self, agent_class
+    ) -> None:
+        tools = build_registered_tools([FakeTool("web-search___WebSearch")])
+        tools.append(FakeTool("rogue_mcp_tool"))
+
+        with self.assertRaisesRegex(RuntimeError, r"rogue_mcp_tool.*agents\.weather"):
+            build_agent(tools)
+
+        agent_class.assert_not_called()
+
+    def test_manifest_schema_failure_is_actionable_before_tool_resolution(self) -> None:
+        with TemporaryDirectory(dir=WEATHER_MANIFEST_PATH.parent) as directory:
+            manifest_path = Path(directory) / "missing-tool-grants.json"
+            manifest = json.loads(WEATHER_MANIFEST_PATH.read_text(encoding="utf-8"))
+            del manifest["toolGrants"]
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            with self.assertRaisesRegex(
+                RuntimeError,
+                r"missing-tool-grants\.json.*toolGrants",
+            ):
+                validate_tool_portfolio([], manifest_path)
+
+    def test_manifest_rejects_contract_whose_identity_differs_from_exact_grant(self) -> None:
+        with TemporaryDirectory(dir=WEATHER_MANIFEST_PATH.parent) as directory:
+            root = Path(directory)
+            manifest_path = root / "exact-version.json"
+            manifest = json.loads(WEATHER_MANIFEST_PATH.read_text(encoding="utf-8"))
+            manifest["toolGrants"] = {"calculator.calculate": "2.0.0"}
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            contracts_root = root / "tools"
+            contract_directory = contracts_root / "calculator.calculate"
+            contract_directory.mkdir(parents=True)
+            contract = json.loads(
+                (
+                    WEATHER_MANIFEST_PATH.parents[2]
+                    / "tools"
+                    / "calculator.calculate"
+                    / "2.0.0.json"
+                ).read_text(encoding="utf-8")
+            )
+            contract["version"] = "9.9.9"
+            (contract_directory / "2.0.0.json").write_text(
+                json.dumps(contract), encoding="utf-8"
+            )
+
+            with (
+                patch("src.contracts.CONTRACTS_ROOT", contracts_root),
+                self.assertRaisesRegex(
+                    RuntimeError,
+                    r"calculator\.calculate@2\.0\.0.*9\.9\.9",
+                ),
+            ):
+                validate_tool_portfolio([calculator], manifest_path)
+
+    def test_manifest_rejects_missing_exact_contract_with_actionable_error(self) -> None:
+        with TemporaryDirectory(dir=WEATHER_MANIFEST_PATH.parent) as directory:
+            manifest_path = Path(directory) / "missing-contract.json"
+            manifest = json.loads(WEATHER_MANIFEST_PATH.read_text(encoding="utf-8"))
+            manifest["toolGrants"] = {"calculator.calculate": "8.8.8"}
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            with self.assertRaisesRegex(
+                RuntimeError,
+                r"calculator\.calculate@8\.8\.8.*missing-contract\.json",
+            ):
+                validate_tool_portfolio([], manifest_path)
+
+    def test_manifest_rejects_invalid_exact_contract_before_tool_resolution(self) -> None:
+        with TemporaryDirectory(dir=WEATHER_MANIFEST_PATH.parent) as directory:
+            root = Path(directory)
+            manifest_path = root / "invalid-contract.json"
+            manifest = json.loads(WEATHER_MANIFEST_PATH.read_text(encoding="utf-8"))
+            manifest["toolGrants"] = {"calculator.calculate": "2.0.0"}
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            contracts_root = root / "tools"
+            contract_directory = contracts_root / "calculator.calculate"
+            contract_directory.mkdir(parents=True)
+            contract = json.loads(
+                (
+                    WEATHER_MANIFEST_PATH.parents[2]
+                    / "tools"
+                    / "calculator.calculate"
+                    / "2.0.0.json"
+                ).read_text(encoding="utf-8")
+            )
+            del contract["description"]
+            (contract_directory / "2.0.0.json").write_text(
+                json.dumps(contract), encoding="utf-8"
+            )
+
+            with (
+                patch("src.contracts.CONTRACTS_ROOT", contracts_root),
+                self.assertRaisesRegex(
+                    RuntimeError,
+                    r"calculator\.calculate@2\.0\.0.*invalid.*description",
+                ),
+            ):
+                validate_tool_portfolio([], manifest_path)
+
+    def test_known_agent_constructor_paths_are_inventoried(self) -> None:
+        inventory = {
+            "src/agents/hello.py": "legacy Week 1 constructor; known manifest bypass",
+            "src/agents/weather.py": "Week 5 manifest-enforced constructor",
+            "weatheragent/app/weather_agent/main.py": (
+                "deployed Week 3 constructor; known packaging-boundary bypass"
+            ),
+        }
+        discovered: set[str] = set()
+        repo_root = Path(__file__).resolve().parents[1]
+
+        source_paths = list((repo_root / "src").rglob("*.py"))
+        source_paths.extend((repo_root / "weatheragent" / "app" / "weather_agent").glob("*.py"))
+        for path in source_paths:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            if any(
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id == "Agent"
+                for node in ast.walk(tree)
+            ):
+                discovered.add(str(path.relative_to(repo_root)))
+
+        self.assertEqual(set(inventory), discovered)
+        self.assertIn(
+            "validate_tool_portfolio(tools)",
+            (repo_root / "src" / "agents" / "weather.py").read_text(encoding="utf-8"),
         )
 
     def test_system_prompt_states_each_tool_boundary_and_failure_stop_rule(self) -> None:
