@@ -1,0 +1,81 @@
+{
+  "toolId": "calculator.calculate",
+  "name": "calculator",
+  "version": "2.0.0",
+  "description": "Evaluate a required arithmetic expression supplied as a string.\n\nThe expression may contain numeric literals, parentheses, unary signs, and\nthe arithmetic operators +, -, *, /, //, %, and **. It does not retrieve\ncurrent or external facts, accept variables or functions, solve symbolic\nequations, perform calculus, or mutate external state. On success, value is\nreturned as a finite result string. On failure, returns\n{ok: False, error: {kind, message, retryable}}.",
+  "inputSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+      "expression": {
+        "description": "Required arithmetic expression string containing only supported numeric arithmetic syntax.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "expression"
+    ],
+    "type": "object"
+  },
+  "outputSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "ok",
+          "value"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "bad_input"
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "retryable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "kind",
+              "message",
+              "retryable"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "failureModes": [
+    "bad_input"
+  ],
+  "sideEffects": "none",
+  "resultTrust": "trusted_structured",
+  "latencyBudgetMs": 100
+}

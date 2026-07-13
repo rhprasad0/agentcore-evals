@@ -24,13 +24,23 @@ class CalculatorToolTests(unittest.TestCase):
         normalized_description = " ".join(spec["description"].split()).lower()
 
         self.assertEqual("calculator", spec["name"])
-        self.assertIn("arithmetic over supplied numeric values", spec["description"])
+        self.assertIn("required arithmetic expression supplied as a string", normalized_description)
+        self.assertIn("finite result string", normalized_description)
+        self.assertNotIn("supplied numeric values", normalized_description)
         self.assertIn("does not retrieve", normalized_description)
         self.assertEqual(
             {"expression"},
             set(spec["inputSchema"]["json"]["properties"]),
         )
         self.assertEqual(["expression"], spec["inputSchema"]["json"]["required"])
+
+    def test_model_visible_expression_description_matches_string_input(self) -> None:
+        expression_schema = calculator.tool_spec["inputSchema"]["json"]["properties"]["expression"]
+
+        self.assertEqual(
+            "Required arithmetic expression string containing only supported numeric arithmetic syntax.",
+            expression_schema["description"],
+        )
 
     def test_success_is_normalized(self) -> None:
         backend = FakeCalculatorBackend(

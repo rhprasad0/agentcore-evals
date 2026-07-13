@@ -61,6 +61,12 @@ class CapabilityManifestSchemaTests(unittest.TestCase):
 
                 self.assertEqual([], [error.message for error in errors])
 
+    def test_weather_portfolio_pins_current_calculator_contract(self) -> None:
+        manifest = self._load_fixture("valid", "weather-portfolio.json")
+
+        self.assertEqual("2.0.0", manifest["version"])
+        self.assertEqual("2.0.0", manifest["toolGrants"]["calculator.calculate"])
+
     def test_all_invalid_manifest_fixtures_are_rejected(self) -> None:
         schema = json.loads(CAPABILITY_MANIFEST_SCHEMA_PATH.read_text(encoding="utf-8"))
         fixture_paths = sorted((CAPABILITY_MANIFEST_FIXTURES_PATH / "invalid").glob("*.json"))

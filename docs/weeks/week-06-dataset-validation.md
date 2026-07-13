@@ -30,10 +30,10 @@ The corpus has a dataset-level manifest before it has rows. It pins the exact We
   "version": "1.0.0",
   "schemaVersion": "1.0.0",
   "taxonomyVersion": "1.0.0",
-  "agentManifest": {"manifestId": "agents.weather", "version": "1.0.0"},
+  "agentManifest": {"manifestId": "agents.weather", "version": "2.0.0"},
   "toolContracts": [
     {"toolId": "weather.get_current_weather", "version": "1.2.0"},
-    {"toolId": "calculator.calculate", "version": "1.0.0"},
+    {"toolId": "calculator.calculate", "version": "2.0.0"},
     {"toolId": "search.web_search", "version": "1.0.0"}
   ]
 }

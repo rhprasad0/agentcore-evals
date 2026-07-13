@@ -23,7 +23,7 @@ CONTRACT_PATHS = {
     / "contracts"
     / "tools"
     / "calculator.calculate"
-    / "1.0.0.json",
+    / "2.0.0.json",
     "search.web_search": REPO_ROOT
     / "contracts"
     / "tools"

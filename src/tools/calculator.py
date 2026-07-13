@@ -102,11 +102,16 @@ def calculate_expression(
 
 @tool
 def calculator(expression: str) -> dict[str, Any]:
-    """Calculate arithmetic over supplied numeric values.
+    """Evaluate a required arithmetic expression supplied as a string.
 
-    Accepts numeric literals with arithmetic operators and parentheses. It does
-    not retrieve current or external facts, solve symbolic equations, perform
-    calculus, or mutate external state. Returns {ok: True, value} on success or
-    {ok: False, error: {kind, message, retryable}} on failure.
+    The expression may contain numeric literals, parentheses, unary signs, and
+    the arithmetic operators +, -, *, /, //, %, and **. It does not retrieve
+    current or external facts, accept variables or functions, solve symbolic
+    equations, perform calculus, or mutate external state. On success, value is
+    returned as a finite result string. On failure, returns
+    {ok: False, error: {kind, message, retryable}}.
+
+    Args:
+        expression: Required arithmetic expression string containing only supported numeric arithmetic syntax.
     """
     return calculate_expression(expression)
