@@ -6,7 +6,7 @@ import unittest
 
 import requests
 
-from src.tools.weather import FAILURE_KINDS, fetch_current_weather
+from src.tools.weather import FAILURE_KINDS, fetch_current_weather, get_current_weather
 
 
 class FakeResponse:
@@ -47,6 +47,12 @@ class WeatherToolTests(unittest.TestCase):
             result,
             {"ok": True, "city": "Seattle", "temp": 52.5, "units": "imperial", "conditions": "rain"},
         )
+
+    def test_model_visible_units_match_the_closed_runtime_set(self) -> None:
+        units_schema = get_current_weather.tool_spec["inputSchema"]["json"]["properties"]["units"]
+
+        self.assertEqual(["metric", "imperial", "standard"], units_schema["enum"])
+        self.assertEqual("metric", units_schema["default"])
 
     def test_bad_input_empty_city(self) -> None:
         result = fetch_current_weather(" ", api_key="test-key", http_get=fake_get_response(200))

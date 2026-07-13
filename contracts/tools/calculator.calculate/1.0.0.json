@@ -1,21 +1,20 @@
 {
-  "toolId": "example.lookup",
-  "name": "example_lookup",
+  "toolId": "calculator.calculate",
+  "name": "calculator",
   "version": "1.0.0",
-  "description": "Look up a synthetic example record. Does not write or cause external side effects.",
+  "description": "Calculate arithmetic over supplied numeric values.\n\nAccepts numeric literals with arithmetic operators and parentheses. It does\nnot retrieve current or external facts, solve symbolic equations, perform\ncalculus, or mutate external state. Returns {ok: True, value} on success or\n{ok: False, error: {kind, message, retryable}} on failure.",
   "inputSchema": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "type": "object",
     "properties": {
-      "query": {
-        "type": "string",
-        "minLength": 1
+      "expression": {
+        "description": "Parameter expression",
+        "type": "string"
       }
     },
     "required": [
-      "query"
+      "expression"
     ],
-    "additionalProperties": false
+    "type": "object"
   },
   "outputSchema": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -27,7 +26,8 @@
             "const": true
           },
           "value": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
         "required": [
@@ -77,6 +77,5 @@
   ],
   "sideEffects": "none",
   "resultTrust": "trusted_structured",
-  "latencyBudgetMs": 100,
-  "owner": "example-team"
+  "latencyBudgetMs": 100
 }

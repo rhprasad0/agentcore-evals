@@ -100,9 +100,10 @@ class WeatherAgentRunnerTests(unittest.TestCase):
 
         self.assertEqual(
             [tool.tool_name for tool in tools],
-            ["get_current_weather", "calculator", "web-search___WebSearch"],
+            ["get_current_weather", "calculator", "web_search"],
         )
         self.assertIs(calculator, tools[1])
+        self.assertIn("current public information", tools[2].tool_spec["description"])
 
     @patch("src.agents.weather.Agent")
     def test_build_agent_registers_the_supplied_portfolio(self, agent_class) -> None:
@@ -179,7 +180,7 @@ class WeatherAgentRunnerTests(unittest.TestCase):
         self.assertEqual(events, ["enter", "list", "exit"])
         self.assertEqual(
             [spec["name"] for spec in json.loads(output.getvalue())],
-            ["get_current_weather", "calculator", "web-search___WebSearch"],
+            ["get_current_weather", "calculator", "web_search"],
         )
 
     def test_main_invokes_agent_before_mcp_session_closes(self) -> None:

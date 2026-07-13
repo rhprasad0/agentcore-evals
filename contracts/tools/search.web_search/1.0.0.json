@@ -1,0 +1,121 @@
+{
+  "toolId": "search.web_search",
+  "name": "web_search",
+  "version": "1.0.0",
+  "description": "Search for current public information when no dedicated tool owns the request.\n\nDoes not replace structured current-weather queries or arithmetic. Result\ntitles, URLs, dates, and text come from external sources and are untrusted.\nReturns {ok: True, results} on success or\n{ok: False, error: {kind, message, retryable}} on failure.",
+  "inputSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Public-information search query"
+      },
+      "max_results": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 25,
+        "default": 10,
+        "description": "Maximum results to return, from 1 through 25"
+      }
+    },
+    "required": [
+      "query"
+    ]
+  },
+  "outputSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publishedDate": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "publishedDate",
+                "text",
+                "title",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "ok",
+          "results"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "bad_input",
+                  "upstream_5xx"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "retryable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "kind",
+              "message",
+              "retryable"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "failureModes": [
+    "bad_input",
+    "upstream_5xx"
+  ],
+  "sideEffects": "read_external",
+  "resultTrust": "untrusted_external",
+  "authScope": "gateway:web-search:invoke",
+  "latencyBudgetMs": 5000
+}

@@ -38,7 +38,7 @@ class ToolContractSchemaTests(unittest.TestCase):
 
         self.assertEqual(
             schema.get("$id"),
-            "urn:agentcore-evals:schema:tool-contract:1.0.0",
+            "urn:agentcore-evals:schema:tool-contract:2.0.0",
         )
 
     def test_schema_is_valid_draft_2020_12(self) -> None:
@@ -86,6 +86,7 @@ class ToolContractSchemaTests(unittest.TestCase):
         contract = self._load_fixture("valid", "example-lookup.json")
         required_fields = (
             "toolId",
+            "name",
             "version",
             "description",
             "inputSchema",
@@ -236,7 +237,7 @@ class ToolContractSchemaTests(unittest.TestCase):
         schema = json.loads(TOOL_CONTRACT_SCHEMA_PATH.read_text(encoding="utf-8"))
         contract = self._load_fixture("valid", "example-lookup.json")
 
-        for field in ("description", "authScope"):
+        for field in ("name", "description", "authScope"):
             with self.subTest(field=field):
                 candidate = {**contract, field: ""}
                 errors = list(Draft202012Validator(schema).iter_errors(candidate))
@@ -245,6 +246,18 @@ class ToolContractSchemaTests(unittest.TestCase):
                     any(error.validator == "minLength" and list(error.path) == [field] for error in errors),
                     f"expected {field} minLength error, got: {[error.message for error in errors]}",
                 )
+
+    def test_model_visible_name_rejects_spaces(self) -> None:
+        schema = json.loads(TOOL_CONTRACT_SCHEMA_PATH.read_text(encoding="utf-8"))
+        contract = self._load_fixture("valid", "example-lookup.json")
+        contract["name"] = "example lookup"
+
+        errors = list(Draft202012Validator(schema).iter_errors(contract))
+
+        self.assertTrue(
+            any(error.validator == "pattern" and list(error.path) == ["name"] for error in errors),
+            f"expected name pattern error, got: {[error.message for error in errors]}",
+        )
 
     def test_latency_budget_must_be_a_positive_integer(self) -> None:
         schema = json.loads(TOOL_CONTRACT_SCHEMA_PATH.read_text(encoding="utf-8"))

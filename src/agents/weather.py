@@ -25,6 +25,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from src.tools.calculator import calculator
+from src.tools.web_search import build_web_search_tool
 from src.tools.weather import get_current_weather
 from weatheragent.app.weather_agent.weather_contract import PORTFOLIO_SYSTEM_PROMPT
 
@@ -69,7 +70,8 @@ def registered_tool_specs(tools: list[Any]) -> list[dict[str, Any]]:
 
 def build_registered_tools(advertised_tools: list[Any]) -> list[Any]:
     """Build the fixed Week 4 portfolio from direct and approved MCP tools."""
-    return [get_current_weather, calculator, select_web_search_tool(advertised_tools)]
+    web_search = build_web_search_tool(select_web_search_tool(advertised_tools))
+    return [get_current_weather, calculator, web_search]
 
 
 def scrub(value: Any) -> Any:

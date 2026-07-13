@@ -1,5 +1,6 @@
 {
   "toolId": "example.lookup",
+  "name": "example_lookup",
   "version": "1.0.0",
   "description": "Look up a synthetic example record. Does not write or cause external side effects.",
   "inputSchema": {

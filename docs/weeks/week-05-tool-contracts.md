@@ -45,6 +45,7 @@ The shape every tool in this repo must satisfy:
 ```json
 {
   "toolId": "weather.get_current_weather",
+  "name": "get_current_weather",
   "version": "1.2.0",
   "description": "Current weather for a city. Not forecasts, not history.",
   "inputSchema": { "...": "JSON Schema for arguments" },
@@ -60,6 +61,7 @@ The shape every tool in this repo must satisfy:
 Every field earns its place by having a downstream consumer — walk them:
 
 - **`toolId`** — namespaced identity (`weather.` prefix). Dataset rows, traces, labels, manifests, and Policy statements all join on this key; a rename is a breaking change everywhere, which is the point.
+- **`name`** — the exact final model-visible runtime name. It stays distinct from `toolId`: wrappers and Gateway transformations may change what the model calls without changing the stable identity used by datasets, manifests, and policy artifacts. Conformance compares this field after all decorators, adapters, and Gateway discovery transformations.
 - **`version`** — semver for behavior, not just code. Consumers in this lab pin exact versions, not ranges. A patch changes implementation without changing the model-visible name, description, schemas, normalized behavior, failure semantics, or side-effect/trust declarations. A minor version is backward-compatible and additive: existing valid inputs, results, dataset rows, and labels remain valid. A major version changes model-visible description, required inputs/results, normalized failure behavior, side-effect ceiling, or anything else that can invalidate expectations or labels. **A description edit is major for the affected contract**, because description changes can change selection behavior. The schema's own version and a contract instance's version are separate identifiers.
 - **`description`** — the contract-owned scoping sentence, stated with its negative space ("Not forecasts, not history"). Conformance compares it with the final registered model-visible spec, not merely a decorator or Gateway target configuration that may be transformed before the model sees it.
 - **`inputSchema` / `outputSchema`** — JSON Schema for arguments the model may send and for the normalized success/failure result returned to the agent. The output schema does not describe raw provider, Lambda, Gateway, or MCP transport payloads; seam-specific adapter tests prove those become contract-valid normalized results. This boundary lets Week 6 validate mocks and live normalized results against the same promise.

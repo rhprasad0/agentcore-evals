@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Literal
 
 import requests
 from strands import tool
@@ -22,6 +22,7 @@ from .weather_core import (
     status_failure,
 )
 OWM_URL = "https://api.openweathermap.org/data/2.5/weather"
+WeatherUnits = Literal["metric", "imperial", "standard"]
 
 
 def fetch_current_weather(
@@ -63,7 +64,7 @@ def fetch_current_weather(
 
 
 @tool
-def get_current_weather(city: str, units: str = "metric") -> dict[str, Any]:
+def get_current_weather(city: str, units: WeatherUnits = "metric") -> dict[str, Any]:
     """Get current weather for a city. Not forecasts, history, or climate averages.
 
     units must be 'metric', 'imperial', or 'standard'. Returns {ok, city, temp,

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:agentcore-evals:schema:tool-contract:1.0.0",
+  "$id": "urn:agentcore-evals:schema:tool-contract:2.0.0",
   "$defs": {
     "embeddedSchema": {
       "type": "object",
@@ -20,6 +20,11 @@
     "toolId": {
       "type": "string",
       "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
     },
     "version": {
       "type": "string",
@@ -77,6 +82,7 @@
   },
   "required": [
     "toolId",
+    "name",
     "version",
     "description",
     "inputSchema",
