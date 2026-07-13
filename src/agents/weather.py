@@ -18,13 +18,13 @@ from typing import Any
 
 from strands import Agent
 from strands.tools.mcp.mcp_client import MCPClient
-from strands_tools.calculator import calculator
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEPLOYED_STATE_PATH = REPO_ROOT / "weatheragent" / "agentcore" / ".cli" / "deployed-state.json"
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from src.tools.calculator import calculator
 from src.tools.weather import get_current_weather
 from weatheragent.app.weather_agent.weather_contract import PORTFOLIO_SYSTEM_PROMPT
 

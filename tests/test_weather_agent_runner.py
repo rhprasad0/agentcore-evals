@@ -20,6 +20,7 @@ from src.agents.weather import (
     registered_tool_specs,
     select_web_search_tool,
 )
+from src.tools.calculator import calculator
 from weatheragent.app.weather_agent.weather_contract import PORTFOLIO_SYSTEM_PROMPT
 
 
@@ -101,6 +102,7 @@ class WeatherAgentRunnerTests(unittest.TestCase):
             [tool.tool_name for tool in tools],
             ["get_current_weather", "calculator", "web-search___WebSearch"],
         )
+        self.assertIs(calculator, tools[1])
 
     @patch("src.agents.weather.Agent")
     def test_build_agent_registers_the_supplied_portfolio(self, agent_class) -> None:
