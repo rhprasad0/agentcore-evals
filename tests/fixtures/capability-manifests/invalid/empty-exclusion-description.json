@@ -1,0 +1,14 @@
+{
+  "manifestId": "agents.weather",
+  "version": "1.0.0",
+  "toolGrants": {
+    "weather.get_current_weather": "1.2.0",
+    "calculator.calculate": "1.0.0",
+    "search.web_search": "1.0.0"
+  },
+  "sideEffectCeiling": "read_external",
+  "outOfScope": {
+    "external_write_actions": "",
+    "underspecified_external_lookup": "Does not use retrieval tools until an underspecified request identifies the subject needed for a grounded lookup."
+  }
+}

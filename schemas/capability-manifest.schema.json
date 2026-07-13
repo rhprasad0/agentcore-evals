@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentcore-evals:schema:capability-manifest:1.0.0",
+  "$defs": {
+    "namespacedId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)+$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-((?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(?:\\.(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*))?(?:\\+([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?$",
+      "not": {
+        "pattern": "[\\r\\n]"
+      }
+    },
+    "declarationId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    }
+  },
+  "type": "object",
+  "properties": {
+    "manifestId": {
+      "$ref": "#/$defs/namespacedId"
+    },
+    "version": {
+      "$ref": "#/$defs/semver"
+    },
+    "toolGrants": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/namespacedId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/semver"
+      }
+    },
+    "sideEffectCeiling": {
+      "enum": [
+        "none",
+        "read_external",
+        "write_external"
+      ]
+    },
+    "outOfScope": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/declarationId"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "manifestId",
+    "version",
+    "toolGrants",
+    "sideEffectCeiling",
+    "outOfScope"
+  ],
+  "additionalProperties": false
+}
