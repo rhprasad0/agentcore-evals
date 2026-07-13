@@ -129,6 +129,18 @@ class ToolContractSchemaTests(unittest.TestCase):
             f"expected ASCII-only version pattern error, got: {[error.message for error in errors]}",
         )
 
+    def test_contract_with_trailing_newline_in_version_is_rejected(self) -> None:
+        schema = json.loads(TOOL_CONTRACT_SCHEMA_PATH.read_text(encoding="utf-8"))
+        contract = self._load_fixture("valid", "example-lookup.json")
+        contract["version"] = "1.2.3\n"
+
+        errors = list(Draft202012Validator(schema).iter_errors(contract))
+
+        self.assertTrue(
+            any(list(error.path) == ["version"] for error in errors),
+            f"expected trailing-newline version error, got: {[error.message for error in errors]}",
+        )
+
     def test_contract_accepts_core_and_extended_semver(self) -> None:
         schema = json.loads(TOOL_CONTRACT_SCHEMA_PATH.read_text(encoding="utf-8"))
         contract = self._load_fixture("valid", "example-lookup.json")
@@ -139,6 +151,23 @@ class ToolContractSchemaTests(unittest.TestCase):
                 errors = list(Draft202012Validator(schema).iter_errors(candidate))
 
                 self.assertEqual([], [error.message for error in errors])
+
+    def test_contract_rejects_semver_numeric_leading_zeroes(self) -> None:
+        schema = json.loads(TOOL_CONTRACT_SCHEMA_PATH.read_text(encoding="utf-8"))
+        contract = self._load_fixture("valid", "example-lookup.json")
+
+        for version in ("01.2.3", "1.02.3", "1.2.03", "1.2.3-01"):
+            with self.subTest(version=version):
+                candidate = {**contract, "version": version}
+                errors = list(Draft202012Validator(schema).iter_errors(candidate))
+
+                self.assertTrue(
+                    any(
+                        error.validator == "pattern" and list(error.path) == ["version"]
+                        for error in errors
+                    ),
+                    f"expected leading-zero version error, got: {[error.message for error in errors]}",
+                )
 
     def test_contract_with_unknown_failure_mode_is_rejected(self) -> None:
         schema = json.loads(TOOL_CONTRACT_SCHEMA_PATH.read_text(encoding="utf-8"))
@@ -269,6 +298,28 @@ class ToolContractSchemaTests(unittest.TestCase):
                 self.assertTrue(
                     any(error.path and error.path[0] == field for error in errors),
                     f"expected missing embedded dialect error, got: {[error.message for error in errors]}",
+                )
+
+    def test_embedded_schemas_reject_a_different_declared_dialect(self) -> None:
+        schema = json.loads(TOOL_CONTRACT_SCHEMA_PATH.read_text(encoding="utf-8"))
+        contract = self._load_fixture("valid", "example-lookup.json")
+        wrong_dialect_schema = {
+            "$schema": "https://json-schema.org/draft/2019-09/schema",
+            "type": "object",
+        }
+
+        for field in ("inputSchema", "outputSchema"):
+            with self.subTest(field=field):
+                candidate = {**contract, field: wrong_dialect_schema}
+                errors = list(Draft202012Validator(schema).iter_errors(candidate))
+
+                self.assertTrue(
+                    any(
+                        error.validator == "const"
+                        and list(error.path) == [field, "$schema"]
+                        for error in errors
+                    ),
+                    f"expected wrong embedded dialect error, got: {[error.message for error in errors]}",
                 )
 
     def test_invalid_fixtures_each_contain_one_named_top_level_defect(self) -> None:
