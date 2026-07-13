@@ -10,7 +10,7 @@
 
 ## Objective
 
-Build a blind LLM judge that predicts tool-selection correctness and execution quality, calibrate it against the human fixture, and run the same traces through managed AgentCore Evaluations built-ins — a three-way agreement analysis: human vs your judge vs AWS's judge.
+Build a blind LLM judge that predicts tool-selection correctness and execution quality, calibrate it against the human fixture, and run identity-matched eligible telemetry through managed AgentCore Evaluations built-ins — a three-way agreement analysis whose methods state whether the managed lane saw trace-identical or replayed behavior.
 
 ## Why this week exists
 
@@ -53,16 +53,21 @@ For each judge lane, against the human fixture, per field:
 
 Then the part that doesn't automate: **analyze every disagreement by hand.** Some will be judge errors (report them as the judge's failure modes — "over-trusts scoped descriptions", "penalizes defensible alternatives"); some will be *your* label errors (route back through Week 9's adjudication with a versioned relabel). Both belong in the report — a calibration that never indicts a label is suspicious.
 
-### The managed lane: same rubric names, different plumbing
+### The managed lane: same rubric names, three supported plumbing choices
 
-Mechanics verified 2026-07-07: built-in evaluators are addressed as `Builtin.EvaluatorName` (13 exist; this week uses `Builtin.ToolSelectionAccuracy`, `Builtin.ToolParameterAccuracy`, `Builtin.GoalSuccessRate`); their models and prompt templates are fixed and unmodifiable; on-demand evaluation runs via `agentcore run eval --runtime <name> --session-id <id> --evaluator "Builtin.X" ...` (or the starter-toolkit SDK: `Evaluation().run(agent_id=..., session_id=..., evaluators=[...])`), with results reviewable via `agentcore evals history` and landing in CloudWatch.
+Mechanics verified 2026-07-13: built-in evaluators are addressed as `Builtin.EvaluatorName` (this week uses `Builtin.ToolSelectionAccuracy`, `Builtin.ToolParameterAccuracy`, and `Builtin.GoalSuccessRate`), and their models and prompt templates are fixed and unmodifiable. Do not reduce on-demand evaluation to one CloudWatch-only path:
 
-The wrinkle that needs your design attention: **on-demand evaluation sources sessions from CloudWatch logs — it scores sessions that ran against a Runtime, not JSONL files you hand it.** Your 64 labeled traces are local, mocked-lane artifacts. Two honest paths:
+1. **CLI/starter-toolkit session retrieval:** `agentcore run eval` (or the starter toolkit) locates a Runtime session and downloads its telemetry from CloudWatch before evaluation. This is the easiest operational path for deployed sessions.
+2. **Direct `Evaluate` API:** `EvaluationInput.sessionSpans` accepts an array of OpenTelemetry JSON values for a session. This is the cleanest candidate for evaluating the same supported telemetry humans labeled, but current API reference text alone does not settle how ADOT-split correlated event records must be packaged.
+3. **Service-side online/batch sources:** online configurations select a Runtime endpoint or CloudWatch log groups; batch jobs discover and collect matching sessions from CloudWatch. These are later operational lanes, not the default for this calibration fixture.
 
-1. **Replay-and-relabel-aware:** replay the 64 fixture rows through a *deployed* specimen (same pins where possible), let the managed lane score those sessions — and acknowledge that deployed traces may not be identical to the labeled ones (different infrastructure, possibly different behavior). Where behavior diverged, the human labels don't transfer; flag those rows.
-2. **Trace-export:** get your existing normalized traces into CloudWatch in the OTEL shape Evaluations consumes (the Week 6 alignment was aimed exactly here), so the managed judge scores *literally the same traces* humans labeled.
+The 64 labeled traces are local canonical artifacts, not automatically any of those managed inputs. Three honest strategies follow:
 
-Path 2 is the methodologically clean one and the real test of your Week 6 investment; path 1 is operationally simpler. Choose deliberately, document the choice in the calibration report, and either way record **evaluator IDs and dates in the run manifest** — built-ins are versioned dependencies that can change underneath you ([managed boundaries](../../LEARNING_PLAN.md#managed-evaluation-boundaries-read-before-week-8)).
+- **Replay-and-relabel-aware:** replay rows through a deployed specimen, evaluate the resulting Runtime sessions, and acknowledge that labels transfer only where the observed behavior still matches the labeled trace.
+- **Direct supported-telemetry submission:** use the Week 6 source-profile mapping to construct `sessionSpans`, then prove acceptance with one small live `Evaluate` smoke before running the fixture. If split event-record packaging is still undocumented or rejected, record that boundary and adapter delta rather than improvising a hidden format.
+- **CloudWatch export/source:** emit supported telemetry to the expected CloudWatch locations and let the selected managed mode reconstruct sessions from spans plus correlated event records.
+
+Choose deliberately and document trace identity, transport, and label-transfer rules. The live smoke is the first service-acceptance receipt for Week 6's offline compatibility work; a local schema pass was never that receipt. Record **evaluator IDs and dates in the run manifest** because built-ins are moving dependencies ([managed boundaries](../../LEARNING_PLAN.md#managed-evaluation-boundaries-read-before-week-8)).
 
 Score semantics also differ across lanes: built-ins return numeric `value` plus `label`; your judge emits your schema; humans labeled a ternary. Define the mapping into a common verdict space *before* computing agreement — a threshold choice hidden inside the comparison code is a thumb on the scale.
 
@@ -80,9 +85,9 @@ The week ends in a written policy with teeth — e.g.: *own judge for PR-time se
 
 Compute per-field: agreement, false-pass rate, false-fail rate, flip rate across repeats, and where judge confidence diverges from human rationale. Analyze every disagreement by hand — judge errors and label errors both go in the report.
 
-### 3. Run the managed lane over the same traces
+### 3. Prove managed acceptance, then run the managed lane
 
-`Builtin.ToolSelectionAccuracy`, `Builtin.ToolParameterAccuracy`, `Builtin.GoalSuccessRate` via on-demand evaluation (CLI `agentcore run eval` / starter-toolkit — confirm the current invocation shape in the docs; results land in CloudWatch as JSON). Solve the trace-residency question (replay vs export) deliberately. Export scores via a small adapter into the same comparison frame, keyed to fixture rows.
+Choose replay, direct `EvaluationInput.sessionSpans`, or CloudWatch sourcing using the identity rules above. First submit one billboard-safe sample session and verify that AgentCore Evaluations reconstructs the expected invoke-agent and tool-call evidence; record the accepted source profile and any event-record packaging requirement in `docs/telemetry-compatibility.md`. Then run `Builtin.ToolSelectionAccuracy`, `Builtin.ToolParameterAccuracy`, and `Builtin.GoalSuccessRate` over the eligible fixture sessions. Export scores via a small adapter into the same comparison frame, keyed to exact run/trace identities.
 
 ### 4. Publish `docs/judge-calibration.md`
 
@@ -116,7 +121,7 @@ The three-way table, a confusion matrix per judge, cost-per-verdict for each lan
 
 ## Gotchas & drift watch
 
-- **Trace residency is the hidden prerequisite.** On-demand evaluation reads sessions from CloudWatch (verified) — budget real time for the replay-or-export decision and its plumbing; it's the week's most underestimated task. If you export, your Week 6 OTEL field alignment gets its first true test; expect at least one field-name surprise and log it in the mapping table.
+- **Telemetry identity and packaging are the hidden prerequisites.** The CLI session path retrieves Runtime telemetry from CloudWatch; the direct API accepts `sessionSpans`; online/batch modes have service-side sources. None makes the repo's canonical JSON an ingestion format. Budget real time for one live acceptance smoke, especially the span/event-record split, and record every adapter surprise in `docs/telemetry-compatibility.md` before scaling.
 - **Built-ins are moving dependencies.** Their models and templates can change without your consent and cannot be modified (verified). Every managed score in the comparison frame carries evaluator ID + run date; a future re-baseline (Week 13's runbook) starts from those fields.
 - **Cross-Region inference:** built-in evaluators may execute their judge models via cross-Region inference — check the current docs' note if data-locality matters to what you send, and confirm evaluator availability in `us-east-1` before scheduling the week.
 - **Don't let the judge grade its own homework.** Your judge and your specimen may share a model family (Claude judging Claude). That's acceptable — and industry-common — but name it in the report as a limitation with the known risk (self-preference bias), rather than letting a reviewer discover it.
@@ -126,7 +131,7 @@ The three-way table, a confusion matrix per judge, cost-per-verdict for each lan
 ## Deliverable checklist — Automated Judge System
 
 - [ ] Blind judge + execution judge with versioned prompts, structured output schema, repeat-run variance stats.
-- [ ] Managed on-demand evaluation run over the same traces, with export adapter.
+- [ ] Live managed acceptance smoke plus a managed evaluation run over identity-matched eligible traces, with an explicit transport/adapter record.
 - [ ] `docs/judge-calibration.md`: three-way agreement, FP/FN analysis, per-verdict cost, trust policy.
 - [ ] Disagreement casebook (every human-vs-judge conflict adjudicated in writing).
 
@@ -134,15 +139,19 @@ The three-way table, a confusion matrix per judge, cost-per-verdict for each lan
 
 - [ ] Your judge's agreement with humans on `toolSelection` beats a majority-class baseline by a margin you state — and you can name its failure modes.
 - [ ] Verdict flip rate across repeats measured and reported (if >5%, temperature/prompt work before any scaling).
+- [ ] A sample supported-telemetry session is accepted and reconstructed by AgentCore Evaluations; the receipt names the source profile, invocation path, and any split event-record requirement without exposing raw content.
 - [ ] The trust policy names concrete uses for each judge lane, including "not trusted for X yet."
 
 ## Docs to consult
 
-Verified via the AWS docs MCP server, 2026-07-07.
+Verified via the AWS docs MCP server, 2026-07-13.
 
 - [Built-in evaluators overview](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/built-in-evaluators-overview.html) — the `Builtin.Name` ID contract and the immutability note that makes version-recording mandatory.
 - [Built-in evaluator prompt templates](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/prompt-templates-builtin.html) — read the *actual rubrics* you're comparing against, especially both tool-level templates and their placeholder definitions (Exercise 2's source).
 - [Getting started with on-demand evaluation](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/getting-started-on-demand.html) — `agentcore run eval` and the starter-toolkit `Evaluation` client; the invocation shapes for build step 3.
+- [`EvaluationInput` API reference](https://docs.aws.amazon.com/bedrock-agentcore/latest/APIReference/API_EvaluationInput.html) — the direct `sessionSpans` union used by the acceptance smoke.
+- [Strands Agents telemetry extraction](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/supported-frameworks-strands.html) — how Evaluations classifies Strands spans and reads inline versus split content.
+- [Spans, event records, and telemetry signals](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/supported-frameworks-telemetry.html) — why spans alone may be insufficient after ADOT extraction and how correlation works.
 - [AgentCore Evaluations](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/evaluations.html) — the service overview tying evaluators, data sources, and result destinations together.
 - [AgentCore pricing — Evaluations section](https://aws.amazon.com/bedrock/agentcore/pricing/) — how built-in vs custom evaluator billing works; Exercise 6's source.
 - [Structured output via Converse tool use](https://aws.amazon.com/blogs/machine-learning/structured-data-response-with-amazon-bedrock-prompt-engineering-and-tool-use/) — the pattern for schema-conforming judge verdicts (define the verdict schema as a tool's input schema).
@@ -153,5 +162,5 @@ Verified via the AWS docs MCP server, 2026-07-07.
 2. Why is false-pass the dangerous direction for a judge that will scale? Trace the harm through rows 65–10,000.
 3. Your judge agrees with humans at 88%; majority-class is 81%; flip rate is 8%. Write the honest one-sentence summary — and say what the trust policy licenses this judge to do today.
 4. What exactly do you record about a managed evaluator per run, and which future event makes each field load-bearing?
-5. Explain the replay-vs-export fork for the managed lane and what each choice does to the claim "AWS's judge was measured against human labels."
+5. Explain the replay vs direct `sessionSpans` vs CloudWatch-source choice and what each path does to the claim "AWS's judge was measured against the same traces as humans."
 6. A reviewer asks: "Claude judging Claude — isn't that circular?" Give the two-part honest answer (why it's still informative; what limitation you disclose).

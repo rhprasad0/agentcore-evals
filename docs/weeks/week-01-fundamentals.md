@@ -139,7 +139,7 @@ Why *this* hello world: the question is unanswerable from model memory. The only
 
 Read the Strands agent-loop docs, then capture the message list (`agent.messages`) from your run and label each entry with the loop stage it represents: model reasoning → tool selection (the `toolUse` block: which tool, what arguments) → execution (the `toolResult` block) → response synthesis. Commit the annotated version (scrubbed of account ID/ARN — replace with placeholders) as a doc.
 
-This annotation is the seed of everything: Week 6's execution-trace schema is this exercise formalized into JSON Schema; Week 7's `selectionReasoning` capture is the assistant text you'll notice sitting just before the `toolUse` block.
+This annotation is the seed of everything: Week 6's execution-trace schema is this exercise formalized into JSON Schema; Week 7 records assistant text immediately before a `toolUse` block as optional `selectionReasoning`, or explicit null when no such text is emitted. It never invents a causal explanation.
 
 ### 4. Write `docs/architecture.md`
 

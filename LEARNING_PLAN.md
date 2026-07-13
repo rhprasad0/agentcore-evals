@@ -119,7 +119,7 @@ The 12-week plan's hardest-won lessons, restated for AgentCore Evaluations:
 - **A judge score is a measurement, not truth.** `Builtin.ToolSelectionAccuracy` asks a judge model whether an action was "justified" — a defensible rubric, but still a model's opinion. Weeks 9–10 exist to measure how often that opinion matches humans *for this agent*.
 - **Ground truth modes are assertions you wrote, not oracles.** Goal-success-with-ground-truth judges against your success assertions; garbage assertions produce confident garbage verdicts.
 - **Online evaluation is a metered faucet.** Sampled live traces flow to judge models and bill accordingly. Start at the minimum sampling rate that produces signal; confirm rate semantics in the current docs.
-- **Trace shape is the real integration contract.** Evaluations consumes OTEL/OpenInference-instrumented traces (Strands emits these natively). If your custom trace schema (Week 6) aligns field-for-field with those conventions, the managed lane ingests your world without adapters.
+- **Trace compatibility is an adapter contract, not a naming wish.** Evaluations reconstructs sessions from framework-specific OTEL spans and, where applicable, correlated event records. Week 6 keeps raw Strands telemetry, the repo's canonical trace, and managed input as separate shapes joined by a versioned, tested mapping. Field alignment reduces translation; it does not prove transport, event-record packaging, or service acceptance. Week 10 supplies the first live acceptance receipt.
 - **Availability, quotas, and model access vary by Region.** Confirm evaluator availability in `us-east-1`, and remember evaluation configs have account limits and token-per-minute throughput caps.
 
 ## Repository shape to build toward
@@ -206,11 +206,11 @@ Freeze the informal patterns into contracts: tool-contract and capability-manife
 
 ## Week 6 — Tool Execution Dataset & Validation Schema
 
-Build the eval corpus: 100 hand-reviewed tool-calling rows (straightforward, multi-call, no-tool, failure-injection, adversarial with inert canaries), an OTEL-aligned execution-trace schema, deterministic mocks keyed by (toolId, args-hash), and validators in CI. **Deliverable:** Synthetic Dataset + Validators. → [Full guide](docs/weeks/week-06-dataset-validation.md)
+Build the eval corpus: 100 hand-reviewed tool-calling rows (straightforward, multi-call, no-tool, failure-injection, adversarial, and five bounded dependency/stop cases), a canonical execution-trace schema with synthetic Strands inline/ADOT-split compatibility fixtures, deterministic versioned mocks, and validators in CI. **Deliverable:** Synthetic Dataset + Validators. → [Full guide](docs/weeks/week-06-dataset-validation.md)
 
 ## Week 7 — Minimal Tool-Calling Specimen
 
-Reduce to a single-tool specimen with every behavioral input pinned in a run manifest; instrument with OTEL, normalize traces through a tested adapter, capture tool-selection reasoning, run the full dataset, and close the dataset-errata window before humans label. **Deliverable:** Instrumented Agent Specimen. → [Full guide](docs/weeks/week-07-specimen.md)
+Reduce to a single-tool specimen with every behavioral input pinned in a run manifest; capture the declared Strands telemetry profile, normalize it through a tested adapter, record observed pre-tool assistant text or explicit null without inferring causal reasoning, run the full dataset, and close the dataset-errata window before humans label. **Deliverable:** Instrumented Agent Specimen. → [Full guide](docs/weeks/week-07-specimen.md)
 
 ## Week 8 — Local Tool Execution Harness
 
