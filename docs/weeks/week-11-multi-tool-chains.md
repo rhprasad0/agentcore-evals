@@ -58,7 +58,7 @@ Alongside membership, two more deterministic gate families:
 
 ### Trajectory evaluation: the judged complement, under Week 10's rules
 
-Deterministic sequence gates can't assess "was this ordering *sensible* for this task" on genuinely open rows. `strands-evals`' **TrajectoryEvaluator** (verified: LLM-based, with built-in exact / in-order / any-order match scorers exposed as tools to the judge, plus a custom rubric) fills that gap — but it is a *judge*, and Week 10's posture applies with no exceptions: it gets calibrated before it's trusted. Run it first on rows where the DAG gates already produce verdicts; its agreement with the deterministic lane on decidable rows is your evidence for believing it on the undecidable ones. A trajectory judge adopted without that check is exactly the "random-number generator with good vibes" [Appendix C](../../LEARNING_PLAN.md#appendix-c--guardrails) warns about.
+Deterministic sequence gates can't assess "was this ordering *sensible* for this task" on genuinely open rows. Strands Evals' **`TrajectoryEvaluator`** (verified: LLM-based, with exact / in-order / any-order match scorers exposed as tools to the judge, plus a custom rubric) fills that gap — but it is a *judge*, and Week 10's posture applies with no exceptions. Version the rubric; record the exact Evals package and judge-model versions; populate tool descriptions from the same pinned contracts shown to the specimen; and choose the scorer from each row's sequence semantics rather than convenience. Run it first on rows where DAG gates already produce verdicts and measure both agreement and repeat-run flip rate. Only that evidence licenses reading verdicts on undecidable rows. A trajectory judge adopted without this check is exactly the "random-number generator with good vibes" [Appendix C](../../LEARNING_PLAN.md#appendix-c--guardrails) warns about.
 
 ### The regression clause: growth must not cost you Week 8
 
@@ -76,7 +76,7 @@ Four families as above; sentinel-bearing mock fixtures for the handoff traps; tr
 
 ### 3. Extend the harness gates
 
-Valid-sequence DAG membership per scenario, intermediate-state fidelity checks (grep step-N inputs for step-N−1 outputs), and cascade rules from the taxonomy (a failed step must surface, not vanish). Add `strands-evals` trajectory evaluation as the LLM-judged complement, using Week 10's calibration posture.
+Valid-sequence DAG membership per scenario, intermediate-state fidelity checks (grep step-N inputs for step-N−1 outputs), and cascade rules from the taxonomy (a failed step must surface, not vanish). Add the versioned Strands `TrajectoryEvaluator` as the LLM-judged complement, using only pinned contract descriptions and Week 10's calibration posture. Map its `EvaluationOutput` (`score`, `test_pass`, `reason`) into the existing common verdict frame; instrument errors stay distinct from judged failures.
 
 ### 4. Visualize and re-baseline
 
@@ -103,6 +103,8 @@ Generate a Mermaid execution-flow diagram *from trace data* per scenario (a `scr
 **5. Calibrate the trajectory judge before believing it.** Run TrajectoryEvaluator over all rows where DAG gates produced verdicts; compute agreement; then — only then — read its verdicts on the open rows.
 - *Hint 1:* Which scorer (exact / in-order / any-order) corresponds to your DAG semantics? A mismatch here manufactures fake disagreement.
 - *Hint 2:* Where the trajectory judge and the DAG gate disagree, Week 9's five-bucket triage applies — with a new bucket possible: the *DAG row* is wrong (a legal path you didn't enumerate). How do you tell that bucket from judge error?
+- *Hint 3:* Repeat the calibration slice. If the evaluator flips on the same pinned input, what uses remain licensed by the Week 10 trust policy?
+- *Hint 4:* Assert the installed SDK's output contract in tests: the explanatory field is `reason`, not an invented `reasoning`, and every report row identifies the evaluator that produced it.
 
 **6. Render the flow from data.** Build the Mermaid renderer over normalized traces and pick your three committed runs.
 - *Hint 1:* `parentSpanId`/`stepIndex` give you the edges; what marks an *injected-failure* step visually so the diagram tells the cascade story at a glance?
@@ -111,6 +113,7 @@ Generate a Mermaid execution-flow diagram *from trace data* per scenario (a `scr
 ## Gotchas & drift watch
 
 - **Chain runs multiply model calls and cost.** 40 scenarios × up to 5 steps × (agent model + summarizer model) — budget tokens before the first full run, and iterate on a 5-row slice, not the corpus.
+- **Trajectory judging adds another model dependency.** Its package version, judge model, rubric, tool descriptions, and scorer semantics all enter the run manifest. A change to any one creates a new judged baseline rather than silently retargeting old results.
 - **Legal variance vs flakiness.** Chains give the model *more* legitimate choices, so run-to-run sequence variation is expected — the DAG-set design absorbs it. If a scenario's verdict flips across runs, first ask whether the DAG is missing a legal path, not whether the model "got worse."
 - **Two models, two pins.** The summarizer's model ID, prompt, and version join the run manifest. A summarizer swap is a manifest change — Week 8's identity rule extends to every model in the system.
 - **Fetched content is attacker-shaped.** The injection canary rows must now include *fetched-page payloads* (inert, greppable, per Appendix C) — a page that "instructs" the agent. What the agent does with instructions inside tool *results* is a new eval question your Week 15 boundary work will lean on; collect the observations now.
@@ -138,6 +141,7 @@ Verified via the AWS docs MCP server, 2026-07-07.
 - [Strands: agents as tools](https://strandsagents.com/docs/user-guide/concepts/multi-agent/agents-as-tools/) — the three implementation styles (direct in `tools`, `.as_tool()`, `@tool` wrapper); the summarizer seam is this page.
 - [Strands Evals: TrajectoryEvaluator](https://strandsagents.com/docs/user-guide/evals-sdk/evaluators/trajectory_evaluator/) — rubric design and the exact/in-order/any-order scorers; read before Exercise 5 chooses a scorer.
 - [Strands Evals: evaluators overview](https://strandsagents.com/docs/user-guide/evals-sdk/evaluators/) — where trajectory evaluation sits among the SDK's evaluator families.
+- [Strands Evals: experiment management](https://strandsagents.com/docs/user-guide/evals-sdk/how-to/experiment_management/) — multi-evaluator report rows and evaluator identity; verify the exact report shape against the pinned package before writing comparison code.
 - Your own Week 5–6 artifacts — the contract schema, taxonomy, and dataset anatomy are the normative docs this week extends; when in doubt, the discipline is "what would Week 5 require," not "what would be quickest."
 
 ## Self-check

@@ -21,7 +21,7 @@ Since then the parts that matter most to this plan shipped:
 - **AgentCore Evaluations (GA March 2026)** — managed LLM-as-judge evaluation over agent traces, with built-in evaluators at session, trace, and **tool level** — including `Builtin.ToolSelectionAccuracy` and `Builtin.ToolParameterAccuracy` — plus ground-truth modes, custom LLM/Lambda evaluators, and online (sampled live traffic), on-demand, and batch modes.
 - **Agent performance loop (GA June 2026)** — recommendations, batch-evaluation validation, and A/B testing that propose and test prompt/tool-description changes from production traces.
 - **AgentCore CLI (GA March 2026)** — `npm install -g @aws/agentcore`; scaffolds Strands/LangGraph/ADK/OpenAI-Agents projects, local dev with a browser Agent Inspector, CDK-backed deploys.
-- **Strands Agents 1.x** — the SDK this plan builds on (Python `strands-agents`, ~1.45 as of July 2026), plus **Strands Evals** (`strands-agents-evals`): cases, experiments, LLM and deterministic evaluators (`ToolCalled`, `Equals`, `Contains`), trajectory evaluation, and trace-based evaluation.
+- **Strands Agents 1.x + Strands Evals** — the agent SDK and its separately versioned evaluation SDK. The custom lane uses Evals for `Case`/`Experiment` orchestration, task-result caching, custom evaluator execution, and reporting; the repo's schemas and canonical traces remain the evaluation contracts. Pin and record the exact Evals version when Week 8 begins (PyPI snapshot verified 2026-07-13: `1.0.1`).
 - **Protocols** — MCP spec revision 2025-11-25; A2A protocol v1.0 under the Linux Foundation.
 
 That maturity is exactly why the eval-first posture matters: the managed services will happily score your agent for you. This plan builds the ground truth that tells you whether to believe them.
@@ -106,10 +106,26 @@ This plan paraphrases AWS and Strands APIs, CLI flags, evaluator names, and sche
 Five lanes that converge in the Week 16 capstone. Keep their datasets, schemas, and result shapes separate; scores do not transfer between lanes.
 
 1. **Agent build lane** — Strands agents and tools; AgentCore Runtime, Gateway, Memory, Identity for hosting and integration. Weeks 1–5, 11–12, 15.
-2. **Custom eval lane** — the part you own: tool-contract schemas, synthetic datasets, deterministic validators and gates, execution-trace capture, human labeling, self-built blind judge. Engine: `strands-agents-evals` plus your own validators. Weeks 5–10.
+2. **Custom eval lane** — the part you own: tool-contract schemas, synthetic datasets, deterministic validators and gates, execution-trace capture, human labeling, self-built blind judge. Engine: `strands-agents-evals` for execution/reporting plus repo-owned schemas, adapters, and validators for evidence contracts. Weeks 5–10.
 3. **Managed eval lane** — AgentCore Evaluations: built-in evaluators (session/trace/tool level), custom evaluators, on-demand and batch runs, online sampling. Used only after the custom lane can check its homework. Weeks 10, 13–14, 16.
 4. **Platform & CI lane** — GitHub Actions, IaC (CDK via the AgentCore CLI, or Terraform where you need it), S3 artifact/versioning discipline, CloudWatch dashboards. Weeks 3, 13–14, 16.
 5. **Safety & governance lane** — capability manifests, scoped IAM, AgentCore Policy, Gateway-level guardrails, Identity-scoped credentials, public-safety scanning. Weeks 5, 12, 15–16.
+
+### Custom-lane ownership boundary
+
+Strands Evals is the execution framework, not a second source of truth. The integration stays explicit:
+
+| Layer | Owner | Stable artifact | Strands Evals role |
+| --- | --- | --- | --- |
+| Correctness definition | This repo | Week 5 contracts/taxonomy + Week 6 dataset schemas | Receives mapped `Case` objects; does not define truth. |
+| Source telemetry | Strands SDK / ADOT | Pinned source profile | Captures or maps source spans. |
+| Canonical trace | This repo | `execution-trace.schema.json` | Custom evaluators consume the canonical projection through an adapter. |
+| Mechanical evaluation | Repo evaluators on Strands Evals | `EvaluationOutput` verdicts with evidence | Orchestrates cases × evaluators and reports. |
+| Human ground truth | This repo | `human-labels-64.jsonl` | No authority; later comparisons only. |
+| Judged evaluation | Own judge / managed AgentCore lane | Versioned judge outputs | `TrajectoryEvaluator` is used only where explicitly calibrated. |
+| CI | This repo + Strands Evals CLI | Experiment/report JSON + committed safe fixtures | Validates serialized experiments, runs offline tasks, applies exit policy, renders reports. |
+
+`strands-evals validate` proves a serialized Strands experiment can be loaded; it does not replace `scripts/validate_dataset.py`, contract validation, or the public-safety scan. Likewise, a Strands `Session` is a framework representation, not the repo's canonical trace schema.
 
 ## Managed evaluation boundaries (read before Week 8)
 
@@ -158,6 +174,8 @@ agentcore-evals/
     judges/                    # blind judge prompt + runner (W10)
   evals/
     cases/                     # strands-evals Case definitions
+    adapters/                  # canonical repo artifacts → Strands Evals types
+    experiments/               # versioned serialized Experiment definitions
     evaluators/                # deterministic gates + custom evaluators
     harness.py                 # W8 local harness entrypoint
   scripts/
@@ -214,7 +232,7 @@ Reduce to a single-tool specimen with every behavioral input pinned in a run man
 
 ## Week 8 — Local Tool Execution Harness
 
-Build the local harness on `strands-agents-evals`: deterministic gates implementing the dataset's `expected` blocks, per-tag reporting in three renderings, CI wiring on every PR, and a baseline ×3 plus sensitivity check proving the instrument measures the agent. **Deliverable:** Local Evaluation Harness. → [Full guide](docs/weeks/week-08-local-harness.md)
+Make Week 8 the explicit `strands-agents-evals` integration: map versioned dataset rows to `Case` objects, run repo-owned deterministic `Evaluator` gates through an `Experiment`, separate metered task generation from cached/offline re-evaluation, validate and report through the SDK/CLI, wire the offline fixture lane into PR CI, and run a sensitivity check proving the instrument measures the agent. **Deliverable:** Local Evaluation Harness. → [Full guide](docs/weeks/week-08-local-harness.md)
 
 ## Week 9 — Human Tool-Selection Labeling
 
@@ -226,7 +244,7 @@ Build a blind selection judge and a full-trace execution judge (structured outpu
 
 ## Week 11 — Multi-Tool Integration Complexity
 
-Scale to a 5-tool dependency chain under contract discipline: chain scenarios with state-handoff traps, DAG-membership sequencing gates, cascade rules (no silent mid-chain failures), calibrated trajectory evaluation, and the regression check that portfolio growth didn't cost single-tool accuracy. **Deliverable:** Multi-Tool Chain Agent. → [Full guide](docs/weeks/week-11-multi-tool-chains.md)
+Scale to a 5-tool dependency chain under contract discipline: chain scenarios with state-handoff traps, DAG-membership sequencing gates, cascade rules (no silent mid-chain failures), a versioned and calibrated Strands `TrajectoryEvaluator` complement, and the regression check that portfolio growth didn't cost single-tool accuracy. **Deliverable:** Multi-Tool Chain Agent. → [Full guide](docs/weeks/week-11-multi-tool-chains.md)
 
 ## Week 12 — External Integration Reliability Gates
 
@@ -300,4 +318,5 @@ Carried forward from the 12-week plan, adapted for agents. These override enthus
 - **Write actions are gated twice.** Stubbed until reliability gates exist (Week 12); idempotency-checked forever after.
 - **Synthetic is not safe.** Adversarial rows use inert canaries, never operational payloads. This repo must not double as an attack cookbook.
 - **Raw traces stay out of git.** Public artifacts carry provenance (versions, hashes, kinds, scores), not payloads. The billboard test is a CI check, not a vibe.
+- **Framework schemas are adapters, not truth.** Strands Evals cases, sessions, experiments, and reports are useful execution formats. Repo contracts, canonical traces, and human labels remain the stable evidence model; SDK upgrades cross a tested adapter boundary.
 - **No magic production claims.** Passing evals are scoped evidence about tested scenarios. The honest sentence is always available: "measured X on Y under Z."

@@ -39,6 +39,8 @@ The pipeline is capture → normalize → store:
 - **Normalize** in `src/adapters/`: a declared Week 6 Strands source profile in → `execution-trace.schema.json`-valid trace out. The adapter is boring, load-bearing code — it gets unit tests with the public-safe synthetic inline and split fixtures from Week 6 so an SDK upgrade changing raw shapes fails tests instead of silently corrupting normalized data.
 - **Store** under `datasets/runs/<runId>/` — raw traces git-ignored, public-safe summaries committed. The billboard rule is at its most tempting to break here, because raw traces are so *useful*; the summary format you design this week is what makes the useful parts shareable.
 
+Strands Evals also offers a convenience path: `@eval_task(TracedHandler())` clears the in-memory exporter per case, invokes a fresh agent, and maps finished spans into a Strands `Session`. Exercise it once as a **compatibility probe**, then compare it with the repo adapter on the same declared synthetic source profile. The convenience path does not replace the canonical trace, and a Strands `Session` is not a new storage contract. Any serialized Session receives the same treatment as a raw trace: private and git-ignored unless transformed into an explicitly reviewed synthetic fixture.
+
 ### `selectionReasoning`: optional observed text, not a causal explanation
 
 If an assistant message contains text immediately preceding a `toolUse` block, store that observed text as `selectionReasoning` on the canonical tool-call span. Week 10's blind judge may use it as evidence about the stated justification; the decision remains judgeable from conversation state and available tools when it is absent.
@@ -62,7 +64,9 @@ Weather agent, weather tool only (mock registry from Week 6 behind it), pinned m
 
 ### 2. Instrument and normalize
 
-Strands hooks/callbacks + telemetry export capture the loop; write the adapter (`src/adapters/`) that normalizes the pinned Week 6 Strands source profile into `execution-trace.schema.json`. Support the profile actually emitted by this run (inline or ADOT-split), fail loudly on orphaned correlations, and store observed pre-tool assistant text or explicit null as `selectionReasoning`. Ship the adapter with tests: synthetic source fixture in → schema-valid trace out.
+Use Strands hooks/callbacks + telemetry export to capture the loop; write the adapter (`src/adapters/`) that normalizes the pinned Week 6 Strands source profile into `execution-trace.schema.json`. Support the profile actually emitted by this run (inline or ADOT-split), fail loudly on orphaned correlations, and store observed pre-tool assistant text or explicit null as `selectionReasoning`. Ship the adapter with tests: synthetic source fixture in → schema-valid trace out.
+
+Run one synthetic case through `@eval_task(TracedHandler())` as a bounded cross-check. Compare its mapped Session with the repo-normalized trace for tool name, arguments, result status, and correlation identifiers; document fields present in only one representation and fail if either path silently drops a canonical required fact. Record the exact `strands-agents-evals` version and capture path in the run manifest.
 
 ### 3. Run the full 100-row dataset
 
@@ -95,11 +99,17 @@ Annotate surprises. Mislabeled expectations in the dataset get fixed *now*, with
 - *Hint 1:* If presence is low, what could raise it — and is that intervention (prompting for explanations) *changing the specimen*? What does the manifest say about that?
 - *Hint 2:* Whatever the rate is, write it in the run summary; Week 10's judge design must plan for the null case rather than discover it.
 
+**6. Cross-check the native Evals mapping.** Run one public-safe synthetic case through `@eval_task(TracedHandler())`, inspect the resulting Strands `Session`, and compare it with the repo adapter's canonical trace for the same declared source profile.
+- *Hint 1:* The two shapes do not need to serialize identically. Observed tool name, arguments, result status, and correlation identifiers must agree; the canonical `toolId`/contract binding remains a repo-owned extension that the checked mapping must recover explicitly.
+- *Hint 2:* Plant one source field that the canonical schema requires. A comparison that still passes after either adapter drops it is a tautology, not a compatibility test.
+- *Hint 3:* `TracedHandler` manages exporter clearing per case, but cache/report identity still depends on unique case and session identifiers. Where are those pins recorded?
+
 ## Gotchas & drift watch
 
 - **Temperature low ≠ deterministic.** Provider-side sampling, batching, and numerical nondeterminism can vary output at temperature 0. Week 6 proves byte identity only for ordered canonical projections of equivalent telemetry inputs. This week measures repeated model runs separately through tool-call sequence agreement.
 - **Versions and hashes answer different questions.** Exact contract/manifest versions say which reviewed promises governed the run; hashes prove the actual prompt/spec bytes did not drift. Keep both. A changed version creates a new run identity and triggers dataset/mock revalidation; no automatic migration is promised.
 - **Hooks/telemetry APIs are the fastest-moving part of Strands.** Some hook and telemetry interfaces live in experimental namespaces; verify current names in the docs before wiring, and pin SDK versions in the manifest so an upgrade is a *decision*, not ambient drift.
+- **Convenience mapping can become accidental architecture.** `TracedHandler` is useful plumbing, but custom gates still consume the repo's canonical trace through a tested adapter. If an SDK Session gains or loses a field, the compatibility test should fail before the evidence model changes.
 - **Keep committed source fixtures synthetic.** The adapter's test fixtures preserve raw Strands-shaped structure, but their values are authored placeholders—not captured Runtime payloads. Run the safety scan over `tests/` as well as `datasets/`; live raw telemetry remains private.
 - **Errata cutoff is real.** After Week 9's labels exist, dataset expectation edits invalidate the affected labels (and any calibration built on them). Date the errata window's close in the changelog; late-found bugs get logged and batch-fixed with explicit relabeling, not quietly patched.
 - **Summaries are the public artifact — design them, don't dump them.** Counts, rates, kinds, verdict distributions, manifest fields: yes. Prompt texts wholesale, tool arguments verbatim, model prose: only what review confirms billboard-safe. The summary generator is repo code (`scripts/summarize_run.py` is coming in Week 8 — seed it now if convenient).
@@ -109,6 +119,7 @@ Annotate surprises. Mislabeled expectations in the dataset get fixed *now*, with
 
 - [ ] Specimen config + run manifest schema; everything pinned and recorded.
 - [ ] Trace normalization adapter with tests (pinned synthetic Strands source profile in → schema-valid trace out).
+- [ ] One public-safe synthetic compatibility test comparing the repo adapter with Strands Evals' `TracedHandler`/Session mapping on the same declared source profile.
 - [ ] Full-dataset run: 100 normalized traces + a public-safe summary report.
 - [ ] Dataset errata changelog from the hand review.
 
@@ -117,6 +128,7 @@ Annotate surprises. Mislabeled expectations in the dataset get fixed *now*, with
 - [ ] 100/100 traces validate against the trace schema.
 - [ ] Repeated same-manifest runs are compared with an exact tool-call-sequence comparator; the agreement rate and every difference are reported rather than converted into a model-determinism claim.
 - [ ] Every trace answers, mechanically: which tool, what args, what result kind, what the agent said, and whether observed pre-tool assistant text was present or explicitly null; no causal rationale is inferred.
+- [ ] The native Strands Evals mapping and repo adapter agree on required tool-call facts for the synthetic compatibility case; shape differences are documented and no byte-identical-schema claim is made.
 
 ## Docs to consult
 
@@ -125,6 +137,7 @@ Verified via the AWS docs MCP server, 2026-07-07.
 - [Strands traces](https://strandsagents.com/docs/user-guide/observability-evaluation/traces/) — the span hierarchy you're capturing and its attribute names; the adapter's input format lives here.
 - [Strands observability overview](https://strandsagents.com/docs/user-guide/observability-evaluation/observability/) — how traces/metrics/logs relate in the SDK; links out to the per-primitive pages including hooks-level instrumentation.
 - [Strands Evals quickstart](https://strandsagents.com/docs/user-guide/evals-sdk/quickstart/) — the telemetry setup (in-memory exporter, session mapping) this specimen's capture can reuse directly, easing the Week 8 handoff.
+- [Strands Evals task decorator](https://strandsagents.com/docs/user-guide/evals-sdk/how-to/eval_task/) — `@eval_task(TracedHandler())`, exporter clearing, and Session mapping used by the bounded compatibility probe; verify against the exact package version recorded in the manifest.
 
 ## Self-check
 

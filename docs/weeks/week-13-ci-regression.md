@@ -27,7 +27,7 @@ The pipeline splits along the line Week 8 drew (stage A/B), now formalized:
 | | **Lane 1 — every PR** | **Lane 2 — merge to main / nightly** |
 | --- | --- | --- |
 | Question | "Did this change break known-good behavior *mechanically*?" | "Does the *deployed* agent still score above calibrated thresholds?" |
-| Runs | Dataset validation → safety scan → unit tests → harness over regression fixtures with mocks | Invoke deployed agent over pinned prompts → normalize traces → batch evaluation (managed + own judge) → threshold check |
+| Runs | Repo dataset validation → safety scan → unit tests → Strands Experiment validation → custom gates over committed public-safe regression traces through an offline task → report | Invoke deployed agent over pinned prompts → normalize traces → batch evaluation (managed + own judge) → threshold check |
 | Time / cost | Minutes, free (no cloud calls) | Tens of minutes, real money (invocations + judge tokens) |
 | Threshold | **100%** on regression rows | Calibration-derived score floors (see below) |
 | Failure meaning | A specific pinned behavior changed — the evidence payload names it | Deployed quality drifted — triage begins (agent? evaluator? environment?) |
@@ -79,7 +79,7 @@ Deploy the Week 12 agent via `agentcore deploy` (config in repo; observability e
 
 ### 2. Build lane 1 (`ci.yml`, every PR)
 
-Dataset validation → safety scan → unit tests → harness over regression fixtures with mocks → thresholds (tool-selection gate pass rate = 100% on regression rows; they're regression rows *because* they must not flake). Target: complete fast enough that you never skip it.
+Repo dataset/contract validation → safety scan → unit tests → validate the derived Strands Experiment → run custom evaluators over committed public-safe regression traces through a fixture-loading `--task` → render/upload the flattened report → thresholds (tool-selection gate pass rate = 100% on regression rows; they're regression rows *because* they must not flake). Use `--fail-on any`. Do **not** use `--agent` in the PR lane: it would invoke the model, violating the lane's cloud-free contract. Do not depend on a developer-local task-result cache; CI fixtures are reviewed, pinned artifacts.
 
 ### 3. Build lane 2 (merge to main / nightly)
 
@@ -118,6 +118,8 @@ The seeded-regression PR: innocent-looking description edit → red gate → scr
 ## Gotchas & drift watch
 
 - **Lane 2 is metered — schedule accordingly.** Nightly + on-merge, never per-PR; pinned prompt set, not the full corpus. The cost guardrails ([Working assumptions](../../LEARNING_PLAN.md#working-assumptions)) treat batch evals as "pinned small datasets, not everything-always."
+- **Strands CLI failures have different meanings.** Preserve exit code `1` (evaluation threshold/failure), `2` (bad input, experiment, or custom-evaluator registration), and `3` (unexpected runtime error) in the runbook and job summary. Only code `1` is evidence that the agent violated a gate.
+- **No raw Evals cache uploads.** `--data-store` is disabled in the PR lane or points to ephemeral storage that is never uploaded. The flattened report must pass the public-safety scan before artifact upload; full cached `EvaluationData` remains private.
 - **Span propagation is the phantom failure.** Between `agentcore invoke` and batch evaluation discovering the session, spans must reach CloudWatch and the session must close. Poll or sleep deliberately; document the observed delay in the runbook the first time it bites.
 - **Deploy freshness:** lane 2 must test what merged. Either lane 2 deploys before invoking, or it verifies the deployed version matches `main` (manifest/version check) — a nightly lane silently testing last Tuesday's deploy produces confident nonsense either way.
 - **Two judges disagreeing in lane 2 is signal, not breakage.** Your judge and the built-ins were calibrated with known disagreement patterns (Week 10's casebook). The runbook's triage uses that: both drop → believe it; only the built-in drops → suspect evaluator drift; only yours drops → suspect your judge's sensitivity. Write this into the runbook now, while the reasoning is fresh.
@@ -142,6 +144,7 @@ The seeded-regression PR: innocent-looking description edit → red gate → scr
 Verified via the AWS docs MCP server, 2026-07-08, except where marked external.
 
 - [Getting started with batch evaluation](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/batch-evaluations-getting-started.html) — CLI and boto3 invocation shapes, session discovery from CloudWatch, result formats; lane 2's spine.
+- [Strands Evals CLI](https://strandsagents.com/docs/user-guide/evals-sdk/cli/) — lane 1's offline `--task` entry point, custom evaluator registration, `--fail-on` policy, report JSON, and exit-code contract; verify flags against the exact pinned version.
 - [Get batch evaluation results](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/batch-evaluations-get.html) — polling, terminal states, `evaluatorSummaries` result structure; what your threshold step parses.
 - [AgentCore pricing — Evaluations](https://aws.amazon.com/bedrock/agentcore/pricing/) — what lane 2 costs per run; the input to your scheduling decision.
 - [GitHub Actions: OIDC with AWS](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services) *(external)* — the keyless auth pattern for lane 2; pair with your Week 5 least-privilege discipline.

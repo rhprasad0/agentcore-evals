@@ -113,6 +113,11 @@ The widget table above: tool-call volume by toolId, selection-accuracy trend (on
 - *Hint 1:* No-retry follow-up rate: what non-satisfaction causes a no-retry session (user gave up)? What satisfaction-compatible behavior looks like a retry (user asked a genuinely new question)?
 - *Hint 2:* Name the decision this proxy is allowed to influence and the decision it isn't (e.g., "worth investigating" vs "agent is good"). Proxies earn narrow jobs.
 
+**7. Audit the Strands Evals CloudWatch mapper.** For a small billboard-safe synthetic/test session set, retrieve the same AgentCore Runtime session through the repo's CloudWatch adapter and Strands Evals' `CloudWatchProvider`, then compare the mapped tool-call facts.
+- *Hint 1:* Compare session/trace identity, observed tool name, arguments/result presence, status, and final response. Which differences are provider-query behavior, mapper behavior, or canonical repo extensions?
+- *Hint 2:* The provider is a useful compatibility lens, not a replacement for `src/adapters/`. Promote a discovered difference into a synthetic regression fixture only if it changes a required canonical fact.
+- *Hint 3:* Never commit either provider's raw output. The public receipt is the field-level comparison and package/source-profile versions.
+
 ## Gotchas & drift watch
 
 - **The faucet runs while you sleep.** Online evaluation bills per sampled session continuously. Pause the config (`agentcore pause`) outside demo windows; the Week 3 teardown habit extends to evaluation configs. Budget alarm still standing guard from Week 1.
@@ -121,6 +126,7 @@ The widget table above: tool-call volume by toolId, selection-accuracy trend (on
 - **Log retention is a cost and an exposure window.** Set explicit retention on both the agent and results log groups — indefinite retention of even scrubbed telemetry is spend without purpose.
 - **Console views drift fastest.** The GenAI observability console pages get reorganized more often than APIs; if a screenshot in this repo stops matching the console, trust the data (log groups, metrics), not the layout.
 - **Verify the online-eval CLI flags before wiring** — `add online-eval` exists in the verified command list, but flag names in the plan's sketch (`--sampling-rate`, `--enable-on-create`) should be confirmed against `agentcore add online-eval --help`; the control-plane API (`OnlineEvaluationConfig`) is the fallback path with verified field semantics.
+- **Remote provider convenience is another adapter boundary.** `CloudWatchProvider` queries Runtime log groups and maps records into a Strands `Session`; its output can drift with SDK/query changes. Compare it with the repo adapter on synthetic/test sessions, but keep canonical evidence and public-safety policy repo-owned.
 - **Alarms need a destination that wakes you.** An alarm to an unmonitored email is decoration (Week 13's rule, applied to ops). Test-fire both alarms once — the test fire is itself a receipt for the docs.
 
 ## Deliverable checklist — Observability Dashboard
@@ -144,6 +150,7 @@ Verified via the AWS docs MCP server, 2026-07-08, except where marked.
 - [AgentCore Observability](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/observability.html) — the session/trace/span views and where each surface lives.
 - [Create online evaluations](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/create-online-evaluations.html) — config fields: evaluators, data source, sampling, session timeout, execution role; the authoritative source for build step 3's flags and semantics.
 - [Build custom code-based evaluators (AWS blog)](https://aws.amazon.com/blogs/machine-learning/build-custom-code-based-evaluators-in-amazon-bedrock-agentcore/) — the clearest end-to-end description of online-eval mechanics (discovery, sampling, EMF metrics, alarms) at verification time; also previews custom evaluators if your dashboard wants a deterministic metric scored online.
+- [Strands Evals remote trace providers](https://strandsagents.com/docs/user-guide/evals-sdk/how-to/trace_providers/) — `CloudWatchProvider`, `CloudWatchSessionMapper`, and provider error boundaries used by Exercise 7's compatibility audit; pin and record the package version.
 - CloudWatch Logs Insights query syntax *(standard CloudWatch docs)* — for the billboard-test catalog.
 
 ## Self-check

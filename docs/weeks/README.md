@@ -23,8 +23,8 @@ One tool keeps tool-selection labels unambiguous. The eval contract is the work.
 | --- | --- | --- |
 | 5 | [Agent/Tool Contract Architecture](week-05-tool-contracts.md) | Tool contract specification + capability manifests |
 | 6 | [Tool Execution Dataset & Validation Schema](week-06-dataset-validation.md) | 100-row synthetic dataset + validators + mocks |
-| 7 | [Minimal Tool-Calling Specimen](week-07-specimen.md) | Instrumented, pinned, reproducible specimen |
-| 8 | [Local Tool Execution Harness](week-08-local-harness.md) | Deterministic gate harness in CI |
+| 7 | [Minimal Tool-Calling Specimen](week-07-specimen.md) | Canonical trace specimen + Strands-native mapping compatibility check |
+| 8 | [Local Tool Execution Harness](week-08-local-harness.md) | Versioned Strands Experiment + deterministic custom gates + offline CI report |
 | 9 | [Human Tool-Selection Labeling](week-09-human-labeling.md) | Blind-labeled 64-row human fixture |
 | 10 | [Tool Selection Judge Calibration](week-10-judge-calibration.md) | Three-way judge calibration + trust policy |
 
