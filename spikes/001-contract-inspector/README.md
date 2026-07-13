@@ -28,7 +28,7 @@ The inspector provides:
 - Recursive input-schema rendering with required fields, enums, defaults, and constraints
 - Separate success and failure output envelopes
 - Raw JSON with copy support
-- A field guide explaining the contract vocabulary
+- Hover/focus field descriptions for contract vocabulary, colocated with the relevant labels
 - Hash-addressable tool and tab selection
 - Dense desktop inspection layout
 
@@ -50,11 +50,12 @@ The generated file is self-contained and can be opened directly; it does not fet
 
 - Generator compiled and executed successfully.
 - Generated artifact contains all three exact-version contracts.
-- JSDOM exercised tool selection, natural-language search, input/output tabs, hash routing, and the field guide with no runtime errors.
+- Chromium exercised tool selection, natural-language search, input/output/raw tabs, hash routing, and hover/focus field descriptions with no runtime errors.
 - Chromium rendered at 1440×960 with no console errors or document-level horizontal overflow.
-- A desktop screenshot is saved beside the artifact.
-- Verification caught and fixed one real issue:
+- A desktop screenshot with a representative tooltip open is saved beside the artifact.
+- Verification caught and fixed two real issues:
   - natural-language `web search` did not initially match `search.web_search`;
+  - removed Field guide hashes initially retained the current tab instead of normalizing to Overview.
 
 ### Visual audit
 

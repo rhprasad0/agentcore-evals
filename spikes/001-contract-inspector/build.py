@@ -207,6 +207,46 @@ TEMPLATE = r'''<!doctype html>
     .fact dt { color: var(--muted); }
     .fact dd { margin: 0; font-family: var(--mono); overflow-wrap: anywhere; }
     .explain { display: block; margin-top: 3px; color: var(--dim); font: 12px/1.45 var(--sans); }
+    .described-field { display: inline-flex; align-items: center; gap: 6px; }
+    .field-help {
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      width: 17px;
+      height: 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 50%;
+      color: var(--dim);
+      font: 700 10px/1 var(--mono);
+      cursor: help;
+    }
+    .field-tooltip {
+      position: absolute;
+      z-index: 20;
+      left: 0;
+      bottom: calc(100% + 9px);
+      width: max-content;
+      max-width: min(320px, 70vw);
+      padding: 9px 11px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: #080c0d;
+      color: var(--ink);
+      box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+      font: 12px/1.45 var(--sans);
+      letter-spacing: normal;
+      text-align: left;
+      text-transform: none;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 100ms ease;
+    }
+    .field-help:hover .field-tooltip,
+    .field-help:focus-visible .field-tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
     .badge-row { display: flex; flex-wrap: wrap; gap: 7px; }
     .badge {
       display: inline-flex;
@@ -229,7 +269,7 @@ TEMPLATE = r'''<!doctype html>
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
-      overflow: hidden;
+      overflow: visible;
     }
     .schema-card > header {
       display: flex;
@@ -238,6 +278,7 @@ TEMPLATE = r'''<!doctype html>
       align-items: baseline;
       padding: 15px 18px;
       border-bottom: 1px solid var(--line);
+      border-radius: 8px 8px 0 0;
       background: var(--panel-2);
     }
     .schema-card h3 { margin: 0; font: 700 15px/1.25 var(--mono); }
@@ -290,12 +331,6 @@ TEMPLATE = r'''<!doctype html>
       cursor: pointer;
     }
     .copy-button:hover { border-color: var(--amber); }
-
-    .glossary { margin-top: 14px; }
-    .glossary details { border-top: 1px solid var(--line); }
-    .glossary details:last-child { border-bottom: 1px solid var(--line); }
-    .glossary summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-family: var(--mono); }
-    .glossary p { margin: 0 0 16px; color: var(--muted); max-width: 820px; }
 
     @media (max-width: 820px) {
       .shell { grid-template-columns: 1fr; }
@@ -350,7 +385,6 @@ TEMPLATE = r'''<!doctype html>
         <button class="tab" data-tab="inputs" role="tab">Inputs</button>
         <button class="tab" data-tab="outputs" role="tab">Outputs</button>
         <button class="tab" data-tab="raw" role="tab">Raw JSON</button>
-        <button class="tab" data-tab="glossary" role="tab">Field guide</button>
       </div>
       <section id="view" aria-live="polite"></section>
     </main>
@@ -358,7 +392,7 @@ TEMPLATE = r'''<!doctype html>
 
   <script>
     const contracts = __CONTRACT_DATA__;
-    const glossary = {
+    const fieldDescriptions = {
       toolId: "Stable namespaced identity used by manifests, datasets, traces, labels, and policy artifacts. It is not the runtime function name.",
       name: "Exact final name exposed to the model after decorators, wrappers, and Gateway transformations.",
       version: "Exact SemVer behavior identity. Consumers pin this value rather than accepting a range.",
@@ -396,7 +430,8 @@ TEMPLATE = r'''<!doctype html>
       const version = decodeURIComponent(match[2]);
       const index = contracts.findIndex(c => c.toolId === toolId && c.version === version);
       if (index >= 0) selectedIndex = index;
-      if (["overview", "inputs", "outputs", "raw", "glossary"].includes(match[3])) activeTab = match[3];
+      const validTabs = ["overview", "inputs", "outputs", "raw"];
+      activeTab = validTabs.includes(match[3]) ? match[3] : "overview";
     }
 
     function normalizeSearch(value) {
@@ -426,6 +461,13 @@ TEMPLATE = r'''<!doctype html>
       return `<span class="badge ${className}">${escapeHtml(value)}</span>`;
     }
 
+    function describedField(label, key, suffix) {
+      const description = fieldDescriptions[key];
+      if (!description) return escapeHtml(label);
+      const tooltipId = `field-help-${suffix}`;
+      return `<span class="described-field">${escapeHtml(label)}<span class="field-help" tabindex="0" aria-describedby="${escapeHtml(tooltipId)}" aria-label="Explain ${escapeHtml(label)}">?<span class="field-tooltip" id="${escapeHtml(tooltipId)}" role="tooltip">${escapeHtml(description)}</span></span></span>`;
+    }
+
     function overview(contract) {
       const trustClass = contract.resultTrust.includes("untrusted") ? "untrusted" : "trusted";
       return `
@@ -433,22 +475,22 @@ TEMPLATE = r'''<!doctype html>
           <section class="section">
             <h3>Identity</h3>
             <dl class="facts">
-              <div class="fact"><dt>toolId</dt><dd>${escapeHtml(contract.toolId)}<span class="explain">Stable join key across artifacts</span></dd></div>
-              <div class="fact"><dt>runtime name</dt><dd>${escapeHtml(contract.name)}<span class="explain">Exact name exposed to the model</span></dd></div>
-              <div class="fact"><dt>version</dt><dd>${escapeHtml(contract.version)}<span class="explain">Consumers pin this exact behavior</span></dd></div>
+              <div class="fact"><dt>${describedField("toolId", "toolId", "overview-tool-id")}</dt><dd>${escapeHtml(contract.toolId)}<span class="explain">Stable join key across artifacts</span></dd></div>
+              <div class="fact"><dt>${describedField("runtime name", "name", "overview-runtime-name")}</dt><dd>${escapeHtml(contract.name)}<span class="explain">Exact name exposed to the model</span></dd></div>
+              <div class="fact"><dt>${describedField("version", "version", "overview-version")}</dt><dd>${escapeHtml(contract.version)}<span class="explain">Consumers pin this exact behavior</span></dd></div>
             </dl>
           </section>
           <section class="section">
             <h3>Operational envelope</h3>
             <dl class="facts">
-              <div class="fact"><dt>side effects</dt><dd>${badge(contract.sideEffects, "effect")}</dd></div>
-              <div class="fact"><dt>result trust</dt><dd>${badge(contract.resultTrust, trustClass)}</dd></div>
-              <div class="fact"><dt>latency budget</dt><dd>${escapeHtml(contract.latencyBudgetMs)} ms</dd></div>
-              <div class="fact"><dt>auth scope</dt><dd>${escapeHtml(contract.authScope || "none")}</dd></div>
+              <div class="fact"><dt>${describedField("side effects", "sideEffects", "overview-side-effects")}</dt><dd>${badge(contract.sideEffects, "effect")}</dd></div>
+              <div class="fact"><dt>${describedField("result trust", "resultTrust", "overview-result-trust")}</dt><dd>${badge(contract.resultTrust, trustClass)}</dd></div>
+              <div class="fact"><dt>${describedField("latency budget", "latencyBudgetMs", "overview-latency-budget")}</dt><dd>${escapeHtml(contract.latencyBudgetMs)} ms</dd></div>
+              <div class="fact"><dt>${describedField("auth scope", "authScope", "overview-auth-scope")}</dt><dd>${escapeHtml(contract.authScope || "none")}</dd></div>
             </dl>
           </section>
           <section class="section wide">
-            <h3>Normalized failure modes</h3>
+            <h3>${describedField("Normalized failure modes", "failureModes", "overview-failure-modes")}</h3>
             <div class="badge-row">${contract.failureModes.map(mode => badge(mode, "failure")).join("")}</div>
           </section>
           <section class="section wide">
@@ -499,12 +541,13 @@ TEMPLATE = r'''<!doctype html>
       }).join("")}</div>`;
     }
 
-    function schemaCard(title, schema, path, variant = "") {
-      return `<section class="schema-card ${variant}"><header><h3>${escapeHtml(title)}</h3><span class="path">${escapeHtml(path)}</span></header>${fieldsMarkup(schema, path)}</section>`;
+    function schemaCard(title, schema, path, variant = "", descriptionKey = "", tooltipSuffix = "") {
+      const heading = descriptionKey ? describedField(title, descriptionKey, tooltipSuffix) : escapeHtml(title);
+      return `<section class="schema-card ${variant}"><header><h3>${heading}</h3><span class="path">${escapeHtml(path)}</span></header>${fieldsMarkup(schema, path)}</section>`;
     }
 
     function inputView(contract) {
-      return `<div class="schema-stack">${schemaCard("Arguments the model may send", contract.inputSchema, "input")}</div>`;
+      return `<div class="schema-stack">${schemaCard("Arguments the model may send", contract.inputSchema, "input", "", "inputSchema", "input-schema")}</div>`;
     }
 
     function outputView(contract) {
@@ -513,16 +556,12 @@ TEMPLATE = r'''<!doctype html>
         const okConst = schema.properties?.ok?.const;
         const title = okConst === true ? "Success envelope" : okConst === false ? "Failure envelope" : `Variant ${index + 1}`;
         const variant = okConst === true ? "variant success" : okConst === false ? "variant failure" : "variant";
-        return schemaCard(title, schema, `output.oneOf[${index}]`, variant);
+        return schemaCard(title, schema, `output.oneOf[${index}]`, variant, "outputSchema", `output-schema-${index}`);
       }).join("")}</div>`;
     }
 
     function rawView(contract) {
       return `<div class="raw-toolbar"><button class="copy-button" id="copy-json">Copy JSON</button></div><pre>${escapeHtml(JSON.stringify(contract, null, 2))}</pre>`;
-    }
-
-    function glossaryView() {
-      return `<section class="section"><h3>Contract field guide</h3><div class="glossary">${Object.entries(glossary).map(([key, text]) => `<details><summary>${escapeHtml(key)}</summary><p>${escapeHtml(text)}</p></details>`).join("")}</div></section>`;
     }
 
     function renderContract() {
@@ -536,7 +575,7 @@ TEMPLATE = r'''<!doctype html>
         tab.classList.toggle("active", selected);
         tab.setAttribute("aria-selected", selected ? "true" : "false");
       });
-      const views = { overview, inputs: inputView, outputs: outputView, raw: rawView, glossary: glossaryView };
+      const views = { overview, inputs: inputView, outputs: outputView, raw: rawView };
       $("#view").innerHTML = views[activeTab](contract);
       if (activeTab === "raw") {
         $("#copy-json").addEventListener("click", async event => {

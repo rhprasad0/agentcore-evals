@@ -179,6 +179,46 @@
     .fact dt { color: var(--muted); }
     .fact dd { margin: 0; font-family: var(--mono); overflow-wrap: anywhere; }
     .explain { display: block; margin-top: 3px; color: var(--dim); font: 12px/1.45 var(--sans); }
+    .described-field { display: inline-flex; align-items: center; gap: 6px; }
+    .field-help {
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      width: 17px;
+      height: 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 50%;
+      color: var(--dim);
+      font: 700 10px/1 var(--mono);
+      cursor: help;
+    }
+    .field-tooltip {
+      position: absolute;
+      z-index: 20;
+      left: 0;
+      bottom: calc(100% + 9px);
+      width: max-content;
+      max-width: min(320px, 70vw);
+      padding: 9px 11px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: #080c0d;
+      color: var(--ink);
+      box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+      font: 12px/1.45 var(--sans);
+      letter-spacing: normal;
+      text-align: left;
+      text-transform: none;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 100ms ease;
+    }
+    .field-help:hover .field-tooltip,
+    .field-help:focus-visible .field-tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
     .badge-row { display: flex; flex-wrap: wrap; gap: 7px; }
     .badge {
       display: inline-flex;
@@ -201,7 +241,7 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
-      overflow: hidden;
+      overflow: visible;
     }
     .schema-card > header {
       display: flex;
@@ -210,6 +250,7 @@
       align-items: baseline;
       padding: 15px 18px;
       border-bottom: 1px solid var(--line);
+      border-radius: 8px 8px 0 0;
       background: var(--panel-2);
     }
     .schema-card h3 { margin: 0; font: 700 15px/1.25 var(--mono); }
@@ -262,12 +303,6 @@
       cursor: pointer;
     }
     .copy-button:hover { border-color: var(--amber); }
-
-    .glossary { margin-top: 14px; }
-    .glossary details { border-top: 1px solid var(--line); }
-    .glossary details:last-child { border-bottom: 1px solid var(--line); }
-    .glossary summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-family: var(--mono); }
-    .glossary p { margin: 0 0 16px; color: var(--muted); max-width: 820px; }
 
     @media (max-width: 820px) {
       .shell { grid-template-columns: 1fr; }
@@ -322,7 +357,6 @@
         <button class="tab" data-tab="inputs" role="tab">Inputs</button>
         <button class="tab" data-tab="outputs" role="tab">Outputs</button>
         <button class="tab" data-tab="raw" role="tab">Raw JSON</button>
-        <button class="tab" data-tab="glossary" role="tab">Field guide</button>
       </div>
       <section id="view" aria-live="polite"></section>
     </main>
@@ -330,7 +364,7 @@
 
   <script>
     const contracts = [{"toolId": "calculator.calculate", "name": "calculator", "version": "1.0.0", "description": "Calculate arithmetic over supplied numeric values.\n\nAccepts numeric literals with arithmetic operators and parentheses. It does\nnot retrieve current or external facts, solve symbolic equations, perform\ncalculus, or mutate external state. Returns {ok: True, value} on success or\n{ok: False, error: {kind, message, retryable}} on failure.", "inputSchema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "properties": {"expression": {"description": "Parameter expression", "type": "string"}}, "required": ["expression"], "type": "object"}, "outputSchema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "oneOf": [{"type": "object", "properties": {"ok": {"const": true}, "value": {"type": "string", "minLength": 1}}, "required": ["ok", "value"], "additionalProperties": false}, {"type": "object", "properties": {"ok": {"const": false}, "error": {"type": "object", "properties": {"kind": {"const": "bad_input"}, "message": {"type": "string", "minLength": 1}, "retryable": {"type": "boolean"}}, "required": ["kind", "message", "retryable"], "additionalProperties": false}}, "required": ["ok", "error"], "additionalProperties": false}]}, "failureModes": ["bad_input"], "sideEffects": "none", "resultTrust": "trusted_structured", "latencyBudgetMs": 100}, {"toolId": "search.web_search", "name": "web_search", "version": "1.0.0", "description": "Search for current public information when no dedicated tool owns the request.\n\nDoes not replace structured current-weather queries or arithmetic. Result\ntitles, URLs, dates, and text come from external sources and are untrusted.\nReturns {ok: True, results} on success or\n{ok: False, error: {kind, message, retryable}} on failure.", "inputSchema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "type": "object", "properties": {"query": {"type": "string", "minLength": 1, "description": "Public-information search query"}, "max_results": {"type": "integer", "minimum": 1, "maximum": 25, "default": 10, "description": "Maximum results to return, from 1 through 25"}}, "required": ["query"]}, "outputSchema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "oneOf": [{"type": "object", "properties": {"ok": {"const": true}, "results": {"type": "array", "items": {"type": "object", "properties": {"publishedDate": {"type": "string", "minLength": 1}, "text": {"type": "string", "minLength": 1}, "title": {"type": "string", "minLength": 1}, "url": {"type": "string", "format": "uri"}}, "required": ["publishedDate", "text", "title", "url"], "additionalProperties": false}}}, "required": ["ok", "results"], "additionalProperties": false}, {"type": "object", "properties": {"ok": {"const": false}, "error": {"type": "object", "properties": {"kind": {"enum": ["bad_input", "upstream_5xx"]}, "message": {"type": "string", "minLength": 1}, "retryable": {"type": "boolean"}}, "required": ["kind", "message", "retryable"], "additionalProperties": false}}, "required": ["ok", "error"], "additionalProperties": false}]}, "failureModes": ["bad_input", "upstream_5xx"], "sideEffects": "read_external", "resultTrust": "untrusted_external", "authScope": "gateway:web-search:invoke", "latencyBudgetMs": 5000}, {"toolId": "weather.get_current_weather", "name": "get_current_weather", "version": "1.2.0", "description": "Get current weather for a city. Not forecasts, history, or climate averages.\n\nunits must be 'metric', 'imperial', or 'standard'. Returns {ok, city, temp,\nunits, conditions} on success or {ok: False, error: {kind, message,\nretryable}} on failure.", "inputSchema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "properties": {"city": {"description": "Parameter city", "type": "string"}, "units": {"default": "metric", "description": "Parameter units", "enum": ["metric", "imperial", "standard"], "type": "string"}}, "required": ["city"], "type": "object"}, "outputSchema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "oneOf": [{"type": "object", "properties": {"ok": {"const": true}, "city": {"type": "string", "minLength": 1}, "temp": {"type": "number"}, "units": {"enum": ["metric", "imperial", "standard"]}, "conditions": {"type": "string", "minLength": 1}}, "required": ["ok", "city", "temp", "units", "conditions"], "additionalProperties": false}, {"type": "object", "properties": {"ok": {"const": false}, "error": {"type": "object", "properties": {"kind": {"enum": ["bad_input", "auth", "upstream_4xx", "upstream_5xx", "timeout", "network"]}, "message": {"type": "string", "minLength": 1}, "retryable": {"type": "boolean"}}, "required": ["kind", "message", "retryable"], "additionalProperties": false}}, "required": ["ok", "error"], "additionalProperties": false}]}, "failureModes": ["bad_input", "auth", "upstream_4xx", "upstream_5xx", "timeout", "network"], "sideEffects": "read_external", "resultTrust": "trusted_structured", "authScope": "owm:read", "latencyBudgetMs": 5000}];
-    const glossary = {
+    const fieldDescriptions = {
       toolId: "Stable namespaced identity used by manifests, datasets, traces, labels, and policy artifacts. It is not the runtime function name.",
       name: "Exact final name exposed to the model after decorators, wrappers, and Gateway transformations.",
       version: "Exact SemVer behavior identity. Consumers pin this value rather than accepting a range.",
@@ -368,7 +402,8 @@
       const version = decodeURIComponent(match[2]);
       const index = contracts.findIndex(c => c.toolId === toolId && c.version === version);
       if (index >= 0) selectedIndex = index;
-      if (["overview", "inputs", "outputs", "raw", "glossary"].includes(match[3])) activeTab = match[3];
+      const validTabs = ["overview", "inputs", "outputs", "raw"];
+      activeTab = validTabs.includes(match[3]) ? match[3] : "overview";
     }
 
     function normalizeSearch(value) {
@@ -398,6 +433,13 @@
       return `<span class="badge ${className}">${escapeHtml(value)}</span>`;
     }
 
+    function describedField(label, key, suffix) {
+      const description = fieldDescriptions[key];
+      if (!description) return escapeHtml(label);
+      const tooltipId = `field-help-${suffix}`;
+      return `<span class="described-field">${escapeHtml(label)}<span class="field-help" tabindex="0" aria-describedby="${escapeHtml(tooltipId)}" aria-label="Explain ${escapeHtml(label)}">?<span class="field-tooltip" id="${escapeHtml(tooltipId)}" role="tooltip">${escapeHtml(description)}</span></span></span>`;
+    }
+
     function overview(contract) {
       const trustClass = contract.resultTrust.includes("untrusted") ? "untrusted" : "trusted";
       return `
@@ -405,22 +447,22 @@
           <section class="section">
             <h3>Identity</h3>
             <dl class="facts">
-              <div class="fact"><dt>toolId</dt><dd>${escapeHtml(contract.toolId)}<span class="explain">Stable join key across artifacts</span></dd></div>
-              <div class="fact"><dt>runtime name</dt><dd>${escapeHtml(contract.name)}<span class="explain">Exact name exposed to the model</span></dd></div>
-              <div class="fact"><dt>version</dt><dd>${escapeHtml(contract.version)}<span class="explain">Consumers pin this exact behavior</span></dd></div>
+              <div class="fact"><dt>${describedField("toolId", "toolId", "overview-tool-id")}</dt><dd>${escapeHtml(contract.toolId)}<span class="explain">Stable join key across artifacts</span></dd></div>
+              <div class="fact"><dt>${describedField("runtime name", "name", "overview-runtime-name")}</dt><dd>${escapeHtml(contract.name)}<span class="explain">Exact name exposed to the model</span></dd></div>
+              <div class="fact"><dt>${describedField("version", "version", "overview-version")}</dt><dd>${escapeHtml(contract.version)}<span class="explain">Consumers pin this exact behavior</span></dd></div>
             </dl>
           </section>
           <section class="section">
             <h3>Operational envelope</h3>
             <dl class="facts">
-              <div class="fact"><dt>side effects</dt><dd>${badge(contract.sideEffects, "effect")}</dd></div>
-              <div class="fact"><dt>result trust</dt><dd>${badge(contract.resultTrust, trustClass)}</dd></div>
-              <div class="fact"><dt>latency budget</dt><dd>${escapeHtml(contract.latencyBudgetMs)} ms</dd></div>
-              <div class="fact"><dt>auth scope</dt><dd>${escapeHtml(contract.authScope || "none")}</dd></div>
+              <div class="fact"><dt>${describedField("side effects", "sideEffects", "overview-side-effects")}</dt><dd>${badge(contract.sideEffects, "effect")}</dd></div>
+              <div class="fact"><dt>${describedField("result trust", "resultTrust", "overview-result-trust")}</dt><dd>${badge(contract.resultTrust, trustClass)}</dd></div>
+              <div class="fact"><dt>${describedField("latency budget", "latencyBudgetMs", "overview-latency-budget")}</dt><dd>${escapeHtml(contract.latencyBudgetMs)} ms</dd></div>
+              <div class="fact"><dt>${describedField("auth scope", "authScope", "overview-auth-scope")}</dt><dd>${escapeHtml(contract.authScope || "none")}</dd></div>
             </dl>
           </section>
           <section class="section wide">
-            <h3>Normalized failure modes</h3>
+            <h3>${describedField("Normalized failure modes", "failureModes", "overview-failure-modes")}</h3>
             <div class="badge-row">${contract.failureModes.map(mode => badge(mode, "failure")).join("")}</div>
           </section>
           <section class="section wide">
@@ -471,12 +513,13 @@
       }).join("")}</div>`;
     }
 
-    function schemaCard(title, schema, path, variant = "") {
-      return `<section class="schema-card ${variant}"><header><h3>${escapeHtml(title)}</h3><span class="path">${escapeHtml(path)}</span></header>${fieldsMarkup(schema, path)}</section>`;
+    function schemaCard(title, schema, path, variant = "", descriptionKey = "", tooltipSuffix = "") {
+      const heading = descriptionKey ? describedField(title, descriptionKey, tooltipSuffix) : escapeHtml(title);
+      return `<section class="schema-card ${variant}"><header><h3>${heading}</h3><span class="path">${escapeHtml(path)}</span></header>${fieldsMarkup(schema, path)}</section>`;
     }
 
     function inputView(contract) {
-      return `<div class="schema-stack">${schemaCard("Arguments the model may send", contract.inputSchema, "input")}</div>`;
+      return `<div class="schema-stack">${schemaCard("Arguments the model may send", contract.inputSchema, "input", "", "inputSchema", "input-schema")}</div>`;
     }
 
     function outputView(contract) {
@@ -485,16 +528,12 @@
         const okConst = schema.properties?.ok?.const;
         const title = okConst === true ? "Success envelope" : okConst === false ? "Failure envelope" : `Variant ${index + 1}`;
         const variant = okConst === true ? "variant success" : okConst === false ? "variant failure" : "variant";
-        return schemaCard(title, schema, `output.oneOf[${index}]`, variant);
+        return schemaCard(title, schema, `output.oneOf[${index}]`, variant, "outputSchema", `output-schema-${index}`);
       }).join("")}</div>`;
     }
 
     function rawView(contract) {
       return `<div class="raw-toolbar"><button class="copy-button" id="copy-json">Copy JSON</button></div><pre>${escapeHtml(JSON.stringify(contract, null, 2))}</pre>`;
-    }
-
-    function glossaryView() {
-      return `<section class="section"><h3>Contract field guide</h3><div class="glossary">${Object.entries(glossary).map(([key, text]) => `<details><summary>${escapeHtml(key)}</summary><p>${escapeHtml(text)}</p></details>`).join("")}</div></section>`;
     }
 
     function renderContract() {
@@ -508,7 +547,7 @@
         tab.classList.toggle("active", selected);
         tab.setAttribute("aria-selected", selected ? "true" : "false");
       });
-      const views = { overview, inputs: inputView, outputs: outputView, raw: rawView, glossary: glossaryView };
+      const views = { overview, inputs: inputView, outputs: outputView, raw: rawView };
       $("#view").innerHTML = views[activeTab](contract);
       if (activeTab === "raw") {
         $("#copy-json").addEventListener("click", async event => {
