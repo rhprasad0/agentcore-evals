@@ -220,7 +220,7 @@ Integrate tools three ways — direct `@tool`, external MCP servers, and AgentCo
 
 ## Week 5 — Agent/Tool Contract Architecture
 
-Freeze the informal patterns into contracts: tool-contract and capability-manifest schemas with valid/invalid fixtures, exact-version joins, scoped manifest enforcement over direct and discovered registration paths, a two-layer isolation proof (microVM + bounded IAM receipts), and a failure taxonomy with baseline degradation behavior plus explicit retry qualifiers. **Deliverable:** Tool Contract Specification. → [Full guide](docs/weeks/week-05-tool-contracts.md)
+Freeze the informal patterns into contracts: tool-contract and capability-manifest schemas with valid/invalid fixtures, exact-version joins, scoped manifest enforcement over direct and discovered registration paths, a controlled Gateway schema-drift rejection and verified recovery receipt, a two-layer isolation proof (microVM + bounded IAM receipts), and a failure taxonomy with baseline degradation behavior plus explicit retry qualifiers. **Deliverable:** Tool Contract Specification. → [Full guide](docs/weeks/week-05-tool-contracts.md)
 
 ## Week 6 — Tool Execution Dataset & Validation Schema
 
