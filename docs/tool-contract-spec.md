@@ -153,9 +153,9 @@ The application also keeps a bounded in-process Agent cache keyed by Runtime ses
 
 ### Execution-role IAM
 
-The Runtime role constrains AWS API actions available to deployed code. It does not govern the direct OpenWeather HTTPS request. The Week 3 baseline identified broad model, CloudWatch read/admin, and configuration-bundle grants that Week 5 must test before removing.
+The Runtime role constrains AWS API actions available to deployed code. It does not govern the direct OpenWeather HTTPS request. The Week 3 baseline identified broad model, CloudWatch read/admin, and configuration-bundle grants; Week 5 tested a tightened policy on a separate scratch Runtime so the working weather deployment was not placed at risk.
 
-A green weather invocation proves only that the tested model/tool path still worked. A red denial proves only the tested action, resource shape, principal class, and session context. Neither result alone proves complete least privilege.
+The bounded probe preserved the selected model, normalized weather-tool, log, and trace paths. Exact red calls for an adjacent model, configuration-bundle deletion, and CloudWatch log reads returned `AccessDeniedException` under the Runtime-provided identity. The public-safe result and session-isolation observation are recorded in [`week-05-runtime-iam-isolation.md`](reports/week-05-runtime-iam-isolation.md) and its [machine-readable receipt](assets/week-05-runtime-iam-isolation.json). A green path proves only that the tested path worked; a red denial proves only the tested action, resource shape, principal class, and session context. Neither result alone proves complete least privilege.
 
 ### Gateway controls
 
@@ -188,6 +188,8 @@ Required Week 5 probe families are:
 
 Each red probe must correspond to a permission removed from the recorded Week 3 baseline. An unrelated easy denial is not evidence that the tightened role preserved the intended boundary.
 
+The 2026-07-14 scratch run satisfied these probe families. The committed receipt uses placeholders and bounded error classes; private runtime state, policies, logs, traces, and identifiers were not retained in git.
+
 ## Downstream consumers
 
 | Consumer | Contract fields consumed |
@@ -219,5 +221,7 @@ A Week 5 contract change is complete only when:
 - [Week 3 execution-role baseline](execution-role-baseline.md)
 - [Week 4 direct-versus-Gateway comparison](reports/week-04-weather-seam-comparison.md)
 - [Explicit tool-registration decision](decisions/0001-explicit-tool-registration.md)
+- [Week 5 Runtime IAM and session-isolation receipt](reports/week-05-runtime-iam-isolation.md)
+- [Week 5 machine-readable synthetic receipt](assets/week-05-runtime-iam-isolation.json)
 - [AgentCore Runtime security best practices](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-security-best-practices.html)
 - [AgentCore Runtime IAM permissions](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-permissions.html)

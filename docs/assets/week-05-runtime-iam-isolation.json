@@ -1,0 +1,92 @@
+{
+  "artifact": "week-05-runtime-iam-isolation",
+  "observedOn": "2026-07-14",
+  "region": "us-east-1",
+  "principalClass": "scratch AgentCore Runtime execution role",
+  "iamProbes": [
+    {
+      "probeName": "selected-model-direct",
+      "action": "bedrock:InvokeModel",
+      "resourceShape": "arn:aws:bedrock:us-east-1:<AWS_ACCOUNT_ID>:inference-profile/global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "expectedDecision": "allow",
+      "observedDecision": "allow",
+      "errorClass": null,
+      "pairedControl": "unapproved-model",
+      "interpretation": "The tested Runtime role could invoke the explicitly selected inference profile.",
+      "claimLimit": "This proves only the tested action, profile, principal class, Region, and invocation context."
+    },
+    {
+      "probeName": "unapproved-model",
+      "action": "bedrock:InvokeModel",
+      "resourceShape": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0",
+      "expectedDecision": "deny",
+      "observedDecision": "deny",
+      "errorClass": "AccessDeniedException",
+      "pairedControl": "selected-model-direct",
+      "interpretation": "The tested Runtime role could not invoke an adjacent model outside its approved resource set.",
+      "claimLimit": "This denial does not prove that every unapproved model, profile, action variant, or effective permission path is denied."
+    },
+    {
+      "probeName": "configuration-bundle-mutation",
+      "action": "bedrock-agentcore:DeleteConfigurationBundle",
+      "resourceShape": "arn:aws:bedrock-agentcore:us-east-1:<AWS_ACCOUNT_ID>:configuration-bundle/example-bundle-0000000000",
+      "expectedDecision": "deny",
+      "observedDecision": "deny",
+      "errorClass": "AccessDeniedException",
+      "pairedControl": "The Week 3 scaffold baseline granted configuration-bundle administration.",
+      "interpretation": "The tightened Runtime role did not retain the tested configuration-bundle mutation capability.",
+      "claimLimit": "This proves only the tested delete action against a synthetic resource identity; other configuration-bundle actions were not invoked."
+    },
+    {
+      "probeName": "cloudwatch-log-read",
+      "action": "logs:FilterLogEvents",
+      "resourceShape": "arn:aws:logs:us-east-1:<AWS_ACCOUNT_ID>:log-group:/aws/bedrock-agentcore/runtimes/<SCRATCH_RUNTIME_ID>-DEFAULT",
+      "expectedDecision": "deny",
+      "observedDecision": "deny",
+      "errorClass": "AccessDeniedException",
+      "pairedControl": "Runtime log publication remained observable from the operator lane.",
+      "interpretation": "The Runtime role could publish operational telemetry without retaining the tested log-reading capability.",
+      "claimLimit": "This proves only logs:FilterLogEvents for the tested log group; it is not a complete CloudWatch authorization audit."
+    }
+  ],
+  "greenControls": [
+    {
+      "control": "runtime-role-context",
+      "observed": "allow",
+      "evidence": "A bounded STS identity call succeeded inside the scratch Runtime without publishing the returned identity."
+    },
+    {
+      "control": "strands-selected-model-path",
+      "observed": "allow",
+      "evidence": "The scratch Runtime completed a Strands call through the selected model profile."
+    },
+    {
+      "control": "normalized-weather-tool",
+      "observed": "allow",
+      "evidence": "The deployed weather adapter produced its exact normalized success envelope from a synthetic provider response; no external credential or live provider response was used."
+    },
+    {
+      "control": "telemetry-publication",
+      "observed": "allow",
+      "evidence": "The operator lane observed 27 Runtime log events and at least five matching X-Ray traces in the bounded probe window without retaining raw event or trace content."
+    }
+  ],
+  "sessionIsolation": {
+    "positiveControl": "A canary planted in one Runtime session was present on a second invocation in the same session.",
+    "negativeControl": "A different Runtime session reported the canary absent.",
+    "claimLimit": "This is one in-memory canary experiment across two sessions. It supports the tested session-bound context claim, not universal filesystem, durable-memory, or user-authorization isolation."
+  },
+  "publicSafety": {
+    "excluded": [
+      "account IDs",
+      "ARNs with live identifiers",
+      "role and session names",
+      "Runtime IDs",
+      "request and trace IDs",
+      "raw IAM policies",
+      "raw logs and traces",
+      "prompts and model responses",
+      "credentials and provider payloads"
+    ]
+  }
+}
