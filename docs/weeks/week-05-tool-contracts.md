@@ -141,26 +141,18 @@ For each failure kind, write the baseline degradation behavior, retry qualifier,
 - *Hint 4:* Cover an unmanifested direct `@tool`, an unmanifested discovered MCP tool, duplicate IDs, description/input-schema drift, and a known alternate `Agent(..., tools=...)` path that skips the validator. The last is an inventory test over this repo's constructors, not proof that Python makes bypass impossible.
 - *Hint 5:* For Gateway metadata drift, try a contract-owned wrapper first. If the SDK cannot preserve invocation semantics cleanly, create a seam-specific contract version for the actual discovered spec. A blank description may be a weak contract, but it cannot be exempt from contract conformance.
 
-**4. Break the managed schema, not the Lambda.** Reuse the Week 4 Gateway weather target for a controlled compatibility exercise: change only its model-visible input schema so a previously optional or absent field (for example, `country`) becomes required. Leave the Lambda and unchanged caller alone. Prove the baseline schema and call are green, deploy the breaking schema, retrieve the changed schema through live `tools/list`, preserve the caller's schema/argument rejection, then restore and re-verify the baseline.
-- *Hint 1:* Which layer changed: Lambda implementation, authored target schema, Gateway-advertised MCP schema, or caller? Keep the experiment single-defect so the answer is unambiguous.
-- *Hint 2:* A successful CloudFormation or AgentCore control-plane update proves the resource accepted the configuration. Why does it not prove existing callers remain compatible?
-- *Hint 3:* Record the actual rejection shape privately before deciding whether it came from the MCP client, Gateway, or Lambda. Do not invent exact service error text in the public receipt or claim the Lambda was never invoked without separate evidence.
-- *Hint 4:* Use the target's existing infrastructure-as-code owner rather than an out-of-band target update. Preview the change, restore in a guaranteed cleanup path, poll `tools/list` until the original schema returns, and require a final green call before calling the exercise complete.
-- *Hint 5:* Design the public receipt as **green → red → restored green**: required fields before/after/restore, one bounded rejection category, zero live identifiers, and one sentence limiting the claim to this controlled target and synthetic call. That is the LinkedIn screenshot; raw endpoints, ARNs, request IDs, exceptions, and provider output stay private.
-- *Hint 6:* Which release controls could prevent the break from reaching callers: an additive optional field, a new versioned tool name, consumer contract tests, a staged target, startup conformance checks, or some combination? State what each catches and what it does not.
-
-**5. Engineer the denial.** Design the minimal execution role for the weather agent, then produce denial receipts for permissions removed from the Week 3 baseline.
+**4. Engineer the denial.** Design the minimal execution role for the weather agent, then produce denial receipts for permissions removed from the Week 3 baseline.
 - *Hint 1:* Inventory first (Week 3, Exercise 3): the deployed Runtime legitimately invokes its selected Bedrock model and emits logs/traces; the current weather request goes to OpenWeather over HTTPS and needs no AWS IAM action. Which scaffold permissions remain unsupported by observed behavior?
 - *Hint 2:* Pick out-of-scope calls tied to permissions you actually removed from the Week 3 baseline. Pair red probes with the green weather/model/telemetry path rather than choosing a theatrical unrelated denial.
 - *Hint 3:* Scrub before committing: keep the principal *class*, action, synthetic resource shape, decision/error class, and claim limit; remove every live identifier and raw event. Run the public-safety scan and Gitleaks over the receipt.
 
-**6. The taxonomy table.** Six normalized kinds × baseline degradation behavior, with retry eligibility/attempt qualifiers, user-facing assertions, diagnostic source/code, and each assertion tagged with how it will be checked (deterministic gate / judge / human-only).
+**5. The taxonomy table.** Six normalized kinds × baseline degradation behavior, with retry eligibility/attempt qualifiers, user-facing assertions, diagnostic source/code, and each assertion tagged with how it will be checked (deterministic gate / judge / human-only).
 - *Hint 1:* Start from what you *observed* in Week 2 Exercise 4 — where observed behavior was fine, canonize it; where it wasn't, the required behavior is the correction.
 - *Hint 2:* The hardest column is "tell the user what, exactly?" — write the *criteria* for a good message, not a template message (templates rot; criteria gate).
 - *Hint 3:* Compare a retryable timeout, non-retryable 404, and retryable 429: which differences belong to baseline degradation, retry policy, and diagnostics? Can a gate distinguish each claim?
 - *Hint 4:* Before splitting a kind, ask whether the difference changes user-facing degradation, only retry eligibility, or only diagnostics. The latter two belong in orthogonal fields.
 
-**7. Re-describe all three tools as contract instances.** Weather, calculator, web search — including the seam differences: what's the calculator's `latencyBudgetMs` rationale? What `sideEffects` and `resultTrust` values apply to each? What does the Gateway seam do to `authScope`?
+**6. Re-describe all three tools as contract instances.** Weather, calculator, web search — including the seam differences: what's the calculator's `latencyBudgetMs` rationale? What `sideEffects` and `resultTrust` values apply to each? What does the Gateway seam do to `authScope`?
 - *Hint 1:* Search reads the outside world — can `read_external` results be treated as trusted input? (Note the thought; Week 15's injection probes cash it.)
 - *Hint 2:* If a field feels meaningless for the calculator (`authScope`?), that's evidence about your schema: optional field, or empty-string convention? Decide once, in the schema.
 
@@ -169,7 +161,6 @@ For each failure kind, write the baseline degradation behavior, retry qualifier,
 - **Pin the JSON Schema dialect.** Put `$schema` in your schemas and pin the validator library version; "valid" must mean the same thing in CI as on your machine. The JSON Schema spec's own site lists dialect differences — pick one (2020-12 is current) and stop thinking about it.
 - **Contract/runtime forking.** The contract's `description` and the docstring the decorator ships to the model can silently diverge. Either generate one from the other or add a validator asserting equality — divergence here re-opens the exact hole contracts close.
 - **Gateway metadata is measured, not assumed.** The managed Web Search seam has already produced a blank model-visible description. Prefer a wrapper that restores the intended contract-owned spec; otherwise version a seam-specific contract that records the actual discovered spec and its weaker selection surface. Target configuration is not evidence of what the model saw, and no seam bypasses final-spec conformance.
-- **A valid managed update can still break consumers.** For the schema-drift exercise, use the Gateway target's existing CloudFormation owner, preview the exact resource change, and treat live `tools/list` plus an unchanged client call as the compatibility evidence. Restore the baseline in a guaranteed cleanup path and verify the restored schema and call before publishing a receipt. Keep raw AWS errors and identifiers private; one controlled rejection does not establish outage frequency or prove which internal layer rejected the call without supporting evidence.
 - **Registration enforcement has a scope.** Search for every `Agent(..., tools=...)`, direct `@tool`, and in-process MCP client. Route known constructors through the common validator or document and test the bypass. Manifest success is not evidence that arbitrary SDK/network calls are impossible.
 - **Fixtures follow the billboard rule too.** Invalid fixtures tempt you toward realistic-looking ARNs and keys to test the safety scanner — use obviously-fake placeholders (`<AWS_ACCOUNT_ID>`, `INJECTION_CANARY_DO_NOT_FOLLOW` style) so the repo never contains a plausible secret even as a negative example.
 - **Denial-receipt safety:** run the denial experiment against scratch resources, not by breaking your working deployment's role mid-session; IAM changes propagate with delay, which can make results look flaky — wait out propagation before concluding.
@@ -179,27 +170,25 @@ For each failure kind, write the baseline degradation behavior, retry qualifier,
 ## Deliverable checklist — Tool Contract Specification
 
 - [ ] Offline lane: `tool-contract.schema.json` + `capability-manifest.schema.json`, valid/invalid fixtures, three exact-version contract instances, manifest loader/enforcement, model-visible conformance tests, taxonomy, and validation command.
-- [x] Every registered direct or discovered tool resolves to one exact contract version and passes grant, ceiling, and final-spec checks before `Agent(...)`; known alternate constructors are inventoried.
-- [ ] Managed compatibility lane: one controlled Gateway schema change rejects an unchanged caller, the baseline is restored and re-verified, and only a public-safe green → red → restored-green receipt is retained.
-- [x] `docs/tool-contract-spec.md`: rationale, contract boundary, enforcement-scope matrix, failure taxonomy, Runtime isolation write-up, and bounded IAM evidence. Matrix columns: surface; registration/execution path; contract/manifest enforcer; outer control; negative test; known bypass/claim limit.
-- [x] Deployed lane: required model/tool/telemetry behavior remains green; selected removed permissions deny under the Runtime role; synthetic receipts pass public-safety scanning.
+- [ ] Every registered direct or discovered tool resolves to one exact contract version and passes grant, ceiling, and final-spec checks before `Agent(...)`; known alternate constructors are inventoried.
+- [ ] `docs/tool-contract-spec.md`: rationale, contract boundary, enforcement-scope matrix, failure taxonomy, Runtime isolation write-up, and bounded IAM evidence. Matrix columns: surface; registration/execution path; contract/manifest enforcer; outer control; negative test; known bypass/claim limit.
+- [ ] Deployed lane: required model/tool/telemetry behavior remains green; selected removed permissions deny under the Runtime role; synthetic receipts pass public-safety scanning.
 - [ ] Schema/fixture validation is wired into pre-commit or CI without prematurely naming contract validation as dataset validation.
 
 ## Success criteria
 
-- [x] Unmanifested direct and discovered tools, duplicate IDs, side-effect ceiling violations, and any mismatch with the applicable direct or seam-specific final spec fail before `Agent(...)` (tests prove it).
+- [ ] Unmanifested direct and discovered tools, duplicate IDs, side-effect ceiling violations, and any mismatch with the applicable direct or seam-specific final spec fail before `Agent(...)` (tests prove it).
 - [ ] Invalid contract/manifest fixtures fail validation; valid ones pass — in CI.
-- [ ] A syntactically accepted but consumer-breaking Gateway schema update is observed through the live MCP surface, rejects the unchanged synthetic caller, and is rolled back to a verified green baseline; the receipt states the tested scope and does not generalize to production outage frequency.
-- [x] Every failure kind has baseline degradation assertions plus explicit retry qualifiers and bounded diagnostics.
+- [ ] Every failure kind has baseline degradation assertions plus explicit retry qualifiers and bounded diagnostics.
 - [ ] Dataset and run consumers join on exact contract and manifest versions; a version change creates a different run identity and requires fixture revalidation, not automatic migration.
-- [x] IAM claims name the tested actions and principal context, and committed receipts contain no live identifiers or raw events.
+- [ ] IAM claims name the tested actions and principal context, and committed receipts contain no live identifiers or raw events.
 
 ## Docs to consult
 
 Verified via the AWS docs MCP server, 2026-07-07, except where marked external.
 
 - [JSON Schema specification](https://json-schema.org/specification) *(external)* — dialect selection, `$schema`, validation keywords; you need enough to author two schemas confidently, not the whole spec.
-- [Security best practices for AgentCore Runtime](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-security-best-practices.html) — least privilege, ARN-scoped resources, the execution-role-privilege rule, condition keys; the standard your Exercise 5 role is held to.
+- [Security best practices for AgentCore Runtime](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-security-best-practices.html) — least privilege, ARN-scoped resources, the execution-role-privilege rule, condition keys; the standard your Exercise 4 role is held to.
 - [IAM permissions for AgentCore Runtime](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-permissions.html) — what the CLI's dev policies actually grant (read it to see what you're tightening *from*).
 - [Use isolated sessions for agents](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-sessions.html) — re-read for build step 3's platform-layer write-up.
 
@@ -208,7 +197,6 @@ Verified via the AWS docs MCP server, 2026-07-07, except where marked external.
 1. Recite the contract's fields and, for each, its first downstream consumer by week.
 2. Why must manifest enforcement fail at *construction* rather than at first tool call? Name the failure mode the difference prevents.
 3. Your teammate "clarifies" a tool description in a PR with no version bump. Walk the harm chain if it merges — which artifacts silently desync?
-4. A Gateway target accepts a schema update that makes `country` required. What must you inspect and invoke before you can say whether unchanged callers remain compatible?
-5. What makes a required behavior *gateable*? Convert "handles auth errors gracefully" into three observable assertions.
-6. State the IAM escalation rule about execution roles vs invoking principals, and explain the attack it forecloses.
-7. Why is a denial receipt stronger evidence than a policy file showing the permission absent?
+4. What makes a required behavior *gateable*? Convert "handles auth errors gracefully" into three observable assertions.
+5. State the IAM escalation rule about execution roles vs invoking principals, and explain the attack it forecloses.
+6. Why is a denial receipt stronger evidence than a policy file showing the permission absent?
