@@ -31,4 +31,4 @@ jobs:
           enable-cache: true
 
       - name: Validate contracts
-        run: uv run --locked python scripts/validate_contracts.py
+        run: uv run --locked python -m scripts.validate_contracts

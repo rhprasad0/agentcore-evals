@@ -61,6 +61,8 @@ A description change is behaviorally significant because it can change tool sele
 
 Week 6 dataset manifests and Week 7 run manifests must pin both the capability manifest and tool contracts. A version change creates a different run identity and requires fixture revalidation; it does not trigger automatic migration.
 
+`src/version_bindings.py` owns the shared boundary those consumers will call. `ExactVersionBindings` sorts exact tool references into a readable identity component (`manifest=<id>@<version>;tools=<id>@<version>,...`), so input order cannot change identity while any manifest or contract version change must. `resolve_exact_version_bindings(...)` loads the exact capability-manifest path, requires the consumer's complete tool bindings to equal that manifest's grants, and resolves each exact contract document without fallback. A mismatch fails rather than silently retargeting rows, runs, fixtures, or labels; Weeks 6–7 add their own dataset/run pins around this shared component instead of reimplementing the join.
+
 ## Enforcement scope
 
 The manifest is an in-process registration control, not a Python sandbox or universal authorization layer.

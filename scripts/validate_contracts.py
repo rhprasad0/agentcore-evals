@@ -10,6 +10,8 @@ from typing import Any
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
+from src.version_bindings import VersionBindingError, resolve_exact_version_bindings
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_FIXTURE_GROUPS = (
@@ -125,27 +127,25 @@ def validate() -> tuple[list[str], dict[str, int]]:
             except ValueError as error:
                 failures.append(str(error))
                 continue
-            failures.extend(
-                format_schema_errors(
-                    manifest_path,
-                    list(manifest_validator.iter_errors(manifest)),
+            manifest_errors = list(manifest_validator.iter_errors(manifest))
+            failures.extend(format_schema_errors(manifest_path, manifest_errors))
+            if manifest_errors:
+                continue
+            try:
+                resolve_exact_version_bindings(
+                    {
+                        "manifestId": manifest["manifestId"],
+                        "version": manifest["version"],
+                    },
+                    [
+                        {"toolId": tool_id, "version": version}
+                        for tool_id, version in manifest["toolGrants"].items()
+                    ],
+                    manifests_root=CAPABILITY_MANIFESTS_ROOT,
+                    tool_contracts_root=TOOL_CONTRACTS_ROOT,
                 )
-            )
-            expected_identity = (manifest_path.parent.name, manifest_path.stem)
-            actual_identity = (manifest.get("manifestId"), manifest.get("version"))
-            if actual_identity != expected_identity:
-                failures.append(
-                    f"{manifest_path.relative_to(REPO_ROOT)}: path identifies "
-                    f"{expected_identity[0]}@{expected_identity[1]}, document identifies "
-                    f"{actual_identity[0]}@{actual_identity[1]}"
-                )
-            for tool_id, version in manifest.get("toolGrants", {}).items():
-                contract_path = TOOL_CONTRACTS_ROOT / tool_id / f"{version}.json"
-                if not contract_path.is_file():
-                    failures.append(
-                        f"{manifest_path.relative_to(REPO_ROOT)}: grant {tool_id}@{version} "
-                        f"does not resolve to {contract_path.relative_to(REPO_ROOT)}"
-                    )
+            except VersionBindingError as error:
+                failures.append(str(error))
 
     return failures, counts
 

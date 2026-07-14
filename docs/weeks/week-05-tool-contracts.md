@@ -169,21 +169,21 @@ For each failure kind, write the baseline degradation behavior, retry qualifier,
 
 ## Deliverable checklist — Tool Contract Specification
 
-Canonical validation command: `uv run --locked python scripts/validate_contracts.py`. It checks both schemas against Draft 2020-12, exercises every valid and invalid fixture, validates all checked-in tool contracts and capability manifests, verifies artifact path identities, and resolves every exact manifest grant. [Contract validation CI](../../.github/workflows/contract-validation.yml) runs the same command on pushes and pull requests.
+Canonical validation command: `uv run --locked python -m scripts.validate_contracts`. It checks both schemas against Draft 2020-12, exercises every valid and invalid fixture, validates all checked-in tool contracts and capability manifests, verifies artifact path identities, and resolves every exact manifest grant. [Contract validation CI](../../.github/workflows/contract-validation.yml) runs the same command on pushes and pull requests.
 
 - [x] Offline lane: `tool-contract.schema.json` + `capability-manifest.schema.json`, valid/invalid fixtures, three exact-version contract instances, manifest loader/enforcement, model-visible conformance tests, taxonomy, and validation command.
-- [ ] Every registered direct or discovered tool resolves to one exact contract version and passes grant, ceiling, and final-spec checks before `Agent(...)`; known alternate constructors are inventoried.
-- [ ] `docs/tool-contract-spec.md`: rationale, contract boundary, enforcement-scope matrix, failure taxonomy, Runtime isolation write-up, and bounded IAM evidence. Matrix columns: surface; registration/execution path; contract/manifest enforcer; outer control; negative test; known bypass/claim limit.
-- [ ] Deployed lane: required model/tool/telemetry behavior remains green; selected removed permissions deny under the Runtime role; synthetic receipts pass public-safety scanning.
+- [x] Every registered direct or discovered tool resolves to one exact contract version and passes grant, ceiling, and final-spec checks before `Agent(...)`; known alternate constructors are inventoried.
+- [x] `docs/tool-contract-spec.md`: rationale, contract boundary, enforcement-scope matrix, failure taxonomy, Runtime isolation write-up, and bounded IAM evidence. Matrix columns: surface; registration/execution path; contract/manifest enforcer; outer control; negative test; known bypass/claim limit.
+- [x] Deployed lane: required model/tool/telemetry behavior remains green; selected removed permissions deny under the Runtime role; synthetic receipts pass public-safety scanning.
 - [x] Schema/fixture validation is wired into CI without prematurely naming contract validation as dataset validation.
 
 ## Success criteria
 
-- [ ] Unmanifested direct and discovered tools, duplicate IDs, side-effect ceiling violations, and any mismatch with the applicable direct or seam-specific final spec fail before `Agent(...)` (tests prove it).
+- [x] Unmanifested direct and discovered tools, duplicate IDs, side-effect ceiling violations, and any mismatch with the applicable direct or seam-specific final spec fail before `Agent(...)` (tests prove it).
 - [x] Invalid contract/manifest fixtures fail validation; valid ones pass — in CI.
-- [ ] Every failure kind has baseline degradation assertions plus explicit retry qualifiers and bounded diagnostics.
-- [ ] Dataset and run consumers join on exact contract and manifest versions; a version change creates a different run identity and requires fixture revalidation, not automatic migration.
-- [ ] IAM claims name the tested actions and principal context, and committed receipts contain no live identifiers or raw events.
+- [x] Every failure kind has baseline degradation assertions plus explicit retry qualifiers and bounded diagnostics.
+- [x] The shared dataset/run binding resolver joins exact contract and manifest versions; a version change creates a different identity component, mismatched grants fail rather than retarget, and Weeks 6–7 consume the boundary without automatic migration.
+- [x] IAM claims name the tested actions and principal context, and committed receipts contain no live identifiers or raw events.
 
 ## Docs to consult
 

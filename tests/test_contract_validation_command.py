@@ -15,8 +15,12 @@ VALIDATION_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "contract-validation
 
 class ContractValidationCommandTests(unittest.TestCase):
     def test_command_validates_all_contract_artifact_classes(self) -> None:
+        self.assertTrue(
+            VALIDATION_SCRIPT.is_file(),
+            f"missing validator: {VALIDATION_SCRIPT.relative_to(REPO_ROOT)}",
+        )
         result = subprocess.run(
-            [sys.executable, str(VALIDATION_SCRIPT)],
+            [sys.executable, "-m", "scripts.validate_contracts"],
             cwd=REPO_ROOT,
             check=False,
             capture_output=True,
@@ -38,7 +42,7 @@ class ContractValidationCommandTests(unittest.TestCase):
         workflow = VALIDATION_WORKFLOW.read_text(encoding="utf-8")
 
         self.assertIn(
-            "uv run --locked python scripts/validate_contracts.py",
+            "uv run --locked python -m scripts.validate_contracts",
             workflow,
         )
 
