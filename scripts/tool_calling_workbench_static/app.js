@@ -119,36 +119,6 @@ function selectControl(values, currentValue, onChange, label) {
   return control;
 }
 
-function readChecklistItems() {
-  return state.dataset.editorMetadata.checklist
-    .split("\n")
-    .filter((line) => line.startsWith("- [ ] "))
-    .map((line) => line.slice(6));
-}
-
-function checklistKey() {
-  return `tool-calling-workbench:${state.selectedId}:checklist`;
-}
-
-function checkedChecklistItems() {
-  try {
-    return JSON.parse(sessionStorage.getItem(checklistKey()) || "[]");
-  } catch {
-    return [];
-  }
-}
-
-function updateChecklist(index, checked) {
-  const checkedItems = new Set(checkedChecklistItems());
-  if (checked) checkedItems.add(index);
-  else checkedItems.delete(index);
-  sessionStorage.setItem(checklistKey(), JSON.stringify([...checkedItems]));
-}
-
-function allChecklistItemsComplete() {
-  return checkedChecklistItems().length === readChecklistItems().length;
-}
-
 function setError(error) {
   state.error = error;
   render();
@@ -290,27 +260,6 @@ function renderError() {
     message.append(element("button", { type: "button", text: "Reload current version", onClick: loadDataset }));
   }
   return message;
-}
-
-function renderChecklist() {
-  const items = readChecklistItems();
-  const checked = new Set(checkedChecklistItems());
-  const details = element("details", { class: "checklist" });
-  details.append(element("summary", { text: `Blind-review checklist (${checked.size}/${items.length} local checks)` }));
-  const list = element("div", { class: "checklist-items" });
-  items.forEach((item, index) => {
-    const checkbox = element("input", {
-      type: "checkbox",
-      checked: checked.has(index),
-      onChange: (event) => {
-        updateChecklist(index, event.target.checked);
-        render();
-      },
-    });
-    list.append(element("label", {}, checkbox, element("span", { text: item })));
-  });
-  details.append(list, element("p", { class: "local-note", text: "Checklist ticks remain only in this browser session; only the row review status is persisted." }));
-  return details;
 }
 
 function updateDraft(mutator, { renderAfter = true } = {}) {
@@ -536,7 +485,6 @@ function renderInspector() {
       element("span", { class: `status-pill ${currentRow.provenance.reviewStatus === "reviewed" ? "finalized" : "draft"}`, text: currentRow.provenance.reviewStatus }),
     ),
     element("p", { class: "prompt", text: currentRow.prompt }),
-    renderChecklist(),
   );
   const reveal = element("button", {
     type: "button", class: "primary", text: state.revealExpected ? "Hide expected behavior" : "Reveal expected behavior",
@@ -592,10 +540,6 @@ async function saveRow(row) {
 }
 
 async function markReviewStatus(reviewStatus) {
-  if (reviewStatus === "reviewed" && !allChecklistItemsComplete()) {
-    setError({ message: "Complete the local blind-review checklist before marking this row reviewed.", details: [] });
-    return;
-  }
   const candidate = clone(state.draftRow);
   candidate.provenance.reviewStatus = reviewStatus;
   await saveRow(candidate);

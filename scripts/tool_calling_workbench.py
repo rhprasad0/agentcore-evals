@@ -113,7 +113,6 @@ def editor_metadata(paths: DatasetPaths, snapshot: DatasetSnapshot) -> dict[str,
         contract_path = paths.repo_root / "contracts" / "tools" / tool_id / f"{reference['version']}.json"
         contract = load_json_object(contract_path)
         contract_inputs[tool_id] = sorted(contract["inputSchema"].get("properties", {}))
-    checklist_path = resolve_repo_path(paths.repo_root, snapshot.manifest["editorialChecklistPath"])
     return {
         "scenarioFamilies": example_schema["properties"]["scenarioFamily"]["enum"],
         "tags": example_schema["properties"]["tags"]["items"]["enum"],
@@ -123,7 +122,6 @@ def editor_metadata(paths: DatasetPaths, snapshot: DatasetSnapshot) -> dict[str,
         "failureKinds": failure_kinds,
         "failureSources": failure_properties["source"]["enum"],
         "contractInputs": contract_inputs,
-        "checklist": checklist_path.read_text(encoding="utf-8"),
     }
 
 
@@ -132,13 +130,6 @@ def load_json_object(path: Path) -> dict[str, Any]:
     if not isinstance(document, dict):
         raise ValueError(f"{path} must contain a JSON object")
     return document
-
-
-def resolve_repo_path(repo_root: Path, relative_path: str) -> Path:
-    candidate = (repo_root / relative_path).resolve()
-    if repo_root not in candidate.parents:
-        raise ValueError(f"artifact path escapes repository root: {relative_path}")
-    return candidate
 
 
 def handle_row_update(

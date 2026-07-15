@@ -74,7 +74,7 @@ class ToolCallingWorkbenchTests(unittest.TestCase):
         self.assertIn("failure-injection", payload["editorMetadata"]["scenarioFamilies"])
         self.assertIn("weather.get_current_weather", payload["editorMetadata"]["contractInputs"])
         self.assertIn("city", payload["editorMetadata"]["contractInputs"]["weather.get_current_weather"])
-        self.assertIn("editorial checklist", payload["editorMetadata"]["checklist"])
+        self.assertNotIn("checklist", payload["editorMetadata"])
 
     def test_static_workbench_surface_and_assets_are_served_from_fixed_routes(self) -> None:
         status, content_type, document = self.request_text("/")
@@ -88,11 +88,17 @@ class ToolCallingWorkbenchTests(unittest.TestCase):
         self.assertTrue(content_type.startswith("application/javascript"))
         self.assertIn("saveRow", script)
         self.assertIn("refreshFilteredView", script)
+        self.assertNotIn("readChecklistItems", script)
+        self.assertNotIn("renderChecklist", script)
+        self.assertNotIn("Blind-review checklist", script)
+        self.assertNotIn("allChecklistItemsComplete", script)
 
         status, content_type, stylesheet = self.request_text("/assets/styles.css")
         self.assertEqual(200, status)
         self.assertTrue(content_type.startswith("text/css"))
         self.assertIn("--surface", stylesheet)
+        self.assertNotIn(".checklist", stylesheet)
+        self.assertNotIn(".local-note", stylesheet)
 
         status, _, _ = self.request_text("/assets/not-a-file.js")
         self.assertEqual(404, status)
