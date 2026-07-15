@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import argparse
 import json
+import sys
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
@@ -506,14 +509,37 @@ def build_rows() -> list[dict[str, Any]]:
     return rows
 
 
-def main() -> int:
-    rows = build_rows()
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(
+def write_rows(rows: list[dict[str, Any]], output_path: Path, *, overwrite: bool) -> None:
+    if output_path.exists() and not overwrite:
+        raise FileExistsError(
+            f"refusing to overwrite {output_path}; pass --overwrite-existing to regenerate a draft"
+        )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
         "".join(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in rows),
         encoding="utf-8",
     )
-    print(f"Generated {len(rows)} draft rows at {OUTPUT_PATH.relative_to(REPO_ROOT)}")
+
+
+def main(
+    argv: Sequence[str] | None = None,
+    *,
+    output_path: Path = OUTPUT_PATH,
+) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--overwrite-existing",
+        action="store_true",
+        help="replace an existing corpus with a newly generated draft",
+    )
+    arguments = parser.parse_args(argv)
+    rows = build_rows()
+    try:
+        write_rows(rows, output_path, overwrite=arguments.overwrite_existing)
+    except FileExistsError as error:
+        print(error, file=sys.stderr)
+        return 2
+    print(f"Generated {len(rows)} draft rows at {output_path.relative_to(REPO_ROOT)}")
     return 0
 
 
