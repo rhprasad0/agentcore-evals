@@ -13,6 +13,7 @@ dist/
 build/
 cdk.out/
 .agentcore/
+.hermes/
 
 # Terraform local state and private inputs
 .terraform/
