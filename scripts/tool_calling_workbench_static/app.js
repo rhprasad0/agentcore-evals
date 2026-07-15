@@ -216,8 +216,7 @@ function renderRail(rows) {
     onInput: (event) => {
       state.filters.search = event.target.value;
       state.draftId = null;
-      synchronizeSelection(visibleRows());
-      render();
+      refreshFilteredView();
     },
   });
   rail.append(search);
@@ -246,6 +245,11 @@ function renderRail(rows) {
   authorControl.options[0].textContent = "All authors";
   filters.append(familyControl, reviewControl, authorControl);
   rail.append(filters);
+  rail.append(renderRowList(rows));
+  return rail;
+}
+
+function renderRowList(rows) {
   const list = element("div", { class: "row-list" });
   if (!rows.length) {
     list.append(element("p", { class: "empty-rail", text: "No rows match these filters." }));
@@ -263,8 +267,14 @@ function renderRail(rows) {
     card.append(meta, element("span", { class: "prompt-excerpt", text: row.prompt }));
     list.append(card);
   }
-  rail.append(list);
-  return rail;
+  return list;
+}
+
+function refreshFilteredView() {
+  const rows = visibleRows();
+  synchronizeSelection(rows);
+  root.querySelector(".row-list")?.replaceWith(renderRowList(rows));
+  root.querySelector(".inspector")?.replaceWith(renderInspector());
 }
 
 function renderError() {
@@ -303,11 +313,11 @@ function renderChecklist() {
   return details;
 }
 
-function updateDraft(mutator) {
+function updateDraft(mutator, { renderAfter = true } = {}) {
   mutator(state.draftRow);
   state.rawError = null;
   clearError();
-  render();
+  if (renderAfter) render();
 }
 
 function checkboxToolList(title, toolIds, activeIds, onToggle) {
@@ -386,7 +396,7 @@ function renderConstraintEditor() {
       value: predicateValue(constraint), disabled: isFinalized() || activePredicate === "absent", "aria-label": "Constraint value",
       onInput: (event) => updateDraft((draft) => {
         draft.expected.argConstraints[index][activePredicate] = coercePredicateValue(activePredicate, event.target.value);
-      }),
+      }, { renderAfter: false }),
     });
     const remove = element("button", { type: "button", text: "Remove", disabled: isFinalized(), onClick: () => updateDraft((draft) => {
       draft.expected.argConstraints.splice(index, 1);
@@ -423,7 +433,7 @@ function renderExpectedEditor() {
   for (const field of ["minCalls", "maxCalls"]) {
     const input = element("input", {
       type: "number", min: "0", value: row.expected[field], disabled: isFinalized(), "aria-label": field,
-      onInput: (event) => updateDraft((draft) => { draft.expected[field] = Number(event.target.value); }),
+      onInput: (event) => updateDraft((draft) => { draft.expected[field] = Number(event.target.value); }, { renderAfter: false }),
     });
     countBlock.append(element("label", { class: "inline-label" }, field, input));
   }
@@ -431,7 +441,7 @@ function renderExpectedEditor() {
   for (const [field, label] of [["responseMust", "Must include"], ["responseMustNot", "Must not include"]]) {
     const input = element("textarea", {
       value: row.expected[field].join("\n"), disabled: isFinalized(), "aria-label": label,
-      onInput: (event) => updateDraft((draft) => { draft.expected[field] = parseList(event.target.value); }),
+      onInput: (event) => updateDraft((draft) => { draft.expected[field] = parseList(event.target.value); }, { renderAfter: false }),
     });
     responseBlock.append(element("label", { class: "inline-label" }, label), input);
   }
@@ -478,6 +488,15 @@ function renderFailureEditor() {
 }
 
 function renderRawEditor() {
+  const panel = element("div", {});
+  const refreshRawError = () => {
+    panel.querySelector(".error-region")?.remove();
+    if (state.rawError) {
+      panel.prepend(element("div", { class: "error-region", text: `Local JSON parse error: ${state.rawError}` }));
+    }
+    const saveButton = root.querySelector('[data-action="save-row"]');
+    if (saveButton) saveButton.disabled = isFinalized() || Boolean(state.rawError);
+  };
   const textarea = element("textarea", {
     class: "raw-editor",
     value: JSON.stringify(state.draftRow, null, 2),
@@ -491,11 +510,10 @@ function renderRawEditor() {
       } catch (error) {
         state.rawError = error.message;
       }
-      render();
+      refreshRawError();
     },
   });
-  const panel = element("div", {});
-  if (state.rawError) panel.append(element("div", { class: "error-region", text: `Local JSON parse error: ${state.rawError}` }));
+  refreshRawError();
   panel.append(textarea);
   return panel;
 }
@@ -541,7 +559,7 @@ function renderInspector() {
   if (serverError) editorPanel.append(serverError);
   const actions = element("div", { class: "action-row" });
   actions.append(
-    element("button", { type: "button", class: "primary", text: "Save row", disabled: isFinalized() || Boolean(state.rawError), onClick: () => saveRow(state.draftRow) }),
+    element("button", { type: "button", class: "primary", text: "Save row", "data-action": "save-row", disabled: isFinalized() || Boolean(state.rawError), onClick: () => saveRow(state.draftRow) }),
     element("button", { type: "button", text: "Mark reviewed", disabled: isFinalized(), onClick: () => markReviewStatus("reviewed") }),
     element("button", { type: "button", text: "Return to pending", disabled: isFinalized(), onClick: () => markReviewStatus("pending") }),
     element("button", { type: "button", class: "danger", text: "Finalize dataset review", disabled: isFinalized(), onClick: finalizeDataset }),

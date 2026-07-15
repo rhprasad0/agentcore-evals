@@ -81,11 +81,13 @@ class ToolCallingWorkbenchTests(unittest.TestCase):
         self.assertEqual(200, status)
         self.assertTrue(content_type.startswith("text/html"))
         self.assertIn('id="workbench"', document)
+        self.assertIn('rel="icon" href="data:,"', document)
 
         status, content_type, script = self.request_text("/assets/app.js")
         self.assertEqual(200, status)
         self.assertTrue(content_type.startswith("application/javascript"))
         self.assertIn("saveRow", script)
+        self.assertIn("refreshFilteredView", script)
 
         status, content_type, stylesheet = self.request_text("/assets/styles.css")
         self.assertEqual(200, status)
