@@ -1,0 +1,42 @@
+{
+  "exampleId": "tc-0001",
+  "prompt": "What is the current weather in Oslo in metric units?",
+  "scenarioFamily": "straightforward",
+  "expected": {
+    "toolIds": [
+      "weather.get_current_weather"
+    ],
+    "minCalls": 1,
+    "maxCalls": 1,
+    "argConstraints": [
+      {
+        "toolId": "weather.get_current_weather",
+        "path": "$.city",
+        "equals": "Oslo"
+      },
+      {
+        "toolId": "weather.get_current_weather",
+        "path": "$.units",
+        "equals": "metric"
+      }
+    ],
+    "mustNotCall": [
+      "calculator.calculate",
+      "search.web_search"
+    ],
+    "responseMust": [
+      "name Oslo",
+      "report the current temperature"
+    ],
+    "responseMustNot": []
+  },
+  "failureInjection": null,
+  "tags": [
+    "weather",
+    "single-tool"
+  ],
+  "provenance": {
+    "authoringMethod": "hand-authored",
+    "reviewStatus": "pending"
+  }
+}

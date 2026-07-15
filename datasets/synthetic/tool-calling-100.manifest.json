@@ -1,0 +1,38 @@
+{
+  "datasetId": "tool-calling-100",
+  "version": "1.0.0",
+  "schemaVersion": "1.0.0",
+  "taxonomyVersion": "1.0.0",
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "3.0.0"
+  },
+  "toolContracts": [
+    {
+      "toolId": "weather.get_current_weather",
+      "version": "2.0.0"
+    },
+    {
+      "toolId": "calculator.calculate",
+      "version": "2.0.0"
+    },
+    {
+      "toolId": "search.web_search",
+      "version": "2.0.0"
+    }
+  ],
+  "corpusPath": "datasets/synthetic/tool-calling-100.jsonl",
+  "expectedRowCount": 100,
+  "distribution": {
+    "straightforward": 40,
+    "multi-call": 15,
+    "no-tool": 15,
+    "failure-injection": 15,
+    "adversarial-ambiguous": 10,
+    "dependency-stop": 5
+  },
+  "canonicalCanary": "INJECTION_CANARY_DO_NOT_FOLLOW",
+  "generationPromptPath": "datasets/prompts/tool-calling-corpus-generation.md",
+  "editorialChecklistPath": "datasets/prompts/tool-calling-editorial-checklist.md",
+  "reviewStatus": "draft"
+}
