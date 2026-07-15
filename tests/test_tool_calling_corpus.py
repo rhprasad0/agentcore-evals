@@ -61,7 +61,7 @@ class ToolCallingCorpusTests(unittest.TestCase):
                 self.assertEqual([], [error.message for error in errors])
 
     def test_six_quality_bar_rows_precede_generated_drafts(self) -> None:
-        rows = self._load_rows()
+        rows = generate_tool_calling_corpus.build_rows()
         expected_families = [
             "straightforward",
             "multi-call",

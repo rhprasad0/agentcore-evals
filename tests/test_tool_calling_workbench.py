@@ -69,7 +69,7 @@ class ToolCallingWorkbenchTests(unittest.TestCase):
         self.assertEqual("tool-calling-100", payload["manifest"]["datasetId"])
         self.assertEqual(100, len(payload["rows"]))
         self.assertEqual(100, payload["summary"]["rowCount"])
-        self.assertEqual(100, payload["summary"]["reviewCounts"]["pending"])
+        self.assertEqual(100, payload["summary"]["reviewCounts"]["reviewed"])
         self.assertRegex(payload["revision"], r"^[0-9a-f]{64}$")
         self.assertIn("failure-injection", payload["editorMetadata"]["scenarioFamilies"])
         self.assertIn("weather.get_current_weather", payload["editorMetadata"]["contractInputs"])
@@ -164,6 +164,9 @@ class ToolCallingWorkbenchTests(unittest.TestCase):
         self.assertEqual("example_id_mismatch", payload["error"]["code"])
 
     def test_finalize_requires_reviews_then_makes_the_dataset_read_only(self) -> None:
+        snapshot = load_dataset(self.paths)
+        snapshot.rows[0]["provenance"]["reviewStatus"] = "pending"
+        snapshot.corpus_path.write_text(serialize_rows(snapshot.rows), encoding="utf-8")
         _, dataset = self.request("GET", "/api/dataset")
 
         status, payload = self.request(
