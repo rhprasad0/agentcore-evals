@@ -120,6 +120,8 @@ Normalized runs: session/trace/span ids, exact capability-manifest ID/version, a
 
 Fixture responses per the versioned readable key and canonical-arguments hash, scripted failures for injection rows, same registered model-visible contracts as the real tools. Decide and document canonicalization rules and the unknown-key policy. Claim interface equivalence only at the registered contract boundary; Gateway transport, auth, latency, and live-provider behavior remain out of scope.
 
+Implemented in [`src/deterministic_mocks.py`](../../src/deterministic_mocks.py) with checked-in fixtures under [`datasets/fixtures/mocks/`](../../datasets/fixtures/mocks/) and the explicit rules and claim boundary in [`docs/deterministic-mock-registry.md`](../deterministic-mock-registry.md).
+
 ### 4. Extend `scripts/validate_dataset.py`
 
 Schema-validate the dataset manifest and every row; resolve every exact binding against the manifest and contract registry; check tag/kind/distribution coverage; require non-propagation assertions for every exact `untrusted_external` contract; verify canaries are inert; and fail on real-looking secrets. Wire this and the telemetry compatibility fixtures into CI alongside Week 5's contract validation.
@@ -168,7 +170,7 @@ Schema-validate the dataset manifest and every row; resolve every exact binding 
 
 - [ ] Dataset-level manifest pinning exact capability-manifest and tool-contract versions; 100-row reviewed dataset with the exact distribution above; generation prompts committed too.
 - [ ] Canonical execution-trace schema plus `docs/telemetry-compatibility.md`, synthetic Strands inline/ADOT-split fixtures, and a locally validated `EvaluationInput.sessionSpans` request-envelope fixture.
-- [ ] Deterministic mock registry with versioned readable keys, scripted failure fixtures, and loud miss diagnostics.
+- [x] Deterministic mock registry with versioned readable keys, scripted failure fixtures, and loud miss diagnostics.
 - [ ] Validators in CI: schema, binding resolution, distribution/coverage, canary non-propagation, telemetry compatibility, safety scan.
 
 ## Success criteria
