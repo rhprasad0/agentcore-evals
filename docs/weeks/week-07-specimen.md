@@ -20,78 +20,87 @@ The move deserves a name: you are building a **scientific instrument**, and inst
 
 ## Concepts
 
-### Pinning, and the run manifest as the join key
+### Pinning, experiment identity, and execution identity
 
-A measurement you can't reproduce is an anecdote. The specimen pins every input that influences behavior — **model ID, system prompt, tool set (one), exact (`toolId`, contract version) references, exact capability-manifest ID/version, tool descriptions, mock fixture version, dataset version, temperature (low)** — and records them in a **run manifest** (`runId`, plus each pin, plus date). Readable canonical IDs and exact versions are the join keys; hashes supplement them for integrity and change detection. Two properties to design for:
+A measurement you can't reproduce is an anecdote. The specimen pins every input that influences behavior — **model ID, exact system-prompt bytes, tool set (one), exact (`toolId`, contract version) references, exact capability-manifest ID/version, final model-visible tool-description bytes, mock fixture version, dataset version, exact temperature and every supplied sampling control, SDK versions, and source profile** — and records them in a **run manifest**. Classify each field before designing the schema: a behavior *pin* fixed before execution, an environment *record* observed at execution, or an output.
 
-1. **The manifest is the identity of the run.** Same manifest ⇒ comparable numbers; any pin differs ⇒ different experiment, different baseline. Week 8's "flip one word and watch gates move" and Week 13's "regression, not noise" both *are* manifest comparisons.
-2. **The manifest is the join key for everything downstream.** Human labels (Week 9) label traces from a specific run; judge verdicts (Week 10) attach to the same; managed-lane scores (Weeks 10+) get manifest fields recorded alongside — including evaluator IDs and dates, per the plan's [managed-evaluation boundaries](../../LEARNING_PLAN.md#managed-evaluation-boundaries-read-before-week-8). If a score can't name its manifest, it isn't evidence.
+The manifest has two identities with different jobs:
 
-Subtle but important: the **prompt hash must cover the tool descriptions**, not just the system prompt. Week 2 established that descriptions steer selection; a manifest that lets a description change slip through unhashed will happily "reproduce" a different agent.
+1. **`experimentId` identifies comparable behavior pins.** Derive it as SHA-256 over a canonical pin projection serialized as UTF-8 JSON with recursively sorted object keys, compact separators, Unicode preserved, and no environment records or outputs. Same `experimentId` means the declared behavioral inputs are comparable; a changed pin means a different experiment and baseline.
+2. **`runId` identifies one execution.** Generate a UUID4 for each run, reject collisions within the run store, and record `executedAt` as an observed timestamp outside the `experimentId` projection. Repeated executions share an `experimentId` but have distinct `runId`s, so agreement rates never overwrite their provenance.
 
-A contract or capability-manifest version change produces a different run identity. Revalidate the dataset and mock fixtures against the new exact versions; do not silently retarget old runs or migrate labels. Existing labels remain attached to the dataset, contract, and manifest versions they actually judged.
+Both identities are downstream joins: human labels and judge verdicts attach to the exact `runId`, while comparisons group runs by `experimentId`. Managed-lane scores also record evaluator IDs and dates, per the plan's [managed-evaluation boundaries](../../LEARNING_PLAN.md#managed-evaluation-boundaries-read-before-week-8). If a score can't name both the execution and its pin projection, it isn't evidence.
+
+Subtle but important: hash the **exact UTF-8 model-visible bytes** after final agent/tool registration, including the system prompt and tool descriptions. Do not trim or normalize whitespace: it can change tokenization and behavior. Canonical JSON applies to the structured pin projection, not to the prompt bytes it references. Keep readable exact versions beside hashes so humans and artifacts can join without reverse-engineering digests.
+
+A contract or capability-manifest version change produces a different `experimentId`. Revalidate the dataset and mock fixtures against the new exact versions; do not silently retarget old runs or migrate labels. Existing labels remain attached to the dataset, contract, experiment, and run versions they actually judged.
 
 ### Instrumentation: capture the declared source profile, normalize once, test the adapter
 
 The pipeline is capture → normalize → store:
 
-- **Capture** with the exact Strands telemetry profile pinned in the run manifest. Depending on collection, conversation and tool payloads may be inline span events or ADOT-split event records correlated to metadata spans; arguments/results are not assumed to be direct span attributes. For local runs, an in-memory exporter is the friction-free option — the Strands evals SDK ships telemetry setup for exactly this pattern, which Week 8 will lean on directly.
-- **Normalize** in `src/adapters/`: a declared Week 6 Strands source profile in → `execution-trace.schema.json`-valid trace out. The adapter is boring, load-bearing code — it gets unit tests with the public-safe synthetic inline and split fixtures from Week 6 so an SDK upgrade changing raw shapes fails tests instead of silently corrupting normalized data.
+- **Capture** with the exact Strands telemetry profile pinned in the run manifest. `strands-inline` and `strands-adot-split` are separate versioned source profiles, not two best-effort shapes under one name. Implement the profile the specimen actually emits; keep Week 6's pair as the cross-profile compatibility receipt. For local runs, an in-memory exporter is the friction-free option — the Strands evals SDK ships telemetry setup for exactly this pattern, which Week 8 will lean on directly.
+- **Normalize** in `src/adapters/`: one declared Week 6 source profile in → `execution-trace.schema.json`-valid trace out. Inherit the exact [span-identification and correlation contract](../telemetry-compatibility.md#span-identification-and-correlation): join split records by `(traceId, spanId)`, require exactly one per supported span, reject duplicate/missing/orphan records, and order spans by `(startTimeUnixNano, endTimeUnixNano, spanId)`. Arguments/results are not assumed to be direct span attributes. Unit tests use the public-safe synthetic fixtures so SDK shape drift fails instead of silently corrupting normalized data.
 - **Store** under `datasets/runs/<runId>/` — raw traces git-ignored, public-safe summaries committed. The billboard rule is at its most tempting to break here, because raw traces are so *useful*; the summary format you design this week is what makes the useful parts shareable.
 
 Strands Evals also offers a convenience path: `@eval_task(TracedHandler())` clears the in-memory exporter per case, invokes a fresh agent, and maps finished spans into a Strands `Session`. Exercise it once as a **compatibility probe**, then compare it with the repo adapter on the same declared synthetic source profile. The convenience path does not replace the canonical trace, and a Strands `Session` is not a new storage contract. Any serialized Session receives the same treatment as a raw trace: private and git-ignored unless transformed into an explicitly reviewed synthetic fixture.
 
 ### `selectionReasoning`: optional observed text, not a causal explanation
 
-If an assistant message contains text immediately preceding a `toolUse` block, store that observed text as `selectionReasoning` on the canonical tool-call span. Week 10's blind judge may use it as evidence about the stated justification; the decision remains judgeable from conversation state and available tools when it is absent.
+For each `toolUse`, define `selectionReasoning` as the ordered concatenation of the contiguous assistant-text content blocks immediately preceding that block **within the same assistant message**. Stop at the previous non-text content block or message boundary. Never include system/user/tool-result content, cross-message prose, or text emitted after the call. For multiple calls in one assistant message, evaluate each call independently rather than copying one explanation onto every call. If the source profile cannot preserve block-level association, store null and record the limitation instead of guessing. Week 10's blind judge may use present text as evidence about stated justification; the decision remains judgeable from conversation state and available tools when it is absent.
 
 Two honesty notes belong in the schema docs. First, **presence is provider-, prompt-, and telemetry-shape-dependent** — models often emit a tool call with no preceding prose; store explicit null, never an empty string or adapter-invented explanation, and measure the presence *rate* (Exercise 5). Second, **stated reasoning is evidence, not mechanism** — models can rationalize; the text tells you what the model *said*, not causally *why* it acted. The Week 3 trace did not expose a reliable rationale field, so failure to find observed pre-tool text is valid data rather than an adapter defect by default.
 
 ### The errata pass: fix the ruler before measuring people with it
 
-Build step 4 has you hand-review ten traces end-to-end and fix dataset bugs *now*, with a changelog, before humans label against them. The discipline that makes this safe is a sharp line between two kinds of findings:
+Build step 4 has you hand-review ten traces end-to-end and fix dataset bugs *now*, with a changelog, before humans label against them. Before inspecting Stage A output, predeclare ten row IDs with a deterministic, family-stratified rule; record the IDs, selection rule, dataset version, and dataset checksum in the changelog, and do not replace rows after seeing failures. The discipline that makes this safe is a sharp line between two kinds of findings:
 
 - **Dataset bugs** — the row's expectation is wrong or underdetermined (the prompt doesn't imply what `expected` claims). *Fix now*, changelog entry, dataset version bump. After Week 9, editing expectations means invalidating labels — this week is the last cheap window.
 - **Agent bugs** — the expectation is right and the agent violates it. **Do not fix the agent.** Record it. The specimen is under measurement, not development; "fixing" it now would be tuning to the test set before the test exists. Agent failures found here are previews of Week 8–9 findings, and their persistence is what makes those findings real.
 
 If you can't decide which kind a surprise is, that's usually a third finding: the *contract* is ambiguous (Week 5 artifact bug). Route it there.
 
+Dataset or contract defects may be corrected through versioned errata. The measured agent's prompt, final tool description, model, and sampling pins stay frozen throughout review; changing one starts a new `experimentId`. The ten-row pass calibrates the instrument, not the agent, and does not pretend to be a new holdout split.
+
 ## Build steps
 
 ### 1. Configure the specimen
 
-Weather agent, weather tool only (mock registry from Week 6 behind it), pinned model ID, pinned system prompt, temperature pinned low. Record all pins in a run manifest (`runId`, model, prompt hash, exact (`toolId`, contract version) references, exact capability-manifest ID/version, dataset version, mock fixture version, date). Design the manifest schema first (Exercise 1) — it's a schema like any other, with fixtures.
+Weather agent, weather tool only (mock registry from Week 6 behind it), pinned model ID, exact system-prompt and final registered tool-description hashes, exact temperature, and every supplied provider sampling control (`top_p`, `top_k`, seed, stop controls, or explicit null/not-set where unsupported or omitted). Design the run-manifest schema first (Exercise 1), with `experimentId`, UUID4 `runId`, collision check, `executedAt`, readable exact bindings, SDK/source-profile versions, and valid/invalid fixtures.
+
+The inherited mock registry is stateless after construction: outcomes are row-scoped exact fixtures and returned values are deep copies. Prove that mutating one returned result or changing call order cannot affect a later call or a newly constructed registry. Do not add seed/reset machinery unless the implementation introduces mutable or stochastic mock behavior.
 
 ### 2. Instrument and normalize
 
-Use Strands hooks/callbacks + telemetry export to capture the loop; write the adapter (`src/adapters/`) that normalizes the pinned Week 6 Strands source profile into `execution-trace.schema.json`. Support the profile actually emitted by this run (inline or ADOT-split), fail loudly on orphaned correlations, and store observed pre-tool assistant text or explicit null as `selectionReasoning`. Ship the adapter with tests: synthetic source fixture in → schema-valid trace out.
+Use Strands hooks/callbacks + telemetry export to capture the loop; write the adapter (`src/adapters/`) that normalizes the one pinned Week 6 source profile into `execution-trace.schema.json`. Apply the inherited correlation/ordering rules, fail loudly on unknown shapes, and apply the block-local pre-tool-text rule or explicit null. Ship table-driven fixtures for text→call, call-only, text→call→text→call, adjacent call→call, and message-boundary separation, plus shuffled span/event input that must preserve the canonical projection.
 
-Run one synthetic case through `@eval_task(TracedHandler())` as a bounded cross-check. Compare its mapped Session with the repo-normalized trace for tool name, arguments, result status, and correlation identifiers; document fields present in only one representation and fail if either path silently drops a canonical required fact. Record the exact `strands-agents-evals` version and capture path in the run manifest.
+Run one synthetic case through `@eval_task(TracedHandler())` as a bounded cross-check. Plant independently distinctive observed tool name, canonical tool ID/version, non-default argument, result status/failure kind, and trace/span or call correlation identity. Compare those facts with the repo-normalized trace, document representation-only fields, and add one mutation/drop/swap test per fact that fails with a field-specific message. This guards against a tautological comparator but remains adapter-compatibility evidence, not independent proof of Strands correctness or managed ingestion. Record the exact `strands-agents-evals` version and capture path in the run manifest.
 
 ### 3. Run the full 100-row dataset
 
-Store normalized traces under `datasets/runs/<runId>/` (git-ignored raw, committed public-safe summaries). This is your first full-corpus run — expect mock-registry misses (canonicalization gaps) and adapter edge cases; fixing *those* is this week's real debugging.
+Store normalized traces under `datasets/runs/<runId>/` (git-ignored raw, committed public-safe summaries). Before accepting the corpus, require both schema validation and semantic invariants: observed tool name resolves to one granted exact contract; canonical tool reference matches that resolution; arguments/results satisfy the exact contract schemas; sequences are unique/contiguous; parent/correlation references satisfy the pinned profile; and success/failure fields are internally consistent. Unknown mock fixtures and adapter errors are instrument errors, never agent verdicts.
 
 ### 4. Hand-review ten traces end-to-end
 
-Annotate surprises. Mislabeled expectations in the dataset get fixed *now*, with a changelog entry, before humans label against them. Agent misbehavior gets recorded, not fixed.
+Apply the predeclared ten-row sample and annotate surprises. Mislabeled expectations get versioned errata before humans label; agent misbehavior gets recorded, not fixed. Do not change sample membership or behavior pins after inspecting results.
 
 ## Exercises — guided discovery
 
-**1. Design the run-manifest schema.** Decide every field, and for each: is it a *pin* (input you fixed) or a *record* (output you observed)?
-- *Hint 1:* Candidate pins: model ID, prompt hash, exact (`toolId`, contract version) references, exact capability-manifest ID/version, tool-description hashes, dataset version, mock fixture version, temperature, SDK versions. Which of these actually change behavior? (All of them. Which did you almost leave out?)
-- *Hint 2:* What does the prompt hash hash, exactly — and does a whitespace-only edit to a docstring change your agent's behavior? Should it change the hash?
-- *Hint 3:* Why keep readable versions when hashes already detect changes? Which downstream human or artifact needs to join without reverse-engineering a hash?
+**1. Design the run-manifest schema.** Classify every field as behavior pin, environment record, or output. Derive `experimentId` only from the pin projection; give each execution its own collision-checked UUID4 `runId` and observed `executedAt`.
+- *Hint 1:* Candidate pins: model ID, exact prompt/tool-description hashes, exact (`toolId`, contract version) references, capability-manifest ID/version, dataset/mock versions, exact sampling controls, SDK versions, and source profile. Which did you almost leave out?
+- *Hint 2:* Hash exact final model-visible UTF-8 bytes. Why would trimming a whitespace-only docstring edit hide a potentially behavior-relevant change?
+- *Hint 3:* Why keep readable versions when hashes detect changes? Which artifacts join on `runId`, and which comparisons group by `experimentId`?
 
 **2. Adapter edge cases first.** Before writing the happy path, list the source-profile shapes that could break normalization, and write failing tests for them.
-- *Hint 1:* Multiple tool calls in one assistant message; an ADOT event record with no matching span; a tool result with no matching call visible; a run that ends mid-loop; a `toolUse` with no preceding text (null reasoning).
-- *Hint 2:* What should the adapter do with a shape it doesn't recognize — best-effort or refuse? Which failure mode do you want six months from now, and what does your Week 5 fail-loudly precedent suggest?
+- *Hint 1:* Multiple tool calls in one assistant message; text→call→text→call; adjacent calls; message boundaries; a result with no call; a run ending mid-loop; and null pre-tool text.
+- *Hint 2:* For split telemetry, shuffle span and event-record arrays and require the same projection; then independently test duplicate, missing, and orphan `(traceId, spanId)` pairs. Arrival order is not a second correlation rule.
+- *Hint 3:* What should the adapter do with a shape it doesn't recognize — best-effort or refuse? Which failure mode does the Week 5 fail-loudly precedent require?
 
 **3. Measure repeatability, then break it.** Run the dataset twice under one manifest; compare tool-call sequences and the Week 6 ordered canonical projections separately. Then change exactly one pin (temperature up, or one docstring word) and diff again.
 - *Hint 1:* The Week 6 fixture test already proved normalization determinism for equivalent inputs. A same-manifest model rerun can still differ because of sampling. Separate model variation, mock-key misses, and adapter/projection bugs rather than calling all three nondeterminism.
 - *Hint 2:* The one-pin experiment is Week 8's sensitivity check in miniature; save both run directories as its raw material.
 
-**4. The errata protocol.** For your ten-trace review, write the triage rule before reviewing: what evidence classifies a surprise as dataset bug vs agent bug vs contract ambiguity?
+**4. The errata protocol.** Before Stage A output exists, write the family-stratified selection rule and freeze ten row IDs, dataset version, and checksum. Then write the triage rule: what evidence classifies a surprise as dataset bug vs agent bug vs contract ambiguity?
 - *Hint 1:* Test each surprise against the blind-prediction standard: given only the prompt and the contracts, what *should* happen? If reasonable readers disagree, which artifact failed?
 - *Hint 2:* Changelog entry shape: row id, old → new expectation, why, dataset version bump. Where does the version live so Week 9's labels can cite it?
 
@@ -100,39 +109,40 @@ Annotate surprises. Mislabeled expectations in the dataset get fixed *now*, with
 - *Hint 2:* Whatever the rate is, write it in the run summary; Week 10's judge design must plan for the null case rather than discover it.
 
 **6. Cross-check the native Evals mapping.** Run one public-safe synthetic case through `@eval_task(TracedHandler())`, inspect the resulting Strands `Session`, and compare it with the repo adapter's canonical trace for the same declared source profile.
-- *Hint 1:* The two shapes do not need to serialize identically. Observed tool name, arguments, result status, and correlation identifiers must agree; the canonical `toolId`/contract binding remains a repo-owned extension that the checked mapping must recover explicitly.
-- *Hint 2:* Plant one source field that the canonical schema requires. A comparison that still passes after either adapter drops it is a tautology, not a compatibility test.
-- *Hint 3:* `TracedHandler` manages exporter clearing per case, but cache/report identity still depends on unique case and session identifiers. Where are those pins recorded?
+- *Hint 1:* Plant distinct tool name, canonical reference, non-default argument, failure status, and correlation identity. The shapes may differ, but each fact must agree or have a documented repo-owned recovery rule.
+- *Hint 2:* Mutate/drop/swap each fact independently and require a field-specific failure. An all-fields equality check that never proves each field participates is a tautology.
+- *Hint 3:* `TracedHandler` manages exporter clearing per case, but cache/report identity still depends on unique case/session IDs. Where do `experimentId` and `runId` join those records?
 
 ## Gotchas & drift watch
 
-- **Temperature low ≠ deterministic.** Provider-side sampling, batching, and numerical nondeterminism can vary output at temperature 0. Week 6 proves byte identity only for ordered canonical projections of equivalent telemetry inputs. This week measures repeated model runs separately through tool-call sequence agreement.
-- **Versions and hashes answer different questions.** Exact contract/manifest versions say which reviewed promises governed the run; hashes prove the actual prompt/spec bytes did not drift. Keep both. A changed version creates a new run identity and triggers dataset/mock revalidation; no automatic migration is promised.
+- **Exact sampling pins ≠ deterministic generation.** Provider-side sampling, batching, and numerical nondeterminism can vary output even at the minimum temperature. Record every supported sampling control exactly and explicit null/not-set otherwise. Week 6 proves byte identity only for ordered canonical projections of equivalent telemetry inputs; this week measures model reruns separately.
+- **Versions and hashes answer different questions.** Exact versions say which reviewed promises governed the run; exact-byte hashes detect model-visible drift; `experimentId` fingerprints their structured pin projection; `runId` identifies one execution. Do not collapse those jobs or normalize away prompt whitespace.
+- **Schema-valid can still be semantically wrong.** A result attached to the wrong call can satisfy JSON Schema. Run the semantic invariant validator before counting a trace as instrument-valid; only then may agent gates consume it.
 - **Hooks/telemetry APIs are the fastest-moving part of Strands.** Some hook and telemetry interfaces live in experimental namespaces; verify current names in the docs before wiring, and pin SDK versions in the manifest so an upgrade is a *decision*, not ambient drift.
 - **Convenience mapping can become accidental architecture.** `TracedHandler` is useful plumbing, but custom gates still consume the repo's canonical trace through a tested adapter. If an SDK Session gains or loses a field, the compatibility test should fail before the evidence model changes.
 - **Keep committed source fixtures synthetic.** The adapter's test fixtures preserve raw Strands-shaped structure, but their values are authored placeholders—not captured Runtime payloads. Run the safety scan over `tests/` as well as `datasets/`; live raw telemetry remains private.
-- **Errata cutoff is real.** After Week 9's labels exist, dataset expectation edits invalidate the affected labels (and any calibration built on them). Date the errata window's close in the changelog; late-found bugs get logged and batch-fixed with explicit relabeling, not quietly patched.
+- **Errata cutoff is real.** Freeze the ten-row sample before seeing output. After Week 9's labels exist, dataset expectation edits invalidate affected labels and calibration. Date the cutoff; late bugs get explicit relabeling, not quiet patches.
 - **Summaries are the public artifact — design them, don't dump them.** Counts, rates, kinds, verdict distributions, manifest fields: yes. Prompt texts wholesale, tool arguments verbatim, model prose: only what review confirms billboard-safe. The summary generator is repo code (`scripts/summarize_run.py` is coming in Week 8 — seed it now if convenient).
 - **Ten reviews take longer than you think.** A real end-to-end trace review is 10–15 minutes each. Schedule the two hours; a skimmed review that misses a dataset bug costs a relabeling session later.
 
 ## Deliverable checklist — Instrumented Agent Specimen
 
-- [ ] Specimen config + run manifest schema; everything pinned and recorded.
-- [ ] Trace normalization adapter with tests (pinned synthetic Strands source profile in → schema-valid trace out).
-- [ ] One public-safe synthetic compatibility test comparing the repo adapter with Strands Evals' `TracedHandler`/Session mapping on the same declared source profile.
+- [ ] Specimen config + run-manifest schema with content-derived `experimentId`, UUID4 `runId`, exact behavior pins, environment records, and fixtures.
+- [ ] Trace normalization adapter with block-local reasoning, inherited correlation/ordering, schema checks, semantic invariants, and edge-case tests.
+- [ ] Stateless mock-isolation regression test plus one public-safe Strands Evals compatibility probe with orthogonal planted facts and per-field mutation failures.
 - [ ] Full-dataset run: 100 normalized traces + a public-safe summary report.
-- [ ] Dataset errata changelog from the hand review.
+- [ ] Dataset errata changelog containing the predeclared ten-row sample, selection rule, version/checksum, findings, and cutoff date.
 
 ## Success criteria
 
-- [ ] 100/100 traces validate against the trace schema.
-- [ ] Repeated same-manifest runs are compared with an exact tool-call-sequence comparator; the agreement rate and every difference are reported rather than converted into a model-determinism claim.
-- [ ] Every trace answers, mechanically: which tool, what args, what result kind, what the agent said, and whether observed pre-tool assistant text was present or explicitly null; no causal rationale is inferred.
-- [ ] The native Strands Evals mapping and repo adapter agree on required tool-call facts for the synthetic compatibility case; shape differences are documented and no byte-identical-schema claim is made.
+- [ ] 100/100 traces pass both JSON Schema validation and the documented semantic invariants; instrument errors never become agent verdicts.
+- [ ] Repeated runs sharing one `experimentId` have distinct `runId`s and are compared with an exact tool-call-sequence comparator; agreement and every difference are reported rather than converted into a determinism claim.
+- [ ] Every tool call answers mechanically which tool, arguments, result kind, and exact block-local pre-tool text or null; no cross-message text or causal rationale is inferred.
+- [ ] The native Strands Evals mapping and repo adapter agree on every orthogonal planted fact; each per-field mutation fails, shape differences are documented, and no byte-identical-schema or managed-ingestion claim is made.
 
 ## Docs to consult
 
-Verified via the AWS docs MCP server, 2026-07-07.
+Verified via the AWS docs MCP server, Strands documentation, and Context7 `/strands-agents/evals`, 2026-07-16. Verify API signatures against the exact installed package before implementation; installed source wins if generated documentation differs.
 
 - [Strands traces](https://strandsagents.com/docs/user-guide/observability-evaluation/traces/) — the span hierarchy you're capturing and its attribute names; the adapter's input format lives here.
 - [Strands observability overview](https://strandsagents.com/docs/user-guide/observability-evaluation/observability/) — how traces/metrics/logs relate in the SDK; links out to the per-primitive pages including hooks-level instrumentation.
@@ -141,8 +151,9 @@ Verified via the AWS docs MCP server, 2026-07-07.
 
 ## Self-check
 
-1. Recite your manifest's pins from memory. Which pin would most people forget, and what silent failure does forgetting it cause?
+1. Explain `experimentId` versus `runId`. Which fields enter the pin projection, and why is `executedAt` excluded?
 2. Why must the specimen's misbehavior survive this week unfixed? Name the methodological sin the rule prevents.
 3. A trace shows `selectionReasoning: null`. Give two different valid explanations, and say what each implies for Week 10's judge.
 4. Your two "identical" runs differ in one span's latency field and nothing else. Pass or fail on reproducibility? Cite the artifact that decides.
-5. What's the difference between a dataset bug, an agent bug, and a contract ambiguity — and what's the destination artifact for each?
+5. Why must exact prompt bytes preserve whitespace while the structured pin projection uses canonical JSON?
+6. What's the difference between a dataset bug, an agent bug, and a contract ambiguity — and what's the destination artifact for each?

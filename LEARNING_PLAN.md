@@ -230,7 +230,7 @@ Build the eval corpus: 100 hand-reviewed tool-calling rows (straightforward, mul
 
 ## Week 7 — Minimal Tool-Calling Specimen
 
-Reduce to a single-tool specimen with every behavioral input pinned in a run manifest; capture the declared Strands telemetry profile, normalize it through a tested adapter, record observed pre-tool assistant text or explicit null without inferring causal reasoning, run the full dataset, and close the dataset-errata window before humans label. **Deliverable:** Instrumented Agent Specimen. → [Full guide](docs/weeks/week-07-specimen.md)
+Reduce to a single-tool specimen with content-derived experiment identity separated from per-execution run identity; capture one exact Strands source profile under Week 6's correlation contract; normalize it through schema and semantic-invariant checks; record block-local observed pre-tool assistant text or explicit null without inferring causal reasoning; run the full dataset; and close the errata window through a predeclared ten-row review before humans label. **Deliverable:** Instrumented Agent Specimen. → [Full guide](docs/weeks/week-07-specimen.md)
 
 ## Week 8 — Local Tool Execution Harness
 
