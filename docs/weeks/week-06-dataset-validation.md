@@ -169,21 +169,21 @@ Schema-validate the dataset manifest and every row; resolve every exact binding 
 ## Deliverable checklist — Synthetic Dataset + Validators
 
 - [ ] Dataset-level manifest pinning exact capability-manifest and tool-contract versions; 100-row reviewed dataset with the exact distribution above; generation prompts committed too.
-- [ ] Canonical execution-trace schema plus `docs/telemetry-compatibility.md`, synthetic Strands inline/ADOT-split fixtures, and a locally validated `EvaluationInput.sessionSpans` request-envelope fixture.
+- [x] Canonical execution-trace schema plus `docs/telemetry-compatibility.md`, synthetic Strands inline/ADOT-split fixtures, and a locally validated `EvaluationInput.sessionSpans` request-envelope fixture.
 - [x] Deterministic mock registry with versioned readable keys, scripted failure fixtures, and loud miss diagnostics.
 - [ ] Validators in CI: schema, binding resolution, distribution/coverage, canary non-propagation, telemetry compatibility, safety scan.
 
 ## Success criteria
 
 - [ ] `validate_dataset.py` passes; deliberately corrupted rows fail with actionable messages.
-- [ ] Equivalent synthetic telemetry inputs produce byte-identical serialized canonical projections after deterministic ordering and documented volatile-field exclusion.
-- [ ] Both synthetic Strands profiles (inline events and ADOT-split event records) normalize into schema-valid traces containing the expected prompt, response, tool name, arguments, and result; no live managed-ingestion claim is made.
-- [ ] The synthetic managed-input fixture satisfies the documented `sessionSpans` union and 1–1000 item bounds; split event-record packaging remains explicitly unverified until Week 10.
+- [x] Equivalent synthetic telemetry inputs produce byte-identical serialized canonical projections after deterministic ordering and documented volatile-field exclusion.
+- [x] Both synthetic Strands profiles (inline events and ADOT-split event records) normalize into schema-valid traces containing the expected prompt, response, tool name, arguments, and result; no live managed-ingestion claim is made.
+- [x] The synthetic managed-input fixture satisfies the documented `sessionSpans` union and 1–1000 item bounds; split event-record packaging remains explicitly unverified until Week 10.
 - [ ] A teammate (or you, blind, a week later) can predict expected behavior from any row without asking.
 
 ## Docs to consult
 
-Verified via the AWS docs MCP server, 2026-07-13, except where marked external.
+Verified via the AWS docs MCP server, 2026-07-16, except where marked external.
 
 - [OTEL GenAI semantic conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/) *(external; moved page)* — follow its link to the dedicated GenAI semantic-conventions repository and record the exact artifact/version actually targeted.
 - [Strands Agents telemetry extraction](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/supported-frameworks-strands.html) — the active source profile: span classifiers plus inline and ADOT-split content locations.

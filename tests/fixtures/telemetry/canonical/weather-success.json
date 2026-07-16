@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0.0",
+  "canonicalizerVersion": "1.0.0",
+  "sourceProfile": {
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    },
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "version": null,
+      "schemaUrl": null
+    },
+    "collector": null
+  },
+  "sessionId": "synthetic-session-inline",
+  "traceId": "11111111111111111111111111111111",
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "3.0.0"
+  },
+  "prompt": "What is the current weather in Oslo?",
+  "response": "Oslo is currently 7 °C with light rain.",
+  "spans": [
+    {
+      "sequence": 0,
+      "spanId": "1111111111111111",
+      "parentSpanId": null,
+      "operationName": "invoke_agent",
+      "observedToolName": null,
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "selectionReasoning": null,
+      "startTimeUnixNano": 1000000000,
+      "endTimeUnixNano": 1200000000,
+      "latencyMs": 200.0,
+      "tokenUsage": {
+        "input": 24,
+        "output": 13,
+        "total": 37
+      }
+    },
+    {
+      "sequence": 1,
+      "spanId": "2222222222222222",
+      "parentSpanId": "1111111111111111",
+      "operationName": "execute_tool",
+      "observedToolName": "get_current_weather",
+      "tool": {
+        "toolId": "weather.get_current_weather",
+        "contractVersion": "2.0.0"
+      },
+      "arguments": {
+        "city": "Oslo",
+        "units": "metric"
+      },
+      "result": {
+        "ok": true,
+        "output": {
+          "ok": true,
+          "city": "Oslo",
+          "temp": 7,
+          "units": "metric",
+          "conditions": "light rain"
+        },
+        "failureKind": null,
+        "retryable": null,
+        "diagnostic": null
+      },
+      "selectionReasoning": null,
+      "startTimeUnixNano": 1050000000,
+      "endTimeUnixNano": 1100000000,
+      "latencyMs": 50.0,
+      "tokenUsage": null
+    }
+  ]
+}
