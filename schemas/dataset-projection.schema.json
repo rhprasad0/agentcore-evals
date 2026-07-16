@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentcore-evals:schema:dataset-projection:1.0.0",
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-((?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(?:\\.(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*))?(?:\\+([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?$",
+      "not": {"pattern": "[\\r\\n]"}
+    },
+    "namespacedId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)+$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "artifactPath": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)+$"
+    },
+    "toolId": {"$ref": "#/$defs/namespacedId"},
+    "manifestRef": {
+      "type": "object",
+      "properties": {
+        "manifestId": {"$ref": "#/$defs/namespacedId"},
+        "version": {"$ref": "#/$defs/semver"}
+      },
+      "required": ["manifestId", "version"],
+      "additionalProperties": false
+    },
+    "toolRef": {
+      "type": "object",
+      "properties": {
+        "toolId": {"$ref": "#/$defs/toolId"},
+        "version": {"$ref": "#/$defs/semver"}
+      },
+      "required": ["toolId", "version"],
+      "additionalProperties": false
+    },
+    "exampleId": {"type": "string", "pattern": "^tc-[0-9]{4}$"},
+    "distribution": {
+      "type": "object",
+      "properties": {
+        "straightforward": {"type": "integer", "minimum": 0},
+        "multi-call": {"type": "integer", "minimum": 0},
+        "no-tool": {"type": "integer", "minimum": 0},
+        "failure-injection": {"type": "integer", "minimum": 0},
+        "adversarial-ambiguous": {"type": "integer", "minimum": 0},
+        "dependency-stop": {"type": "integer", "minimum": 0}
+      },
+      "required": ["straightforward", "multi-call", "no-tool", "failure-injection", "adversarial-ambiguous", "dependency-stop"],
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "properties": {
+    "projectionId": {"$ref": "#/$defs/namespacedId"},
+    "version": {"$ref": "#/$defs/semver"},
+    "source": {
+      "type": "object",
+      "properties": {
+        "datasetId": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+        "version": {"$ref": "#/$defs/semver"},
+        "manifestPath": {"$ref": "#/$defs/artifactPath"},
+        "manifestSha256": {"$ref": "#/$defs/sha256"},
+        "corpusPath": {"$ref": "#/$defs/artifactPath"},
+        "corpusSha256": {"$ref": "#/$defs/sha256"}
+      },
+      "required": ["datasetId", "version", "manifestPath", "manifestSha256", "corpusPath", "corpusSha256"],
+      "additionalProperties": false
+    },
+    "specimenBindings": {
+      "type": "object",
+      "properties": {
+        "agentManifest": {"$ref": "#/$defs/manifestRef"},
+        "toolContracts": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/toolRef"},
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": ["agentManifest", "toolContracts"],
+      "additionalProperties": false
+    },
+    "selectionRule": {
+      "type": "object",
+      "properties": {
+        "requiredToolIdsSubsetOf": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/toolId"},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "failureToolIdsSubsetOf": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/toolId"},
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": ["requiredToolIdsSubsetOf", "failureToolIdsSubsetOf"],
+      "additionalProperties": false
+    },
+    "semanticExclusions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "exampleId": {"$ref": "#/$defs/exampleId"},
+          "reason": {"type": "string", "minLength": 1}
+        },
+        "required": ["exampleId", "reason"],
+        "additionalProperties": false
+      },
+      "uniqueItems": true
+    },
+    "selectedExampleIds": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/exampleId"},
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "expectedRowCount": {"type": "integer", "minimum": 1},
+    "distribution": {"$ref": "#/$defs/distribution"}
+  },
+  "required": ["projectionId", "version", "source", "specimenBindings", "selectionRule", "semanticExclusions", "selectedExampleIds", "expectedRowCount", "distribution"],
+  "additionalProperties": false
+}

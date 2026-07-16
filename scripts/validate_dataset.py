@@ -16,6 +16,7 @@ from src.telemetry_normalization import (
     validate_agentcore_evaluation_input,
 )
 from src.deterministic_mocks import MockFixtureError, MockRegistry
+from src.dataset_projection import DatasetProjectionError, load_projection
 from src.tool_calling_dataset import (
     DatasetPaths,
     DatasetSnapshot,
@@ -311,6 +312,14 @@ def main() -> int:
     issues.extend(invalid_issues)
     issues.extend(validate_mock_fixtures(REPO_ROOT, snapshot))
     issues.extend(validate_telemetry_compatibility(REPO_ROOT))
+    projection_path = REPO_ROOT / "datasets/projections/weather-only-62.json"
+    try:
+        projection = load_projection(projection_path, repo_root=REPO_ROOT)
+    except DatasetProjectionError as error:
+        issues.append(ValidationIssue("projection.weather-only-62", str(error)))
+        projected_row_count = 0
+    else:
+        projected_row_count = len(projection.rows)
 
     mock_path = REPO_ROOT / "datasets/fixtures/mocks/tool-calling.jsonl"
     invalid_paths = sorted(
@@ -323,6 +332,9 @@ def main() -> int:
         REPO_ROOT / snapshot.manifest["generationPromptPath"],
         REPO_ROOT / snapshot.manifest["editorialChecklistPath"],
         mock_path,
+        projection_path,
+        REPO_ROOT / "schemas/dataset-projection.schema.json",
+        REPO_ROOT / "schemas/run-manifest.schema.json",
         *invalid_paths,
         *telemetry_paths,
     ]
@@ -337,8 +349,8 @@ def main() -> int:
     )
     print(
         f"Validated {len(snapshot.rows)} dataset rows, {invalid_count} invalid regression "
-        f"fixtures, {mock_count} mock fixtures, 2 telemetry profiles, and 1 managed-input "
-        "fixture."
+        f"fixtures, {mock_count} mock fixtures, 2 telemetry profiles, 1 managed-input "
+        f"fixture, and {projected_row_count} projected rows."
     )
     return 0
 

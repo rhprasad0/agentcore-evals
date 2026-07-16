@@ -29,8 +29,8 @@ class ContractValidationCommandTests(unittest.TestCase):
 
         self.assertEqual(0, result.returncode, result.stderr)
         self.assertEqual(
-            "Validated 2 schemas, 2 valid fixtures, 11 invalid fixtures, "
-            "6 tool contracts, and 1 capability manifest.\n",
+            "Validated 4 schemas, 5 valid fixtures, 19 invalid fixtures, "
+            "6 tool contracts, and 2 capability manifests.\n",
             result.stdout,
         )
 

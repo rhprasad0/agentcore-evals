@@ -288,6 +288,7 @@ class WeatherAgentRunnerTests(unittest.TestCase):
         inventory = {
             "src/agents/hello.py": "legacy Week 1 constructor; known manifest bypass",
             "src/agents/weather.py": "Week 5 manifest-enforced constructor",
+            "src/agents/weather_specimen.py": "Week 7 one-tool manifest-enforced constructor",
             "weatheragent/app/weather_agent/main.py": (
                 "deployed Week 3 constructor; known packaging-boundary bypass"
             ),

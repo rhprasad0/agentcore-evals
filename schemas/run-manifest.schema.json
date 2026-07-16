@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentcore-evals:schema:run-manifest:1.0.0",
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-((?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(?:\\.(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*))?(?:\\+([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?$",
+      "not": {"pattern": "[\\r\\n]"}
+    },
+    "namespacedId": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)+$"},
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "artifactPath": {"type": "string", "pattern": "^[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)+$"},
+    "versionRef": {
+      "type": "object",
+      "properties": {
+        "manifestId": {"$ref": "#/$defs/namespacedId"},
+        "version": {"$ref": "#/$defs/semver"}
+      },
+      "required": ["manifestId", "version"],
+      "additionalProperties": false
+    },
+    "numberControl": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {"status": {"const": "set"}, "value": {"type": "number"}},
+          "required": ["status", "value"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {"status": {"enum": ["omitted", "unsupported"]}},
+          "required": ["status"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "integerControl": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {"status": {"const": "set"}, "value": {"type": "integer"}},
+          "required": ["status", "value"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {"status": {"enum": ["omitted", "unsupported"]}},
+          "required": ["status"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "stringArrayControl": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {"const": "set"},
+            "value": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+          },
+          "required": ["status", "value"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {"status": {"enum": ["omitted", "unsupported"]}},
+          "required": ["status"],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "experimentId": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "runId": {"type": "string", "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"},
+    "executedAt": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"},
+    "behaviorPins": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "object",
+          "properties": {
+            "provider": {"type": "string", "minLength": 1},
+            "modelId": {"type": "string", "minLength": 1}
+          },
+          "required": ["provider", "modelId"],
+          "additionalProperties": false
+        },
+        "systemPrompt": {
+          "type": "object",
+          "properties": {
+            "sha256": {"$ref": "#/$defs/sha256"},
+            "utf8ByteLength": {"type": "integer", "minimum": 1}
+          },
+          "required": ["sha256", "utf8ByteLength"],
+          "additionalProperties": false
+        },
+        "capabilityManifest": {"$ref": "#/$defs/versionRef"},
+        "tools": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "properties": {
+              "toolId": {"$ref": "#/$defs/namespacedId"},
+              "version": {"$ref": "#/$defs/semver"},
+              "runtimeName": {"type": "string", "minLength": 1},
+              "descriptionSha256": {"$ref": "#/$defs/sha256"},
+              "registeredSpecSha256": {"$ref": "#/$defs/sha256"}
+            },
+            "required": ["toolId", "version", "runtimeName", "descriptionSha256", "registeredSpecSha256"],
+            "additionalProperties": false
+          }
+        },
+        "datasetProjection": {
+          "type": "object",
+          "properties": {
+            "projectionId": {"$ref": "#/$defs/namespacedId"},
+            "version": {"$ref": "#/$defs/semver"},
+            "artifactSha256": {"$ref": "#/$defs/sha256"}
+          },
+          "required": ["projectionId", "version", "artifactSha256"],
+          "additionalProperties": false
+        },
+        "mockRegistry": {
+          "type": "object",
+          "properties": {
+            "fixtureId": {"$ref": "#/$defs/namespacedId"},
+            "version": {"$ref": "#/$defs/semver"},
+            "canonicalizerVersion": {"$ref": "#/$defs/semver"},
+            "fixtureSha256": {"$ref": "#/$defs/sha256"}
+          },
+          "required": ["fixtureId", "version", "canonicalizerVersion", "fixtureSha256"],
+          "additionalProperties": false
+        },
+        "sampling": {
+          "type": "object",
+          "properties": {
+            "temperature": {"$ref": "#/$defs/numberControl"},
+            "topP": {"$ref": "#/$defs/numberControl"},
+            "topK": {"$ref": "#/$defs/integerControl"},
+            "seed": {"$ref": "#/$defs/integerControl"},
+            "stopSequences": {"$ref": "#/$defs/stringArrayControl"},
+            "maxTokens": {"$ref": "#/$defs/integerControl"}
+          },
+          "required": ["temperature", "topP", "topK", "seed", "stopSequences", "maxTokens"],
+          "additionalProperties": false
+        },
+        "sdkVersions": {
+          "type": "object",
+          "propertyNames": {"pattern": "^[a-z][a-z0-9-]*$"},
+          "additionalProperties": {"$ref": "#/$defs/semver"},
+          "minProperties": 1
+        },
+        "sourceProfile": {
+          "type": "object",
+          "properties": {
+            "profileId": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+            "version": {"$ref": "#/$defs/semver"}
+          },
+          "required": ["profileId", "version"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["model", "systemPrompt", "capabilityManifest", "tools", "datasetProjection", "mockRegistry", "sampling", "sdkVersions", "sourceProfile"],
+      "additionalProperties": false
+    },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "pythonVersion": {"type": "string", "minLength": 1},
+        "platform": {"type": "string", "minLength": 1},
+        "architecture": {"type": "string", "minLength": 1},
+        "region": {"type": ["string", "null"], "minLength": 1}
+      },
+      "required": ["pythonVersion", "platform", "architecture", "region"],
+      "additionalProperties": false
+    },
+    "outputs": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "properties": {
+            "status": {"enum": ["pending", "completed", "instrument-error"]},
+            "runDirectory": {"$ref": "#/$defs/artifactPath"},
+            "canonicalTracePath": {"oneOf": [{"$ref": "#/$defs/artifactPath"}, {"type": "null"}]},
+            "error": {
+              "oneOf": [
+                {"type": "null"},
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {"type": "string", "minLength": 1},
+                    "message": {"type": "string", "minLength": 1, "maxLength": 500}
+                  },
+                  "required": ["kind", "message"],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "required": ["status", "runDirectory", "canonicalTracePath", "error"],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "required": ["schemaVersion", "experimentId", "runId", "executedAt", "behaviorPins", "environment", "outputs"],
+  "additionalProperties": false
+}

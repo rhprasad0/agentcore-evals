@@ -1,0 +1,13 @@
+{
+  "manifestId": "agents.weather",
+  "version": "4.0.0",
+  "toolGrants": {
+    "weather.get_current_weather": "2.0.0"
+  },
+  "sideEffectCeiling": "read_external",
+  "outOfScope": {
+    "external_write_actions": "Does not purchase, send, publish, modify, or delete external resources.",
+    "forecast_history_or_climate": "Does not use current conditions as forecasts, historical weather, or climate averages.",
+    "unnamed_location": "Does not call the weather tool until the request identifies a city."
+  }
+}

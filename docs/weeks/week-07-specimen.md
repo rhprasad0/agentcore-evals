@@ -35,6 +35,8 @@ Subtle but important: hash the **exact UTF-8 model-visible bytes** after final a
 
 A contract or capability-manifest version change produces a different `experimentId`. Revalidate the dataset and mock fixtures against the new exact versions; do not silently retarget old runs or migrate labels. Existing labels remain attached to the dataset, contract, experiment, and run versions they actually judged.
 
+Week 7 therefore uses the source-derived `weather-only-62@1.0.0` projection rather than retargeting the reviewed Week 6 portfolio corpus. It preserves 62 source rows byte-for-byte under the narrowed `agents.weather@4.0.0` capability: every row whose required and failure-injection tools are weather-only, except `tc-0068` and `tc-0069`, whose response expectations explicitly name the absent calculator capability. The original 100-row corpus and `agents.weather@3.0.0` remain the portfolio baseline for later expansion.
+
 ### Instrumentation: capture the declared source profile, normalize once, test the adapter
 
 The pipeline is capture → normalize → store:
@@ -76,9 +78,9 @@ Use Strands hooks/callbacks + telemetry export to capture the loop; write the ad
 
 Run one synthetic case through `@eval_task(TracedHandler())` as a bounded cross-check. Plant independently distinctive observed tool name, canonical tool ID/version, non-default argument, result status/failure kind, and trace/span or call correlation identity. Compare those facts with the repo-normalized trace, document representation-only fields, and add one mutation/drop/swap test per fact that fails with a field-specific message. This guards against a tautological comparator but remains adapter-compatibility evidence, not independent proof of Strands correctness or managed ingestion. Record the exact `strands-agents-evals` version and capture path in the run manifest.
 
-### 3. Run the full 100-row dataset
+### 3. Run the complete weather-only projection
 
-Store normalized traces under `datasets/runs/<runId>/` (git-ignored raw, committed public-safe summaries). Before accepting the corpus, require both schema validation and semantic invariants: observed tool name resolves to one granted exact contract; canonical tool reference matches that resolution; arguments/results satisfy the exact contract schemas; sequences are unique/contiguous; parent/correlation references satisfy the pinned profile; and success/failure fields are internally consistent. Unknown mock fixtures and adapter errors are instrument errors, never agent verdicts.
+Run all 62 rows in `weather-only-62@1.0.0` and store normalized traces under `datasets/runs/<runId>/` (git-ignored raw, committed public-safe summaries). Before accepting the projection, require both schema validation and semantic invariants: observed tool name resolves to one granted exact contract; canonical tool reference matches that resolution; arguments/results satisfy the exact contract schemas; sequences are unique/contiguous; parent/correlation references satisfy the pinned profile; and success/failure fields are internally consistent. Unknown mock fixtures and adapter errors are instrument errors, never agent verdicts.
 
 ### 4. Hand-review ten traces end-to-end
 
@@ -104,7 +106,7 @@ Apply the predeclared ten-row sample and annotate surprises. Mislabeled expectat
 - *Hint 1:* Test each surprise against the blind-prediction standard: given only the prompt and the contracts, what *should* happen? If reasonable readers disagree, which artifact failed?
 - *Hint 2:* Changelog entry shape: row id, old → new expectation, why, dataset version bump. Where does the version live so Week 9's labels can cite it?
 
-**5. Reasoning presence audit.** Across the 100-row run, measure: on what fraction of tool-call spans is `selectionReasoning` non-null? Does presence correlate with row family (ambiguous vs straightforward)?
+**5. Reasoning presence audit.** Across the 62-row projection run, measure: on what fraction of tool-call spans is `selectionReasoning` non-null? Does presence correlate with row family (ambiguous vs straightforward)?
 - *Hint 1:* If presence is low, what could raise it — and is that intervention (prompting for explanations) *changing the specimen*? What does the manifest say about that?
 - *Hint 2:* Whatever the rate is, write it in the run summary; Week 10's judge design must plan for the null case rather than discover it.
 
@@ -127,15 +129,15 @@ Apply the predeclared ten-row sample and annotate surprises. Mislabeled expectat
 
 ## Deliverable checklist — Instrumented Agent Specimen
 
-- [ ] Specimen config + run-manifest schema with content-derived `experimentId`, UUID4 `runId`, exact behavior pins, environment records, and fixtures.
+- [x] Specimen config + run-manifest schema with content-derived `experimentId`, UUID4 `runId`, exact behavior pins, environment records, and fixtures.
 - [ ] Trace normalization adapter with block-local reasoning, inherited correlation/ordering, schema checks, semantic invariants, and edge-case tests.
 - [ ] Stateless mock-isolation regression test plus one public-safe Strands Evals compatibility probe with orthogonal planted facts and per-field mutation failures.
-- [ ] Full-dataset run: 100 normalized traces + a public-safe summary report.
+- [ ] Full-projection run: 62 normalized traces + a public-safe summary report.
 - [ ] Dataset errata changelog containing the predeclared ten-row sample, selection rule, version/checksum, findings, and cutoff date.
 
 ## Success criteria
 
-- [ ] 100/100 traces pass both JSON Schema validation and the documented semantic invariants; instrument errors never become agent verdicts.
+- [ ] 62/62 projected traces pass both JSON Schema validation and the documented semantic invariants; instrument errors never become agent verdicts.
 - [ ] Repeated runs sharing one `experimentId` have distinct `runId`s and are compared with an exact tool-call-sequence comparator; agreement and every difference are reported rather than converted into a determinism claim.
 - [ ] Every tool call answers mechanically which tool, arguments, result kind, and exact block-local pre-tool text or null; no cross-message text or causal rationale is inferred.
 - [ ] The native Strands Evals mapping and repo adapter agree on every orthogonal planted fact; each per-field mutation fails, shape differences are documented, and no byte-identical-schema or managed-ingestion claim is made.

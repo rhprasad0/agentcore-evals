@@ -10,6 +10,7 @@ from typing import Any
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
+from src.dataset_projection import DatasetProjectionError, load_projection
 from src.version_bindings import VersionBindingError, resolve_exact_version_bindings
 
 
@@ -22,6 +23,14 @@ SCHEMA_FIXTURE_GROUPS = (
     (
         REPO_ROOT / "schemas" / "capability-manifest.schema.json",
         REPO_ROOT / "tests" / "fixtures" / "capability-manifests",
+    ),
+    (
+        REPO_ROOT / "schemas" / "dataset-projection.schema.json",
+        REPO_ROOT / "tests" / "fixtures" / "dataset-projections",
+    ),
+    (
+        REPO_ROOT / "schemas" / "run-manifest.schema.json",
+        REPO_ROOT / "tests" / "fixtures" / "run-manifests",
     ),
 )
 TOOL_CONTRACTS_ROOT = REPO_ROOT / "contracts" / "tools"
@@ -147,6 +156,14 @@ def validate() -> tuple[list[str], dict[str, int]]:
             except VersionBindingError as error:
                 failures.append(str(error))
 
+    try:
+        load_projection(
+            REPO_ROOT / "datasets/projections/weather-only-62.json",
+            repo_root=REPO_ROOT,
+        )
+    except DatasetProjectionError as error:
+        failures.append(f"datasets/projections/weather-only-62.json: {error}")
+
     return failures, counts
 
 
@@ -160,7 +177,7 @@ def main() -> int:
     print(
         f"Validated {counts['schemas']} schemas, {counts['valid_fixtures']} valid fixtures, "
         f"{counts['invalid_fixtures']} invalid fixtures, {counts['tool_contracts']} tool "
-        f"contracts, and {counts['capability_manifests']} capability manifest."
+        f"contracts, and {counts['capability_manifests']} capability manifests."
     )
     return 0
 

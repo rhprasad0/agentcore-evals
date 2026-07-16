@@ -1,0 +1,116 @@
+{
+  "projectionId": "datasets.weather_only",
+  "version": "1.0.0",
+  "source": {
+    "datasetId": "tool-calling-100",
+    "version": "1.0.0",
+    "manifestPath": "datasets/synthetic/tool-calling-100.manifest.json",
+    "manifestSha256": "192972e68ddd2269fcbf4c6dfeb9b555320535c937479e340633f484bb87dd0b",
+    "corpusPath": "datasets/synthetic/tool-calling-100.jsonl",
+    "corpusSha256": "7fe026b170c8c64152f41c38a5788818163a5a2a2b6490575a98e16ef310e15b"
+  },
+  "specimenBindings": {
+    "agentManifest": {
+      "manifestId": "agents.weather",
+      "version": "4.0.0"
+    },
+    "toolContracts": [
+      {
+        "toolId": "weather.get_current_weather",
+        "version": "2.0.0"
+      }
+    ]
+  },
+  "selectionRule": {
+    "requiredToolIdsSubsetOf": [
+      "weather.get_current_weather"
+    ],
+    "failureToolIdsSubsetOf": [
+      "weather.get_current_weather"
+    ]
+  },
+  "semanticExclusions": [
+    {
+      "exampleId": "tc-0068",
+      "reason": "Response expectation names the calculator capability, which is absent from the weather-only specimen."
+    },
+    {
+      "exampleId": "tc-0069",
+      "reason": "Response expectation names the calculator capability, which is absent from the weather-only specimen."
+    }
+  ],
+  "selectedExampleIds": [
+    "tc-0001",
+    "tc-0002",
+    "tc-0003",
+    "tc-0004",
+    "tc-0005",
+    "tc-0007",
+    "tc-0008",
+    "tc-0009",
+    "tc-0010",
+    "tc-0011",
+    "tc-0012",
+    "tc-0013",
+    "tc-0014",
+    "tc-0015",
+    "tc-0016",
+    "tc-0017",
+    "tc-0018",
+    "tc-0019",
+    "tc-0020",
+    "tc-0046",
+    "tc-0047",
+    "tc-0048",
+    "tc-0049",
+    "tc-0050",
+    "tc-0051",
+    "tc-0052",
+    "tc-0053",
+    "tc-0054",
+    "tc-0055",
+    "tc-0056",
+    "tc-0057",
+    "tc-0058",
+    "tc-0059",
+    "tc-0060",
+    "tc-0061",
+    "tc-0062",
+    "tc-0063",
+    "tc-0064",
+    "tc-0065",
+    "tc-0066",
+    "tc-0067",
+    "tc-0070",
+    "tc-0071",
+    "tc-0072",
+    "tc-0073",
+    "tc-0075",
+    "tc-0076",
+    "tc-0077",
+    "tc-0078",
+    "tc-0079",
+    "tc-0080",
+    "tc-0081",
+    "tc-0082",
+    "tc-0085",
+    "tc-0086",
+    "tc-0087",
+    "tc-0090",
+    "tc-0091",
+    "tc-0093",
+    "tc-0096",
+    "tc-0098",
+    "tc-0100"
+  ],
+  "expectedRowCount": 62,
+  "distribution": {
+    "straightforward": 15,
+    "multi-call": 15,
+    "no-tool": 13,
+    "failure-injection": 12,
+    "adversarial-ambiguous": 5,
+    "dependency-stop": 2
+  },
+  "owner": "example"
+}

@@ -97,6 +97,48 @@ class MockRegistryTests(unittest.TestCase):
             result,
         )
 
+    def test_mutating_a_result_cannot_leak_into_later_calls_or_registries(self) -> None:
+        first_registry = MockRegistry.from_repo_root(REPO_ROOT)
+        result = first_registry.invoke(
+            "tc-0001",
+            "weather.get_current_weather",
+            {"city": "Oslo", "units": "metric"},
+        )
+        result["temp"] = 999
+
+        later_result = first_registry.invoke(
+            "tc-0001",
+            "weather.get_current_weather",
+            {"city": "Oslo", "units": "metric"},
+        )
+        new_registry_result = MockRegistry.from_repo_root(REPO_ROOT).invoke(
+            "tc-0001",
+            "weather.get_current_weather",
+            {"city": "Oslo", "units": "metric"},
+        )
+
+        self.assertEqual(12.5, later_result["temp"])
+        self.assertEqual(12.5, new_registry_result["temp"])
+
+    def test_call_order_cannot_change_row_scoped_results(self) -> None:
+        calls = [
+            ("tc-0001", {"city": "Oslo", "units": "metric"}),
+            ("tc-0004", {"city": "Reykjavík"}),
+        ]
+        forward = MockRegistry.from_repo_root(REPO_ROOT)
+        reverse = MockRegistry.from_repo_root(REPO_ROOT)
+
+        forward_results = {
+            example_id: forward.invoke(example_id, "weather.get_current_weather", arguments)
+            for example_id, arguments in calls
+        }
+        reverse_results = {
+            example_id: reverse.invoke(example_id, "weather.get_current_weather", arguments)
+            for example_id, arguments in reversed(calls)
+        }
+
+        self.assertEqual(forward_results, reverse_results)
+
     def test_schema_invalid_arguments_fail_before_fixture_lookup(self) -> None:
         registry = MockRegistry.from_repo_root(REPO_ROOT)
 

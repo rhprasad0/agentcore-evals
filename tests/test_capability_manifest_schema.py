@@ -69,6 +69,17 @@ class CapabilityManifestSchemaTests(unittest.TestCase):
         self.assertEqual("2.0.0", manifest["toolGrants"]["calculator.calculate"])
         self.assertEqual("2.0.0", manifest["toolGrants"]["search.web_search"])
 
+    def test_weather_only_manifest_grants_exactly_one_tool(self) -> None:
+        manifest = self._load_fixture("valid", "weather-only.json")
+
+        self.assertEqual("agents.weather", manifest["manifestId"])
+        self.assertEqual("4.0.0", manifest["version"])
+        self.assertEqual(
+            {"weather.get_current_weather": "2.0.0"},
+            manifest["toolGrants"],
+        )
+        self.assertEqual("read_external", manifest["sideEffectCeiling"])
+
     def test_all_invalid_manifest_fixtures_are_rejected(self) -> None:
         schema = json.loads(CAPABILITY_MANIFEST_SCHEMA_PATH.read_text(encoding="utf-8"))
         fixture_paths = sorted((CAPABILITY_MANIFEST_FIXTURES_PATH / "invalid").glob("*.json"))

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "1.0.0",
+  "experimentId": "sha256:136733566c1cb40c092ef71ff09b56d1008127e372963b8ec3ba45f7a6ce3a78",
+  "runId": "12345678-1234-4abc-8def-1234567890ab",
+  "executedAt": "2026-07-16T19:00:00Z",
+  "behaviorPins": {
+    "model": {
+      "provider": "bedrock",
+      "modelId": "global.anthropic.claude-sonnet-4-5-20250929-v1:0"
+    },
+    "systemPrompt": {
+      "sha256": "27ee2c056b9753cb2150d2236d317a005ab1e6d19db6eacc8c394b3b5c19936f",
+      "utf8ByteLength": 359
+    },
+    "capabilityManifest": {
+      "manifestId": "agents.weather",
+      "version": "4.0.0"
+    },
+    "tools": [
+      {
+        "toolId": "weather.get_current_weather",
+        "version": "2.0.0",
+        "runtimeName": "get_current_weather",
+        "descriptionSha256": "c0feb93be7a189ed013e0e1f96218ea2e3aae55be20951eded5513bcf15fe744",
+        "registeredSpecSha256": "464a8f9e03bfc9bd0788488fd4775eb922f0a8b13046141ce32e550b7821ac4a"
+      }
+    ],
+    "datasetProjection": {
+      "projectionId": "datasets.weather_only",
+      "version": "1.0.0",
+      "artifactSha256": "e35782f8f81d06e191b9d29e3e489cf977ca3df810190295d09c22fdc37a22f4"
+    },
+    "mockRegistry": {
+      "fixtureId": "mocks.tool_calling",
+      "version": "1.0.0",
+      "canonicalizerVersion": "1.0.0",
+      "fixtureSha256": "2a175785a790c65de6711a4bb75a7e370e6768a93c94129a833804374ad1e69f"
+    },
+    "sampling": {
+      "temperature": {
+        "status": "set",
+        "value": 0.0
+      },
+      "topP": {
+        "status": "set",
+        "value": 1.0
+      },
+      "topK": {
+        "status": "unsupported"
+      },
+      "seed": {
+        "status": "unsupported"
+      },
+      "stopSequences": {
+        "status": "omitted"
+      },
+      "maxTokens": {
+        "status": "set",
+        "value": 1024
+      }
+    },
+    "sdkVersions": {
+      "strands-agents": "1.46.0",
+      "botocore": "1.43.44",
+      "bedrock-agentcore": "1.17.0",
+      "aws-opentelemetry-distro": "0.18.0"
+    },
+    "sourceProfile": {
+      "profileId": "strands-inline",
+      "version": "1.0.0"
+    }
+  },
+  "environment": {
+    "pythonVersion": "3.12.3",
+    "platform": "linux",
+    "architecture": "x86_64",
+    "region": null
+  },
+  "outputs": null,
+  "owner": "example"
+}
