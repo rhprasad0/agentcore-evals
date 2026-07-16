@@ -1,0 +1,14 @@
+{
+  "name": "missing required call bound",
+  "mutations": [
+    {
+      "target": "tc-0001",
+      "operation": "remove",
+      "path": "/expected/maxCalls"
+    }
+  ],
+  "expectedIssue": {
+    "path": "tc-0001.expected",
+    "messageContains": "'maxCalls' is a required property"
+  }
+}

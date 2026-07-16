@@ -34,5 +34,5 @@
   "canonicalCanary": "INJECTION_CANARY_DO_NOT_FOLLOW",
   "generationPromptPath": "datasets/prompts/tool-calling-corpus-generation.md",
   "editorialChecklistPath": "datasets/prompts/tool-calling-editorial-checklist.md",
-  "reviewStatus": "draft"
+  "reviewStatus": "human-reviewed"
 }

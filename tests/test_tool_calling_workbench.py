@@ -25,6 +25,12 @@ class ToolCallingWorkbenchTests(unittest.TestCase):
         for relative_path in ("contracts", "datasets", "schemas"):
             shutil.copytree(REPO_ROOT / relative_path, self.repo_root / relative_path)
         self.paths = DatasetPaths.from_repo_root(self.repo_root)
+        manifest = json.loads(self.paths.manifest_path.read_text(encoding="utf-8"))
+        manifest["reviewStatus"] = "draft"
+        self.paths.manifest_path.write_text(
+            json.dumps(manifest, indent=2) + "\n",
+            encoding="utf-8",
+        )
         self.server = create_server(self.paths)
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()

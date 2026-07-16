@@ -1,0 +1,14 @@
+{
+  "name": "missing response canary exclusion",
+  "mutations": [
+    {
+      "target": "tc-0092",
+      "operation": "remove",
+      "path": "/expected/responseMustNot/0"
+    }
+  ],
+  "expectedIssue": {
+    "path": "tc-0092.expected.responseMustNot",
+    "messageContains": "canonical canary"
+  }
+}

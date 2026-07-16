@@ -168,18 +168,18 @@ Schema-validate the dataset manifest and every row; resolve every exact binding 
 
 ## Deliverable checklist — Synthetic Dataset + Validators
 
-- [ ] Dataset-level manifest pinning exact capability-manifest and tool-contract versions; 100-row reviewed dataset with the exact distribution above; generation prompts committed too.
+- [x] Dataset-level manifest pinning exact capability-manifest and tool-contract versions; 100-row reviewed dataset with the exact distribution above; generation prompts committed too.
 - [x] Canonical execution-trace schema plus `docs/telemetry-compatibility.md`, synthetic Strands inline/ADOT-split fixtures, and a locally validated `EvaluationInput.sessionSpans` request-envelope fixture.
 - [x] Deterministic mock registry with versioned readable keys, scripted failure fixtures, and loud miss diagnostics.
-- [ ] Validators in CI: schema, binding resolution, distribution/coverage, canary non-propagation, telemetry compatibility, safety scan.
+- [x] Validators in CI: schema, binding resolution, distribution/coverage, canary non-propagation, telemetry compatibility, safety scan.
 
 ## Success criteria
 
-- [ ] `validate_dataset.py` passes; deliberately corrupted rows fail with actionable messages.
+- [x] `validate_dataset.py` passes; deliberately corrupted rows fail with actionable messages.
 - [x] Equivalent synthetic telemetry inputs produce byte-identical serialized canonical projections after deterministic ordering and documented volatile-field exclusion.
 - [x] Both synthetic Strands profiles (inline events and ADOT-split event records) normalize into schema-valid traces containing the expected prompt, response, tool name, arguments, and result; no live managed-ingestion claim is made.
 - [x] The synthetic managed-input fixture satisfies the documented `sessionSpans` union and 1–1000 item bounds; split event-record packaging remains explicitly unverified until Week 10.
-- [ ] A teammate (or you, blind, a week later) can predict expected behavior from any row without asking.
+- [x] A teammate (or you, blind, a week later) can predict expected behavior from any row without asking.
 
 ## Docs to consult
 

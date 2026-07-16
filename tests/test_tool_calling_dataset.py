@@ -123,6 +123,96 @@ class ToolCallingDatasetTests(unittest.TestCase):
 
         self.assertTrue(any(issue.path == "corpus.distribution" for issue in issues), issues)
 
+    def test_validation_requires_every_exact_contract_failure_kind(self) -> None:
+        paths = DatasetPaths.from_repo_root(REPO_ROOT)
+        snapshot = load_dataset(paths)
+        for row in snapshot.rows:
+            injection = row.get("failureInjection")
+            if isinstance(injection, dict) and injection.get("kind") == "network":
+                injection["kind"] = "timeout"
+
+        issues = validate_dataset(snapshot, paths)
+
+        self.assertTrue(
+            any(
+                issue.path == "corpus.failureKinds" and "network" in issue.message
+                for issue in issues
+            ),
+            issues,
+        )
+
+    def test_validation_requires_canary_non_propagation_assertions(self) -> None:
+        paths = DatasetPaths.from_repo_root(REPO_ROOT)
+        snapshot = load_dataset(paths)
+        row = next(row for row in snapshot.rows if "untrusted-result" in row["tags"])
+        row["expected"]["responseMustNot"].remove(snapshot.manifest["canonicalCanary"])
+
+        issues = validate_dataset(snapshot, paths)
+
+        self.assertTrue(
+            any(
+                issue.path == f"{row['exampleId']}.expected.responseMustNot"
+                and "canonical canary" in issue.message
+                for issue in issues
+            ),
+            issues,
+        )
+
+    def test_validation_requires_canary_exclusion_for_every_granted_tool(self) -> None:
+        paths = DatasetPaths.from_repo_root(REPO_ROOT)
+        snapshot = load_dataset(paths)
+        row = next(row for row in snapshot.rows if "untrusted-result" in row["tags"])
+        row["expected"]["argConstraints"] = [
+            constraint
+            for constraint in row["expected"]["argConstraints"]
+            if constraint["toolId"] != "calculator.calculate"
+        ]
+
+        issues = validate_dataset(snapshot, paths)
+
+        self.assertTrue(
+            any(
+                issue.path == f"{row['exampleId']}.expected.argConstraints"
+                and "calculator.calculate" in issue.message
+                for issue in issues
+            ),
+            issues,
+        )
+
+    def test_validation_requires_a_row_for_every_untrusted_result_contract(self) -> None:
+        paths = DatasetPaths.from_repo_root(REPO_ROOT)
+        snapshot = load_dataset(paths)
+        row = next(row for row in snapshot.rows if "untrusted-result" in row["tags"])
+        row["tags"].remove("untrusted-result")
+
+        issues = validate_dataset(snapshot, paths)
+
+        self.assertTrue(
+            any(
+                issue.path == "corpus.untrustedResults"
+                and "search.web_search" in issue.message
+                for issue in issues
+            ),
+            issues,
+        )
+
+    def test_human_reviewed_manifest_requires_every_row_to_be_reviewed(self) -> None:
+        paths = DatasetPaths.from_repo_root(REPO_ROOT)
+        snapshot = load_dataset(paths)
+        snapshot.manifest["reviewStatus"] = "human-reviewed"
+        snapshot.rows[0]["provenance"]["reviewStatus"] = "pending"
+
+        issues = validate_dataset(snapshot, paths)
+
+        self.assertTrue(
+            any(
+                issue.path == "tc-0001.provenance.reviewStatus"
+                and "human-reviewed" in issue.message
+                for issue in issues
+            ),
+            issues,
+        )
+
     def test_serialize_rows_uses_sorted_utf8_jsonl(self) -> None:
         serialized = serialize_rows([{"z": 1, "a": "café"}])
 

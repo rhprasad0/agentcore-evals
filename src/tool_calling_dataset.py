@@ -51,6 +51,13 @@ class DatasetSnapshot:
     corpus_path: Path
 
 
+@dataclass(frozen=True)
+class ContractMetadata:
+    input_fields: dict[str, set[str]]
+    failure_kinds: set[str]
+    untrusted_tool_ids: set[str]
+
+
 def load_dataset(paths: DatasetPaths) -> DatasetSnapshot:
     """Load the manifest-directed JSONL corpus without modifying it."""
 
@@ -116,12 +123,29 @@ def validate_dataset(snapshot: DatasetSnapshot, paths: DatasetPaths) -> list[Val
         if isinstance(reference, dict) and isinstance(reference.get("toolId"), str)
     }
     issues.extend(_tool_reference_issues(snapshot.rows, granted_tool_ids))
-    contract_inputs, contract_issues = _contract_input_fields(snapshot.manifest, paths)
+    contract_metadata, contract_issues = _contract_metadata(snapshot.manifest, paths)
     issues.extend(contract_issues)
-    issues.extend(_constraint_path_issues(snapshot.rows, contract_inputs))
+    issues.extend(_constraint_path_issues(snapshot.rows, contract_metadata.input_fields))
+    issues.extend(
+        _failure_kind_coverage_issues(snapshot.rows, contract_metadata.failure_kinds)
+    )
+    issues.extend(
+        _untrusted_result_coverage_issues(
+            snapshot.rows,
+            contract_metadata.untrusted_tool_ids,
+        )
+    )
+    issues.extend(
+        _canary_assertion_issues(
+            snapshot.rows,
+            snapshot.manifest,
+            granted_tool_ids,
+        )
+    )
     issues.extend(_row_count_issues(snapshot.rows, snapshot.manifest))
     issues.extend(_example_id_issues(snapshot.rows))
     issues.extend(_distribution_issues(snapshot.rows, snapshot.manifest))
+    issues.extend(_review_status_issues(snapshot.rows, snapshot.manifest))
     return issues
 
 
@@ -236,11 +260,13 @@ def _tool_reference_issues(
     return issues
 
 
-def _contract_input_fields(
+def _contract_metadata(
     manifest: dict[str, Any],
     paths: DatasetPaths,
-) -> tuple[dict[str, set[str]], list[ValidationIssue]]:
+) -> tuple[ContractMetadata, list[ValidationIssue]]:
     fields_by_tool_id: dict[str, set[str]] = {}
+    failure_kinds: set[str] = set()
+    untrusted_tool_ids: set[str] = set()
     issues = []
     for reference in manifest.get("toolContracts", []):
         if not isinstance(reference, dict):
@@ -258,7 +284,105 @@ def _contract_input_fields(
         input_schema = contract.get("inputSchema")
         properties = input_schema.get("properties") if isinstance(input_schema, dict) else None
         fields_by_tool_id[tool_id] = set(properties) if isinstance(properties, dict) else set()
-    return fields_by_tool_id, issues
+        failure_modes = contract.get("failureModes")
+        if isinstance(failure_modes, list):
+            failure_kinds.update(kind for kind in failure_modes if isinstance(kind, str))
+        if contract.get("resultTrust") == "untrusted_external":
+            untrusted_tool_ids.add(tool_id)
+    return (
+        ContractMetadata(
+            input_fields=fields_by_tool_id,
+            failure_kinds=failure_kinds,
+            untrusted_tool_ids=untrusted_tool_ids,
+        ),
+        issues,
+    )
+
+
+def _failure_kind_coverage_issues(
+    rows: list[dict[str, Any]],
+    required_failure_kinds: set[str],
+) -> list[ValidationIssue]:
+    covered = {
+        injection["kind"]
+        for row in rows
+        if isinstance((injection := row.get("failureInjection")), dict)
+        and isinstance(injection.get("kind"), str)
+    }
+    missing = sorted(required_failure_kinds - covered)
+    if missing:
+        return [
+            ValidationIssue(
+                path="corpus.failureKinds",
+                message=f"missing failure-injection coverage for: {', '.join(missing)}",
+            )
+        ]
+    return []
+
+
+def _untrusted_result_coverage_issues(
+    rows: list[dict[str, Any]],
+    required_tool_ids: set[str],
+) -> list[ValidationIssue]:
+    covered = set()
+    for row in rows:
+        tags = row.get("tags")
+        expected = row.get("expected")
+        tool_ids = expected.get("toolIds") if isinstance(expected, dict) else None
+        if isinstance(tags, list) and "untrusted-result" in tags and isinstance(tool_ids, list):
+            covered.update(tool_id for tool_id in tool_ids if isinstance(tool_id, str))
+    missing = sorted(required_tool_ids - covered)
+    if missing:
+        return [
+            ValidationIssue(
+                path="corpus.untrustedResults",
+                message=f"missing untrusted-result coverage for: {', '.join(missing)}",
+            )
+        ]
+    return []
+
+
+def _canary_assertion_issues(
+    rows: list[dict[str, Any]],
+    manifest: dict[str, Any],
+    granted_tool_ids: set[str],
+) -> list[ValidationIssue]:
+    canary = manifest.get("canonicalCanary")
+    if not isinstance(canary, str):
+        return []
+    issues = []
+    for index, row in enumerate(rows, start=1):
+        tags = row.get("tags")
+        if not isinstance(tags, list) or "untrusted-result" not in tags:
+            continue
+        example_id = str(row.get("exampleId", f"row-{index}"))
+        expected = row.get("expected")
+        response_must_not = expected.get("responseMustNot") if isinstance(expected, dict) else None
+        if not isinstance(response_must_not, list) or canary not in response_must_not:
+            issues.append(
+                ValidationIssue(
+                    path=f"{example_id}.expected.responseMustNot",
+                    message="must include the canonical canary",
+                )
+            )
+        constraints = expected.get("argConstraints") if isinstance(expected, dict) else None
+        covered_tools = {
+            constraint.get("toolId")
+            for constraint in constraints or []
+            if isinstance(constraint, dict) and constraint.get("notContains") == canary
+        }
+        missing_tools = sorted(granted_tool_ids - covered_tools)
+        if missing_tools:
+            issues.append(
+                ValidationIssue(
+                    path=f"{example_id}.expected.argConstraints",
+                    message=(
+                        "must exclude the canonical canary from arguments for: "
+                        f"{', '.join(missing_tools)}"
+                    ),
+                )
+            )
+    return issues
 
 
 def _distribution_issues(
@@ -281,6 +405,26 @@ def _distribution_issues(
             )
         ]
     return []
+
+
+def _review_status_issues(
+    rows: list[dict[str, Any]],
+    manifest: dict[str, Any],
+) -> list[ValidationIssue]:
+    if manifest.get("reviewStatus") != "human-reviewed":
+        return []
+    issues = []
+    for index, row in enumerate(rows, start=1):
+        provenance = row.get("provenance")
+        if not isinstance(provenance, dict) or provenance.get("reviewStatus") != "reviewed":
+            example_id = str(row.get("exampleId", f"row-{index}"))
+            issues.append(
+                ValidationIssue(
+                    path=f"{example_id}.provenance.reviewStatus",
+                    message="must be reviewed when the dataset manifest is human-reviewed",
+                )
+            )
+    return issues
 
 
 def _example_id_issues(rows: list[dict[str, Any]]) -> list[ValidationIssue]:

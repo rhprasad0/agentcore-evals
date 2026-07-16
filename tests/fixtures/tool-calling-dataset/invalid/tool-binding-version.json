@@ -1,0 +1,15 @@
+{
+  "name": "exact tool binding version mismatch",
+  "mutations": [
+    {
+      "target": "manifest",
+      "operation": "replace",
+      "path": "/toolContracts/0/version",
+      "value": "9.0.0"
+    }
+  ],
+  "expectedIssue": {
+    "path": "manifest.bindings",
+    "messageContains": "expected 2.0.0, got 9.0.0"
+  }
+}

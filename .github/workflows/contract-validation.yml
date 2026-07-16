@@ -32,3 +32,6 @@ jobs:
 
       - name: Validate contracts
         run: uv run --locked python -m scripts.validate_contracts
+
+      - name: Validate dataset
+        run: uv run --locked python -m scripts.validate_dataset

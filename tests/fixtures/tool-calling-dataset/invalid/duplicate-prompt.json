@@ -1,0 +1,15 @@
+{
+  "name": "duplicate prompt",
+  "mutations": [
+    {
+      "target": "tc-0002",
+      "operation": "replace",
+      "path": "/prompt",
+      "value": "What is the current weather in Oslo in metric units?"
+    }
+  ],
+  "expectedIssue": {
+    "path": "tc-0002.prompt",
+    "messageContains": "duplicates prompt from tc-0001"
+  }
+}

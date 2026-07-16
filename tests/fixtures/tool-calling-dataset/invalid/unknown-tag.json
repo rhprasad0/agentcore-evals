@@ -1,0 +1,15 @@
+{
+  "name": "unknown closed-vocabulary tag",
+  "mutations": [
+    {
+      "target": "tc-0001",
+      "operation": "replace",
+      "path": "/tags/0",
+      "value": "outside-taxonomy"
+    }
+  ],
+  "expectedIssue": {
+    "path": "tc-0001.tags[0]",
+    "messageContains": "is not one of"
+  }
+}
