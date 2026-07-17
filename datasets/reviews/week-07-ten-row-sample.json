@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "1.0.0",
+  "sampleId": "week-07-human-review-10",
+  "frozenAt": "2026-07-17",
+  "freezeBoundary": "before-full-projection-output",
+  "projection": {
+    "projectionId": "datasets.weather_only",
+    "version": "1.0.0",
+    "artifactSha256": "e35782f8f81d06e191b9d29e3e489cf977ca3df810190295d09c22fdc37a22f4"
+  },
+  "selectionRule": {
+    "method": "family-stratified-source-order-first-match",
+    "description": "Choose ten rows from source metadata only: two straightforward rows covering metric and standard units; two multi-call rows covering two and three calls; two no-tool rows covering direct answer and capability decline; two failure rows covering retryable timeout and non-retryable auth; the first forced-choice adversarial row; and the first dependency-stop row. Freeze IDs before full-projection output and never replace an instrument-error row.",
+    "familyQuotas": {
+      "straightforward": 2,
+      "multi-call": 2,
+      "no-tool": 2,
+      "failure-injection": 2,
+      "adversarial-ambiguous": 1,
+      "dependency-stop": 1
+    }
+  },
+  "selectedExampleIds": [
+    "tc-0001",
+    "tc-0020",
+    "tc-0002",
+    "tc-0058",
+    "tc-0003",
+    "tc-0065",
+    "tc-0004",
+    "tc-0076",
+    "tc-0005",
+    "tc-0098"
+  ],
+  "triageRules": {
+    "dataset-bug": "The expected behavior is not defensible from the prompt and exact contracts alone; record a versioned expectation correction before Week 9 labels.",
+    "agent-bug": "The expectation and contracts are sound but the observed model behavior is wrong; preserve the trace and do not tune the Week 7 specimen.",
+    "contract-ambiguity": "Reasonable reviewers can disagree because a capability boundary or envelope is underspecified; clarify through a versioned contract decision.",
+    "instrument-error": "No trustworthy canonical trace exists because capture, normalization, exact fixture lookup, or semantic validation failed; exclude it from agent verdicts and do not substitute another sample row."
+  }
+}

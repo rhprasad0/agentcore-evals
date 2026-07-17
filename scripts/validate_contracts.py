@@ -32,6 +32,10 @@ SCHEMA_FIXTURE_GROUPS = (
         REPO_ROOT / "schemas" / "run-manifest.schema.json",
         REPO_ROOT / "tests" / "fixtures" / "run-manifests",
     ),
+    (
+        REPO_ROOT / "schemas" / "run-summary.schema.json",
+        REPO_ROOT / "tests" / "fixtures" / "run-summaries",
+    ),
 )
 TOOL_CONTRACTS_ROOT = REPO_ROOT / "contracts" / "tools"
 CAPABILITY_MANIFESTS_ROOT = REPO_ROOT / "contracts" / "manifests"

@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentcore-evals:schema:run-summary:1.0.0",
+  "$defs": {
+    "count": {"type": "integer", "minimum": 0},
+    "countMap": {
+      "type": "object",
+      "propertyNames": {"type": "string", "minLength": 1},
+      "additionalProperties": {"$ref": "#/$defs/count"}
+    },
+    "familyCounts": {
+      "type": "object",
+      "properties": {
+        "totalCases": {"$ref": "#/$defs/count"},
+        "completedCases": {"$ref": "#/$defs/count"},
+        "instrumentErrors": {"$ref": "#/$defs/count"},
+        "toolCalls": {"$ref": "#/$defs/count"},
+        "selectionReasoningPresent": {"$ref": "#/$defs/count"},
+        "selectionReasoningNull": {"$ref": "#/$defs/count"}
+      },
+      "required": ["totalCases", "completedCases", "instrumentErrors", "toolCalls", "selectionReasoningPresent", "selectionReasoningNull"],
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "experimentId": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "runId": {"type": "string", "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"},
+    "projection": {
+      "type": "object",
+      "properties": {
+        "projectionId": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "artifactSha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "required": ["projectionId", "version", "artifactSha256"],
+      "additionalProperties": false
+    },
+    "counts": {
+      "type": "object",
+      "properties": {
+        "totalCases": {"$ref": "#/$defs/count"},
+        "completedCases": {"$ref": "#/$defs/count"},
+        "instrumentErrors": {"$ref": "#/$defs/count"},
+        "toolCalls": {"$ref": "#/$defs/count"}
+      },
+      "required": ["totalCases", "completedCases", "instrumentErrors", "toolCalls"],
+      "additionalProperties": false
+    },
+    "selectionReasoning": {
+      "type": "object",
+      "properties": {
+        "present": {"$ref": "#/$defs/count"},
+        "null": {"$ref": "#/$defs/count"},
+        "totalToolCalls": {"$ref": "#/$defs/count"}
+      },
+      "required": ["present", "null", "totalToolCalls"],
+      "additionalProperties": false
+    },
+    "resultKinds": {"$ref": "#/$defs/countMap"},
+    "instrumentErrorKinds": {"$ref": "#/$defs/countMap"},
+    "byScenarioFamily": {
+      "type": "object",
+      "propertyNames": {"type": "string", "minLength": 1},
+      "additionalProperties": {"$ref": "#/$defs/familyCounts"}
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "exampleId": {"type": "string", "pattern": "^tc-[0-9]{4}$"},
+          "scenarioFamily": {"type": "string", "minLength": 1},
+          "status": {"enum": ["completed", "instrument-error"]},
+          "toolCalls": {"$ref": "#/$defs/count"},
+          "resultKinds": {"$ref": "#/$defs/countMap"},
+          "selectionReasoningPresent": {"$ref": "#/$defs/count"},
+          "selectionReasoningNull": {"$ref": "#/$defs/count"},
+          "errorKind": {"type": ["string", "null"], "minLength": 1}
+        },
+        "required": ["exampleId", "scenarioFamily", "status", "toolCalls", "resultKinds", "selectionReasoningPresent", "selectionReasoningNull", "errorKind"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["schemaVersion", "experimentId", "runId", "projection", "counts", "selectionReasoning", "resultKinds", "instrumentErrorKinds", "byScenarioFamily", "cases"],
+  "additionalProperties": false
+}

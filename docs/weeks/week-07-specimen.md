@@ -84,9 +84,13 @@ Run one synthetic case through `@eval_task(TracedHandler())` as a bounded cross-
 
 Run all 62 rows in `weather-only-62@1.0.0` and store normalized traces under `datasets/runs/<runId>/` (git-ignored raw, committed public-safe summaries). Before accepting the projection, require both schema validation and semantic invariants: observed tool name resolves to one granted exact contract; canonical tool reference matches that resolution; arguments/results satisfy the exact contract schemas; sequences are unique/contiguous; parent/correlation references satisfy the pinned profile; and success/failure fields are internally consistent. Unknown mock fixtures and adapter errors are instrument errors, never agent verdicts.
 
+The resumable runner is `python3 -m scripts.run_week_07_projection --confirm-live-bedrock`. If interrupted, rerun it with `--resume-run-id <runId>`; completed and instrument-error cases are loaded from their case receipts rather than invoked again. Execute two complete runs under unchanged behavior pins, then compare them with `python3 -m scripts.compare_week_07_runs <leftRunId> <rightRunId> --output <ignored-output-path>`.
+
 ### 4. Hand-review ten traces end-to-end
 
 Apply the predeclared ten-row sample and annotate surprises. Mislabeled expectations get versioned errata before humans label; agent misbehavior gets recorded, not fixed. Do not change sample membership or behavior pins after inspecting results.
+
+The frozen sample is [`../../datasets/reviews/week-07-ten-row-sample.json`](../../datasets/reviews/week-07-ten-row-sample.json); its projection checksum, family quotas, exact ten IDs, and triage rules were recorded before the full 62-row output. Record review outcomes in [`../errata/week-07-dataset-errata.md`](../errata/week-07-dataset-errata.md) without replacing instrument-error rows.
 
 ## Exercises — guided discovery
 
@@ -129,20 +133,32 @@ Apply the predeclared ten-row sample and annotate surprises. Mislabeled expectat
 - **Summaries are the public artifact — design them, don't dump them.** Counts, rates, kinds, verdict distributions, manifest fields: yes. Prompt texts wholesale, tool arguments verbatim, model prose: only what review confirms billboard-safe. The summary generator is repo code (`scripts/summarize_run.py` is coming in Week 8 — seed it now if convenient).
 - **Ten reviews take longer than you think.** A real end-to-end trace review is 10–15 minutes each. Schedule the two hours; a skimmed review that misses a dataset bug costs a relabeling session later.
 
+### Private frozen-row review workbench
+
+Use the loopback-only GUI to inspect the ten predeclared rows without preloading an assistant verdict:
+
+```bash
+uv run --project weatheragent/app/weather_agent --locked \
+  python3 -m scripts.week_07_review_workbench \
+  --run-id <accepted-run-id>
+```
+
+Open `http://127.0.0.1:8777`. The interface presents the prompt and observed canonical trace before revealing the frozen expectation, preserves sample order, and exposes ordered tool calls, arguments, normalized results, block-local selection reasoning, and the final response. Human verdicts, checklist state, confidence, and notes are revision-checked and atomically saved to `datasets/runs/<runId>/human-review.json`, which remains ignored with the private run. `Export JSON` downloads the same run-bound review document for inspection; it does not update the public errata automatically.
+
 ## Deliverable checklist — Instrumented Agent Specimen
 
 - [x] Specimen config + run-manifest schema with content-derived `experimentId`, UUID4 `runId`, exact behavior pins, environment records, and fixtures.
 - [x] Trace normalization adapter with block-local reasoning, inherited correlation/ordering, schema checks, semantic invariants, and edge-case tests.
 - [x] Stateless mock-isolation regression test plus one public-safe Strands Evals compatibility probe with orthogonal planted facts and per-field mutation failures. See [`../reports/week-07-telemetry-compatibility.md`](../reports/week-07-telemetry-compatibility.md).
-- [ ] Full-projection run: 62 normalized traces + a public-safe summary report.
-- [ ] Dataset errata changelog containing the predeclared ten-row sample, selection rule, version/checksum, findings, and cutoff date.
+- [x] Full-projection run: 62 finalized case outcomes (60 canonical traces plus 2 explicit instrument errors) + a public-safe summary report. See [`../reports/week-07-full-projection.md`](../reports/week-07-full-projection.md).
+- [x] Dataset errata changelog containing the predeclared ten-row sample, selection rule, version/checksum, findings, and cutoff date.
 
 ## Success criteria
 
-- [ ] 62/62 projected traces pass both JSON Schema validation and the documented semantic invariants; instrument errors never become agent verdicts.
-- [ ] Repeated runs sharing one `experimentId` have distinct `runId`s and are compared with an exact tool-call-sequence comparator; agreement and every difference are reported rather than converted into a determinism claim.
-- [ ] Every tool call answers mechanically which tool, arguments, result kind, and exact block-local pre-tool text or null; no cross-message text or causal rationale is inferred.
-- [ ] The native Strands Evals mapping and repo adapter agree on every orthogonal planted fact; each per-field mutation fails, shape differences are documented, and no byte-identical-schema or managed-ingestion claim is made.
+- [x] 62/62 projected cases finalize as either a validated canonical trace or an explicit instrument error; every canonical trace passes JSON Schema and semantic validation, and instrument errors never become agent verdicts.
+- [x] Repeated runs sharing one `experimentId` have distinct `runId`s and are compared with an exact tool-call-sequence comparator; agreement and every difference are reported rather than converted into a determinism claim.
+- [x] Every canonical tool call answers mechanically which tool, arguments, result kind, and exact block-local pre-tool text or null; no cross-message text or causal rationale is inferred.
+- [x] The native Strands Evals mapping and repo adapter agree on every orthogonal planted fact; each per-field mutation fails, shape differences are documented, and no byte-identical-schema or managed-ingestion claim is made.
 
 ## Docs to consult
 

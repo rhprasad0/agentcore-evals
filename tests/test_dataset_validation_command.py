@@ -40,7 +40,7 @@ class DatasetValidationCommandTests(unittest.TestCase):
 
         self.assertEqual(0, result.returncode, result.stderr)
         self.assertEqual(
-            "Validated 100 dataset rows, 5 invalid regression fixtures, 21 mock fixtures, "
+            "Validated 100 dataset rows, 5 invalid regression fixtures, 141 mock fixtures, "
             "2 telemetry profiles, 1 managed-input fixture, and 62 projected rows.\n",
             result.stdout,
         )

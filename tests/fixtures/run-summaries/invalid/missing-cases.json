@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0.0",
+  "experimentId": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "runId": "12345678-1234-4abc-8def-1234567890ab",
+  "projection": {
+    "projectionId": "datasets.weather_only",
+    "version": "1.0.0",
+    "artifactSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "counts": {
+    "totalCases": 1,
+    "completedCases": 1,
+    "instrumentErrors": 0,
+    "toolCalls": 0
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0.0",
+  "experimentId": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "runId": "12345678-1234-4abc-8def-1234567890ab",
+  "projection": {
+    "projectionId": "datasets.weather_only",
+    "version": "1.0.0",
+    "artifactSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "counts": {
+    "totalCases": 1,
+    "completedCases": 1,
+    "instrumentErrors": 0,
+    "toolCalls": 0
+  },
+  "selectionReasoning": {
+    "present": 0,
+    "null": 0,
+    "totalToolCalls": 0
+  },
+  "resultKinds": {},
+  "instrumentErrorKinds": {},
+  "byScenarioFamily": {
+    "no-tool": {
+      "totalCases": 1,
+      "completedCases": 1,
+      "instrumentErrors": 0,
+      "toolCalls": 0,
+      "selectionReasoningPresent": 0,
+      "selectionReasoningNull": 0
+    }
+  },
+  "cases": [
+    {
+      "exampleId": "tc-0003",
+      "scenarioFamily": "no-tool",
+      "status": "completed",
+      "toolCalls": 0,
+      "resultKinds": {},
+      "selectionReasoningPresent": 0,
+      "selectionReasoningNull": 0,
+      "errorKind": null
+    }
+  ]
+}

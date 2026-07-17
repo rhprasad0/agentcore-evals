@@ -2,7 +2,7 @@
 
 **Phase:** Eval contract (Weeks 5–10) · **Specimen:** Week 7's pinned single-tool agent
 **Lanes touched:** custom eval lane (primary), platform & CI lane (harness enters CI)
-**Prerequisites:** Week 7 exit gate closed — 100 normalized traces, adapter tested, errata window closed.
+**Prerequisites:** Week 7 exit gate closed — 62 finalized case outcomes with validated canonical traces or explicit instrument errors, adapter tested, errata window closed.
 
 [← Week 7](week-07-specimen.md) · [Week index](README.md) · [Next: Week 9 →](week-09-human-labeling.md)
 
