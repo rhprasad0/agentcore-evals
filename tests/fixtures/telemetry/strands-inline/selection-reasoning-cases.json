@@ -1,0 +1,96 @@
+[
+  {
+    "name": "text-then-call",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": [
+          {"text": "I will check Oslo."},
+          {"toolUse": {"toolUseId": "call-1", "name": "get_current_weather", "input": {"city": "Oslo"}}}
+        ]
+      }
+    ],
+    "expected": {"call-1": "I will check Oslo."}
+  },
+  {
+    "name": "call-only",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": [
+          {"toolUse": {"toolUseId": "call-1", "name": "get_current_weather", "input": {"city": "Oslo"}}}
+        ]
+      }
+    ],
+    "expected": {"call-1": null}
+  },
+  {
+    "name": "distinct-text-for-two-calls",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": [
+          {"text": "First Oslo."},
+          {"toolUse": {"toolUseId": "call-1", "name": "get_current_weather", "input": {"city": "Oslo"}}},
+          {"text": "Then Bergen."},
+          {"toolUse": {"toolUseId": "call-2", "name": "get_current_weather", "input": {"city": "Bergen"}}}
+        ]
+      }
+    ],
+    "expected": {"call-1": "First Oslo.", "call-2": "Then Bergen."}
+  },
+  {
+    "name": "adjacent-calls",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": [
+          {"text": "First Oslo."},
+          {"toolUse": {"toolUseId": "call-1", "name": "get_current_weather", "input": {"city": "Oslo"}}},
+          {"toolUse": {"toolUseId": "call-2", "name": "get_current_weather", "input": {"city": "Bergen"}}}
+        ]
+      }
+    ],
+    "expected": {"call-1": "First Oslo.", "call-2": null}
+  },
+  {
+    "name": "message-boundary",
+    "messages": [
+      {"role": "assistant", "content": [{"text": "This belongs to an earlier message."}]},
+      {
+        "role": "assistant",
+        "content": [
+          {"toolUse": {"toolUseId": "call-1", "name": "get_current_weather", "input": {"city": "Oslo"}}}
+        ]
+      }
+    ],
+    "expected": {"call-1": null}
+  },
+  {
+    "name": "contiguous-text-blocks",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": [
+          {"text": "I will "},
+          {"text": "check Oslo."},
+          {"toolUse": {"toolUseId": "call-1", "name": "get_current_weather", "input": {"city": "Oslo"}}}
+        ]
+      }
+    ],
+    "expected": {"call-1": "I will check Oslo."}
+  },
+  {
+    "name": "user-text-never-counts",
+    "messages": [
+      {"role": "user", "content": [{"text": "Check Oslo."}]},
+      {
+        "role": "assistant",
+        "content": [
+          {"toolUse": {"toolUseId": "call-1", "name": "get_current_weather", "input": {"city": "Oslo"}}}
+        ]
+      }
+    ],
+    "expected": {"call-1": null}
+  }
+]

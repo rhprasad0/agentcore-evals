@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from hashlib import sha256
 from importlib.metadata import version as package_version
 from pathlib import Path
@@ -26,7 +26,7 @@ WEATHER_SPECIMEN_MANIFEST_PATH = (
 )
 PROJECTION_PATH = REPO_ROOT / "datasets/projections/weather-only-62.json"
 MOCK_FIXTURES_PATH = REPO_ROOT / "datasets/fixtures/mocks/tool-calling.jsonl"
-MODEL_ID = "global.anthropic.claude-sonnet-4-5-20250929-v1:0"
+MODEL_ID = "us.amazon.nova-micro-v1:0"
 
 
 def build_specimen_model() -> BedrockModel:
@@ -63,7 +63,13 @@ def build_mock_weather_tool(registry: MockRegistry, example_id: str) -> Any:
     return mock_weather
 
 
-def build_specimen(*, model: Any, registry: MockRegistry, example_id: str) -> Agent:
+def build_specimen(
+    *,
+    model: Any,
+    registry: MockRegistry,
+    example_id: str,
+    trace_attributes: Mapping[str, str] | None = None,
+) -> Agent:
     """Construct the agent only after its one-tool surface passes exact validation."""
 
     mock_weather = build_mock_weather_tool(registry, example_id)
@@ -76,6 +82,7 @@ def build_specimen(*, model: Any, registry: MockRegistry, example_id: str) -> Ag
         system_prompt=SYSTEM_PROMPT,
         tools=tools,
         callback_handler=None,
+        trace_attributes=trace_attributes,
     )
 
 
@@ -155,6 +162,7 @@ def build_behavior_pins(
             package: version_provider(package)
             for package in (
                 "strands-agents",
+                "strands-agents-evals",
                 "botocore",
                 "bedrock-agentcore",
                 "aws-opentelemetry-distro",

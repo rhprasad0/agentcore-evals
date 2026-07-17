@@ -1,12 +1,12 @@
 {
   "schemaVersion": "1.0.0",
-  "experimentId": "sha256:136733566c1cb40c092ef71ff09b56d1008127e372963b8ec3ba45f7a6ce3a78",
+  "experimentId": "sha256:aba82c5470c36fffcdf07eff4bca9aec044ae9d7629523137bb54b41a5947054",
   "runId": "12345678-1234-4abc-8def-1234567890ab",
   "executedAt": "2026-07-16T19:00:00Z",
   "behaviorPins": {
     "model": {
       "provider": "bedrock",
-      "modelId": "global.anthropic.claude-sonnet-4-5-20250929-v1:0"
+      "modelId": "us.amazon.nova-micro-v1:0"
     },
     "systemPrompt": {
       "sha256": "27ee2c056b9753cb2150d2236d317a005ab1e6d19db6eacc8c394b3b5c19936f",
@@ -61,6 +61,7 @@
     },
     "sdkVersions": {
       "strands-agents": "1.46.0",
+      "strands-agents-evals": "1.0.1",
       "botocore": "1.43.44",
       "bedrock-agentcore": "1.17.0",
       "aws-opentelemetry-distro": "0.18.0"

@@ -8,6 +8,8 @@ from typing import Any, Mapping
 
 from jsonschema import Draft202012Validator
 
+from src.execution_trace_validation import validate_execution_trace_semantics
+
 
 SCHEMA_VERSION = "1.0.0"
 CANONICALIZER_VERSION = "1.0.0"
@@ -16,6 +18,53 @@ SUPPORTED_SCOPE = "strands.telemetry.tracer"
 
 class TelemetryNormalizationError(ValueError):
     """Source telemetry cannot be mapped to the canonical trace contract."""
+
+
+def selection_reasoning_by_call_id(messages: list[Any]) -> dict[str, str | None]:
+    """Return exact contiguous assistant text immediately preceding each tool call."""
+
+    reasoning: dict[str, str | None] = {}
+    for message_index, message in enumerate(messages):
+        if not isinstance(message, dict):
+            raise TelemetryNormalizationError(
+                f"messages[{message_index}] must be an object"
+            )
+        if message.get("role") != "assistant":
+            continue
+        content = message.get("content")
+        if not isinstance(content, list):
+            raise TelemetryNormalizationError(
+                f"messages[{message_index}].content must be an array"
+            )
+        for block_index, block in enumerate(content):
+            if not isinstance(block, dict) or "toolUse" not in block:
+                continue
+            tool_use = block.get("toolUse")
+            if not isinstance(tool_use, dict):
+                raise TelemetryNormalizationError(
+                    f"messages[{message_index}].content[{block_index}].toolUse must be an object"
+                )
+            call_id = tool_use.get("toolUseId")
+            if not isinstance(call_id, str) or not call_id:
+                raise TelemetryNormalizationError(
+                    f"messages[{message_index}].content[{block_index}].toolUseId must be non-empty"
+                )
+            if call_id in reasoning:
+                raise TelemetryNormalizationError(f"duplicate toolUseId {call_id!r}")
+            text_parts: list[str] = []
+            cursor = block_index - 1
+            while cursor >= 0:
+                previous = content[cursor]
+                if not isinstance(previous, dict) or set(previous) != {"text"}:
+                    break
+                text = previous["text"]
+                if not isinstance(text, str) or not text:
+                    break
+                text_parts.append(text)
+                cursor -= 1
+            observed = "".join(reversed(text_parts))
+            reasoning[call_id] = observed or None
+    return reasoning
 
 
 def normalize_strands_telemetry(
@@ -53,8 +102,9 @@ def normalize_strands_telemetry(
         span for span in spans if _operation(span) in {"invoke_agent", "execute_tool", "chat"}
     ]
     if profile_name == "strands-inline":
+        selection_reasoning = _inline_selection_reasoning(supported_spans)
         normalized_spans = [
-            _normalize_inline_span(span, sequence, contracts)
+            _normalize_inline_span(span, sequence, contracts, selection_reasoning)
             for sequence, span in enumerate(supported_spans)
         ]
         prompt, response = _inline_prompt_and_response(invoke)
@@ -96,6 +146,7 @@ def normalize_strands_telemetry(
         error = errors[0]
         path = ".".join(str(part) for part in error.path) or "<root>"
         raise TelemetryNormalizationError(f"canonical trace {path}: {error.message}")
+    validate_execution_trace_semantics(result, repo_root=repo_root)
     return result
 
 
@@ -188,10 +239,39 @@ def _validate_source_profile(
             )
 
 
+def _inline_selection_reasoning(
+    spans: list[Mapping[str, Any]],
+) -> dict[str, str | None]:
+    reasoning: dict[str, str | None] = {}
+    for span in spans:
+        if _operation(span) != "chat":
+            continue
+        choice = _unique_event(span, "gen_ai.choice")
+        message = _parse_json_layers(
+            _require_mapping(choice, "attributes").get("message")
+        )
+        if isinstance(message, list):
+            messages = [{"role": "assistant", "content": message}]
+        elif isinstance(message, dict) and message.get("role") == "assistant":
+            messages = [message]
+        else:
+            raise TelemetryNormalizationError(
+                f"chat span {_require_string(span, 'spanId')} choice must preserve assistant content blocks"
+            )
+        for call_id, observed in selection_reasoning_by_call_id(messages).items():
+            if call_id in reasoning:
+                raise TelemetryNormalizationError(
+                    f"duplicate toolUseId {call_id!r} across chat spans"
+                )
+            reasoning[call_id] = observed
+    return reasoning
+
+
 def _normalize_inline_span(
     span: Mapping[str, Any],
     sequence: int,
     contracts: Mapping[str, tuple[str, str]],
+    selection_reasoning: Mapping[str, str | None],
 ) -> dict[str, Any]:
     operation = _operation(span)
     attributes = _require_mapping(span, "attributes")
@@ -211,7 +291,7 @@ def _normalize_inline_span(
         "tool": None,
         "arguments": None,
         "result": None,
-        "selectionReasoning": attributes.get("agentcore_evals.selection_reasoning"),
+        "selectionReasoning": None,
         "startTimeUnixNano": start,
         "endTimeUnixNano": end,
         "latencyMs": (end - start) / 1_000_000,
@@ -228,6 +308,7 @@ def _normalize_inline_span(
         )
     arguments_event = _unique_event(span, "gen_ai.tool.message")
     result_event = _unique_event(span, "gen_ai.choice")
+    call_id = _require_string(attributes, "gen_ai.tool.call.id")
     arguments = _unwrap_tool_payload(
         _require_mapping(arguments_event, "attributes").get("content")
     )
@@ -256,6 +337,7 @@ def _normalize_inline_span(
                 "retryable": None if error is None else error.get("retryable"),
                 "diagnostic": diagnostic,
             },
+            "selectionReasoning": selection_reasoning.get(call_id),
         }
     )
     return normalized
@@ -284,7 +366,7 @@ def _normalize_adot_span(
         "tool": None,
         "arguments": None,
         "result": None,
-        "selectionReasoning": attributes.get("agentcore_evals.selection_reasoning"),
+        "selectionReasoning": None,
         "startTimeUnixNano": start,
         "endTimeUnixNano": end,
         "latencyMs": (end - start) / 1_000_000,

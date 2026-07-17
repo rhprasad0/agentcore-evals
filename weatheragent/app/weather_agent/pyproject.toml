@@ -24,5 +24,6 @@ packages = ["."]
 dev = [
     "jsonschema==4.26.0",
     "mcp-proxy-for-aws>=1.6.3",
+    "strands-agents-evals==1.0.1",
     "strands-agents-tools>=0.8.3",
 ]

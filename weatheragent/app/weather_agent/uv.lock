@@ -3580,6 +3580,27 @@ wheels = [
 ]
 
 [[package]]
+name = "strands-agents-evals"
+version = "1.0.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "boto3" },
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-instrumentation-threading" },
+    { name = "opentelemetry-sdk" },
+    { name = "pydantic" },
+    { name = "rich" },
+    { name = "strands-agents" },
+    { name = "strands-agents-tools" },
+    { name = "tenacity" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/37/cd/bf660bb933447b2cef740fac53e20afee03bb49c43e5d496c1e85925ebe7/strands_agents_evals-1.0.1.tar.gz", hash = "sha256:bcf11f1ee5f2d3b5703733595b20d5b3d87843a127057b4226d04cd75d670261", size = 451203, upload-time = "2026-06-25T22:42:07.502Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/98/30/1ab14993e2f809d3b79d20b6befc133048ee8758a3a5701f1164a369d3f8/strands_agents_evals-1.0.1-py3-none-any.whl", hash = "sha256:b2cee1ca232c3120831b08d68965441a48aeed9fceba18b832bce7cbaa4b981a", size = 352737, upload-time = "2026-06-25T22:42:06.062Z" },
+]
+
+[[package]]
 name = "strands-agents-tools"
 version = "0.8.3"
 source = { registry = "https://pypi.org/simple" }
@@ -3919,6 +3940,7 @@ dependencies = [
 dev = [
     { name = "jsonschema" },
     { name = "mcp-proxy-for-aws" },
+    { name = "strands-agents-evals" },
     { name = "strands-agents-tools" },
 ]
 
@@ -3936,6 +3958,7 @@ requires-dist = [
 dev = [
     { name = "jsonschema", specifier = "==4.26.0" },
     { name = "mcp-proxy-for-aws", specifier = ">=1.6.3" },
+    { name = "strands-agents-evals", specifier = "==1.0.1" },
     { name = "strands-agents-tools", specifier = ">=0.8.3" },
 ]
 

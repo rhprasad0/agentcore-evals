@@ -28,6 +28,7 @@ class WeatherSpecimenTests(unittest.TestCase):
     def _versions(package: str) -> str:
         return {
             "strands-agents": "1.46.0",
+            "strands-agents-evals": "1.0.1",
             "botocore": "1.43.44",
             "bedrock-agentcore": "1.17.0",
             "aws-opentelemetry-distro": "0.18.0",
@@ -37,8 +38,17 @@ class WeatherSpecimenTests(unittest.TestCase):
     def test_build_specimen_registers_only_weather(self, agent_class) -> None:
         model = object()
         registry = MockRegistry.from_repo_root(REPO_ROOT)
+        trace_attributes = {
+            "session.id": "synthetic-session",
+            "gen_ai.conversation.id": "synthetic-session",
+        }
 
-        build_specimen(model=model, registry=registry, example_id="tc-0001")
+        build_specimen(
+            model=model,
+            registry=registry,
+            example_id="tc-0001",
+            trace_attributes=trace_attributes,
+        )
 
         agent_class.assert_called_once()
         arguments = agent_class.call_args.kwargs
@@ -46,6 +56,7 @@ class WeatherSpecimenTests(unittest.TestCase):
         self.assertEqual(SYSTEM_PROMPT, arguments["system_prompt"])
         self.assertEqual(get_current_weather.tool_spec, arguments["tools"][0].tool_spec)
         self.assertIsNone(arguments["callback_handler"])
+        self.assertEqual(trace_attributes, arguments["trace_attributes"])
 
     def test_mock_weather_tool_preserves_exact_surface_and_uses_row_scoped_fixture(self) -> None:
         registry = MockRegistry.from_repo_root(REPO_ROOT)
@@ -84,6 +95,14 @@ class WeatherSpecimenTests(unittest.TestCase):
             max_tokens=1024,
         )
 
+    def test_week_07_uses_nova_micro_us_inference_profile(self) -> None:
+        self.assertEqual("us.amazon.nova-micro-v1:0", MODEL_ID)
+        pins = build_behavior_pins(REPO_ROOT, version_provider=self._versions)
+        self.assertEqual(
+            {"provider": "bedrock", "modelId": "us.amazon.nova-micro-v1:0"},
+            pins["model"],
+        )
+
     def test_behavior_pins_use_exact_runtime_values_and_one_tool_binding(self) -> None:
         pins = build_behavior_pins(REPO_ROOT, version_provider=self._versions)
 
@@ -92,6 +111,7 @@ class WeatherSpecimenTests(unittest.TestCase):
         self.assertEqual(len(SYSTEM_PROMPT.encode("utf-8")), pins["systemPrompt"]["utf8ByteLength"])
         self.assertEqual("strands-inline", pins["sourceProfile"]["profileId"])
         self.assertEqual("1.46.0", pins["sdkVersions"]["strands-agents"])
+        self.assertEqual("1.0.1", pins["sdkVersions"]["strands-agents-evals"])
 
     def test_prompt_or_description_byte_change_changes_experiment_identity(self) -> None:
         pins = build_behavior_pins(REPO_ROOT, version_provider=self._versions)

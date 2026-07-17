@@ -70,6 +70,8 @@ Dataset or contract defects may be corrected through versioned errata. The measu
 
 Weather agent, weather tool only (mock registry from Week 6 behind it), pinned model ID, exact system-prompt and final registered tool-description hashes, exact temperature, and every supplied provider sampling control (`top_p`, `top_k`, seed, stop controls, or explicit null/not-set where unsupported or omitted). Design the run-manifest schema first (Exercise 1), with `experimentId`, UUID4 `runId`, collision check, `executedAt`, readable exact bindings, SDK/source-profile versions, and valid/invalid fixtures.
 
+The selected task model is the US geographic Amazon Nova Micro inference profile, `us.amazon.nova-micro-v1:0`. The exact profile ID is a behavior pin: changing to the in-region model ID or another model creates a new `experimentId` rather than retargeting existing runs.
+
 The inherited mock registry is stateless after construction: outcomes are row-scoped exact fixtures and returned values are deep copies. Prove that mutating one returned result or changing call order cannot affect a later call or a newly constructed registry. Do not add seed/reset machinery unless the implementation introduces mutable or stochastic mock behavior.
 
 ### 2. Instrument and normalize
@@ -130,8 +132,8 @@ Apply the predeclared ten-row sample and annotate surprises. Mislabeled expectat
 ## Deliverable checklist — Instrumented Agent Specimen
 
 - [x] Specimen config + run-manifest schema with content-derived `experimentId`, UUID4 `runId`, exact behavior pins, environment records, and fixtures.
-- [ ] Trace normalization adapter with block-local reasoning, inherited correlation/ordering, schema checks, semantic invariants, and edge-case tests.
-- [ ] Stateless mock-isolation regression test plus one public-safe Strands Evals compatibility probe with orthogonal planted facts and per-field mutation failures.
+- [x] Trace normalization adapter with block-local reasoning, inherited correlation/ordering, schema checks, semantic invariants, and edge-case tests.
+- [x] Stateless mock-isolation regression test plus one public-safe Strands Evals compatibility probe with orthogonal planted facts and per-field mutation failures. See [`../reports/week-07-telemetry-compatibility.md`](../reports/week-07-telemetry-compatibility.md).
 - [ ] Full-projection run: 62 normalized traces + a public-safe summary report.
 - [ ] Dataset errata changelog containing the predeclared ten-row sample, selection rule, version/checksum, findings, and cutoff date.
 

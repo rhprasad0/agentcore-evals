@@ -12,6 +12,7 @@ from jsonschema import Draft202012Validator
 from src.telemetry_normalization import (
     canonical_projection_bytes,
     normalize_strands_telemetry,
+    selection_reasoning_by_call_id,
     validate_agentcore_evaluation_input,
 )
 
@@ -34,6 +35,14 @@ AGENTCORE_INPUT_PATH = (
     / "telemetry"
     / "agentcore-evaluation-input"
     / "session-spans.json"
+)
+SELECTION_REASONING_PATH = (
+    REPO_ROOT
+    / "tests"
+    / "fixtures"
+    / "telemetry"
+    / "strands-inline"
+    / "selection-reasoning-cases.json"
 )
 
 
@@ -83,6 +92,62 @@ class ExecutionTraceSchemaTests(unittest.TestCase):
 
 
 class StrandsTelemetryNormalizationTests(unittest.TestCase):
+    def test_selection_reasoning_is_block_local_and_message_local(self) -> None:
+        cases = json.loads(SELECTION_REASONING_PATH.read_text(encoding="utf-8"))
+
+        for case in cases:
+            with self.subTest(case=case["name"]):
+                self.assertEqual(
+                    case["expected"],
+                    selection_reasoning_by_call_id(case["messages"]),
+                )
+
+    def test_inline_normalizer_correlates_pre_tool_text_by_call_id(self) -> None:
+        source = json.loads(INLINE_PATH.read_text(encoding="utf-8"))
+        source["agentManifest"]["version"] = "4.0.0"
+        source["spans"].append(
+            {
+                "traceId": "11111111111111111111111111111111",
+                "spanId": "3333333333333333",
+                "parentSpanId": "1111111111111111",
+                "name": "chat",
+                "scope": {"name": "strands.telemetry.tracer"},
+                "startTimeUnixNano": 1020000000,
+                "endTimeUnixNano": 1040000000,
+                "attributes": {
+                    "gen_ai.operation.name": "chat",
+                    "session.id": "synthetic-session-inline",
+                },
+                "events": [
+                    {
+                        "name": "gen_ai.choice",
+                        "attributes": {
+                            "message": json.dumps(
+                                [
+                                    {"text": "I will check Oslo."},
+                                    {
+                                        "toolUse": {
+                                            "toolUseId": "synthetic-tool-call-1",
+                                            "name": "get_current_weather",
+                                            "input": {"city": "Oslo", "units": "metric"},
+                                        }
+                                    },
+                                ],
+                                separators=(",", ":"),
+                            )
+                        },
+                    }
+                ],
+            }
+        )
+
+        trace = normalize_strands_telemetry(source, repo_root=REPO_ROOT)
+        tool_span = next(
+            span for span in trace["spans"] if span["operationName"] == "execute_tool"
+        )
+
+        self.assertEqual("I will check Oslo.", tool_span["selectionReasoning"])
+
     def test_inline_events_normalize_to_expected_canonical_trace(self) -> None:
         source = json.loads(INLINE_PATH.read_text(encoding="utf-8"))
         expected = json.loads(VALID_TRACE_PATH.read_text(encoding="utf-8"))
@@ -151,6 +216,18 @@ class StrandsTelemetryNormalizationTests(unittest.TestCase):
             {"source": "transport", "code": "SYNTHETIC_TIMEOUT"},
             result["diagnostic"],
         )
+
+    def test_normalizer_rejects_schema_valid_trace_with_contract_invalid_arguments(self) -> None:
+        source = json.loads(INLINE_PATH.read_text(encoding="utf-8"))
+        source["spans"][0]["events"][0]["attributes"]["content"] = (
+            '{"city":"Oslo","units":"kelvin"}'
+        )
+
+        with self.assertRaisesRegex(
+            ValueError,
+            r"spans\[1\]\.arguments.*weather\.get_current_weather@2\.0\.0",
+        ):
+            normalize_strands_telemetry(source, repo_root=REPO_ROOT)
 
 
 class AgentCoreEvaluationInputFixtureTests(unittest.TestCase):
