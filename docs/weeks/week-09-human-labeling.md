@@ -2,7 +2,7 @@
 
 **Phase:** Eval contract (Weeks 5–10) · **Specimen:** Week 7's traces, now under human judgment
 **Lanes touched:** custom eval lane — the ground-truth layer everything else calibrates against
-**Prerequisites:** Week 8 exit gate closed — harness baselined, per-tag reports exist, gate verdicts recorded (and hidden from you shortly).
+**Prerequisites:** Week 8 exit gate closed — provenance-linked 62-row gate outcomes frozen, per-tag metrics carry explicit denominators and instrument/gate-error counts, and the allowlisted baseline report is recorded (and hidden from you shortly).
 
 [← Week 8](week-08-local-harness.md) · [Week index](README.md) · [Next: Week 10 →](week-10-judge-calibration.md)
 

@@ -234,7 +234,7 @@ Reduce to a single-tool specimen with content-derived experiment identity separa
 
 ## Week 8 — Local Tool Execution Harness
 
-Make Week 8 the explicit `strands-agents-evals` integration: map versioned dataset rows to `Case` objects, run repo-owned deterministic `Evaluator` gates through an `Experiment`, separate metered task generation from cached/offline re-evaluation, validate and report through the SDK/CLI, wire the offline fixture lane into PR CI, and run a sensitivity check proving the instrument measures the agent. **Deliverable:** Local Evaluation Harness. → [Full guide](docs/weeks/week-08-local-harness.md)
+Make Week 8 the explicit `strands-agents-evals` integration: map the exact 62-row weather projection to `Case` objects, run repo-owned deterministic `Evaluator` gates through an `Experiment`, separate metered task generation from run-scoped cache and provenance-linked fixture evaluation, define error-aware metric and public-report contracts, prove the fixture-only Stage B paths fail closed without model/network access, and run a preregistered three-baseline/three-changed sensitivity comparison that may be positive, null, or inconclusive. **Deliverable:** Local Evaluation Harness. → [Full guide](docs/weeks/week-08-local-harness.md)
 
 ## Week 9 — Human Tool-Selection Labeling
 
@@ -299,11 +299,14 @@ Rows 2 and 5–9 are intentionally cloud-light: the eval contract is built local
 
 Defined once, used everywhere; every number in a report links back here.
 
-- **Tool selection accuracy** — share of evaluated decisions where the agent called a tool from the row's expected set (or correctly called none). Deterministic gate; judged variant exists for ambiguous rows.
-- **Tool parameter accuracy** — share of tool calls whose arguments satisfy the row's constraints and derive from context (no fabricated values). Deterministic where constrainable; judged for faithfulness.
-- **Execution success rate** — share of tool calls returning `ok: true`, reported alongside (never blended with) selection accuracy: a correct selection that fails upstream is a different problem than a wrong selection.
-- **Failure-behavior compliance** — share of failure-injection rows where the agent's response matched the taxonomy-required behavior for that failure kind.
-- **No-tool compliance** — share of no-tool rows answered without any tool call.
+Every metric declares its unit (`case` or `tool call`), eligible population, numerator, denominator, and excluded instrument/gate errors. Behavioral rates use only evidence-valid rows/calls; reports also show total projected, evidence-valid, instrument-error, and gate-error counts so exclusions cannot improve a score silently. Overall counts each source row once. A multi-tag row appears once in every applicable stratum, so per-tag counts are diagnostic slices and must not be summed into an overall denominator. Empty strata render `n=0` and rate `null`, never `0%` or `100%`.
+
+- **Tool selection accuracy** — case-level over evidence-valid tool/no-tool rows. Numerator: rows whose observed tool set and call bounds satisfy the row's deterministic selection contract. Denominator: all eligible rows. Wrong/unexpected tools fail selection; ambiguous quality remains a judged variant.
+- **Tool parameter accuracy** — tool-call-level over observed expected-tool calls with evidence-valid arguments. Numerator: calls satisfying deterministic row constraints. Denominator: eligible expected-tool calls. Wrong/unexpected tools remain selection failures rather than becoming extra argument failures; context faithfulness is judged where deterministic constraints cannot establish it.
+- **Execution success rate** — tool-call-level over observed contract-valid tool results. Numerator: calls returning `ok: true`. Denominator: all eligible observed calls, including injected contract-valid failures, which are also stratified by failure kind. Report alongside, never blended with, selection accuracy.
+- **Failure-behavior compliance** — case-level over evidence-valid failure-injection rows. Numerator: rows whose response satisfies only the taxonomy assertions declared deterministically gateable. Denominator: eligible failure-injection rows; human/judge-only quality assertions stay out.
+- **No-tool compliance** — case-level over evidence-valid rows whose expected tool set is empty. Numerator: rows with zero observed tool calls. Denominator: all eligible no-tool rows.
+- **Instrument validity** — case-level over all finalized projected outcomes. Numerator: outcomes containing a schema- and semantic-valid canonical trace. Denominator: all finalized outcomes. Report beside behavioral metrics; never convert instrument errors into agent fails or silently drop them.
 - **Sequencing accuracy** — share of chain scenarios whose call order is within the row's valid-sequence DAG.
 - **Judge agreement** — per-field percent agreement (and κ where a second rater exists) between a judge lane and the human fixture, with false-pass/false-fail rates reported separately. False passes are the dangerous ones.
 - **Verdict flip rate** — share of judged rows whose verdict changes across repeat runs at fixed inputs; instability budget before a judge may scale.
