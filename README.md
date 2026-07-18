@@ -1,126 +1,121 @@
 # AgentCore Evals
+![Ruthless Minimalism — AgentCore Evals: Build less. Measure what remains.](agentcore-evals-banner.png)
 
-**A 16-week, eval-first learning plan for building tool-calling agents with the Strands Agents SDK and Amazon Bedrock AgentCore — where tool selection accuracy and execution reliability are measured contracts, not vibes.**
+**A deliberately small, eval-first build of one production-shaped Strands agent on Amazon Bedrock AgentCore: current weather through a governed Gateway, plus a direct calculator.**
 
-This is the sequel to [aws-ai-evals](https://github.com/rhprasad0/aws-ai-evals), a 12-week project that built an evaluation harness around a deliberately boring chatbot: schemas, synthetic datasets, human labels, judge calibration, managed Bedrock eval jobs, and a CI gate that caught a real regression on camera. That project's guardrails explicitly deferred agent and tool-use evaluation to a future plan. This repo is that plan.
+This repository is the sequel to [aws-ai-evals](https://github.com/rhprasad0/aws-ai-evals). Weeks 1–8 build and close the reusable evaluation foundation; Weeks 9–16 use it once on a Terraform-owned vertical slice with real credentials, policy, reliability, observability, CI, a capped hosted demo, and a recovery drill.
 
-The curriculum lives in [`LEARNING_PLAN.md`](LEARNING_PLAN.md) (methodology, guardrails, and the week index), with one deep hands-on guide per week in [`docs/weeks/`](docs/weeks/README.md). This README is the map: what gets built, in what order, and how to follow along or fork it.
+The curriculum is [`LEARNING_PLAN.md`](LEARNING_PLAN.md). The weekly guides are indexed in [`docs/weeks/`](docs/weeks/README.md). The hosted result is a learning demo with inspectable receipts, not a production-readiness or safety claim.
 
-## The methodology in five bullets
+> **Why the plan was rewritten.** Weeks 1–8 produced a strong evaluation foundation, but the original back half had expanded into a five-tool chain, large labeling/judge programs, multi-agent work, and continuous managed evaluation. That breadth made the curriculum harder to finish and obscured the AgentCore production boundaries it was meant to teach. The rewrite applies ruthless minimalism: one understandable vertical slice, one owner per boundary, and receipts tied to real operations.
+> **Major changes.** Weeks 1–7 are frozen as history and Week 8 closes the existing harness; Weeks 9–16 now use eight preregistered cases and one frozen judge contract, Terraform-only durable infrastructure, Identity/Gateway/Policy with distinct native and proxy guardrails, a bounded weather retry/shared-breaker path, immutable STAGING→PROD releases, same-evidence managed evaluation with manual OIDC CI, a capped hosted demo, and separate Runtime-version and HCL recovery drills.
+## The system being built
 
-1. **Define "correct tool use" before building more tools.** Tool contracts, capability manifests, and a failure taxonomy come before the fun parts.
-2. **Deterministic gates before LLM judges.** Schema validators, tool-selection gates, and sequence checks are cheap, explainable, and never hallucinate.
-3. **Humans are the only ground truth.** A blind-labeled 64-row fixture calibrates every judge — the self-built one *and* AWS's managed evaluators — before either is trusted.
-4. **Deployment is evidence.** The agent ships so that CI regression gates, online evaluations, and dashboards have something real to measure. A preserved red-gate screenshot beats a green-badge collection.
-5. **Optimizers face holdouts.** Proposed improvements (including AgentCore's managed recommendations) are adopted or rejected based on rows they never saw — and rejections get published too.
+1. **Exactly two capabilities:** current weather and calculator. Dropped: the five-tool/write-action path, labeling or judge platform, repeated/nightly managed campaigns, Memory/multi-agent work, and optimizer trial.
+2. **Terraform owns all final durable infrastructure:** remote state, AgentCore, IAM, observability, public edge, and the existing Budget.
+3. **AgentCore Identity owns the OpenWeather credential:** Gateway injects `appid`; the Runtime never receives the key.
+4. **Policy and guardrails have named scopes:** deterministic AgentCore Policy plus native guardrail checks govern Gateway traffic; a separate Bedrock Guardrail protects public proxy input/output.
+5. **One tiny same-evidence evaluation:** six eligible synthetic STAGING traces go to human expectations, one custom judge, and two managed built-ins; two denial rows stay in separate boundary metrics.
+6. **Telemetry supports operations:** CloudWatch traces, a small dashboard, one duration alarm, one error alarm, and SNS notifications.
+7. **The public edge is capped:** private S3 UI through CloudFront, WAF rate rule, IAM-protected Lambda Function URL origin, atomic 10-Runtime-calls/day cap, and an immediate kill switch.
 
-## Why AgentCore + Strands, and why now
+## Final vertical slice
 
-Amazon Bedrock AgentCore went GA in October 2025 as composable infrastructure for agents built with any framework: **Runtime** (session-isolated serverless hosting), **Gateway** (APIs/Lambda/MCP servers as governed MCP tools), **Memory**, **Identity**, **Policy**, built-in tools (Code Interpreter, Browser, Web Search), and OpenTelemetry-based **Observability**. Through 2026 the evaluation story matured fast: **AgentCore Evaluations** (GA March 2026) ships built-in judges down to the tool level — `Builtin.ToolSelectionAccuracy`, `Builtin.ToolParameterAccuracy` — plus online/on-demand/batch modes, custom evaluators, and an optimization loop (recommendations, batch validation, A/B testing, GA June 2026). The **AgentCore CLI** (`npm install -g @aws/agentcore`) scaffolds, runs, and deploys agents with CDK under the hood.
+```text
+Browser
+  ↓
+CloudFront + WAF
+  ├─ private S3 UI via OAC
+  └─ `/api/*` → Lambda Function URL via OAC/SigV4
+       ├─ proxy Bedrock Guardrail (input/output)
+       ├─ DynamoDB daily cap + enabled flag
+       └─ AgentCore Runtime PROD endpoint
+            ├─ direct calculator
+            └─ narrow weather wrapper
+                 ├─ deadline + one retry + shared breaker
+                 └─ AgentCore Gateway
+                      ├─ deterministic Policy allow/deny
+                      ├─ native Policy guardrail checks
+                      └─ OpenWeather target + Identity credential injection
 
-[Strands Agents](https://strandsagents.com/) is the open-source, model-driven SDK this plan builds on (Python, `strands-agents` 1.x), with first-class MCP support, multi-agent patterns (Graph, Swarm, workflow, A2A v1.0), OTEL-native tracing, and a dedicated evals SDK (`strands-agents-evals`).
+CloudWatch → dashboard/alarms → SNS
+Terraform Budget → $10 monthly limit + direct email alerts
+STAGING spans → custom judge + AgentCore Evaluations
+```
 
-That maturity is the point of the exercise: the managed services will happily score your agent. This repo builds the ground truth that says whether to believe them — and publishes the agreement numbers.
+## Evidence model
 
-## What 16 weeks produces
-
-- A deployed multi-tool Strands agent on AgentCore Runtime, every tool behind an explicit schema-validated contract — no magic tool discovery.
-- A 100-row synthetic tool-calling dataset + deterministic local harness (tool selection, parameter fidelity, sequencing, failure behavior) that runs offline in CI.
-- A 64-row blind human-labeled fixture and a **three-way judge calibration**: human labels vs a self-built blind judge vs AgentCore's managed evaluators, with published agreement, false-pass/false-fail rates, and a written trust policy.
-- Resilience under real external APIs: retries, circuit breakers, honest degradation — evaluated with injected outages, not asserted.
-- A two-lane CI regression pipeline (deterministic fixtures on PR, managed batch evaluation against the deployed agent on merge) with a preserved red-gate receipt.
-- Production observability: scrubbed OTEL traces, online evaluation sampling, a CloudWatch dashboard, and alarms on selection-accuracy drift.
-- Multi-agent orchestration (Graph/Swarm/A2A) with coordination accuracy measured, and safety boundaries (AgentCore Policy + Gateway-level guardrails) enforced outside agent code and probed with inert adversarial rows.
-- A public demo, a metrics page fed by real eval artifacts, and a LinkedIn case study.
+- The existing broad baseline is the 62-case deterministic weather projection.
+- The final vertical slice adds eight preregistered cases: six behavioral cases eligible for judges and two denial probes. The two infrastructure-denial rows are ineligible because they measure boundary enforcement, not model tool choice.
+- Human expectations are frozen before output; the custom rubric is frozen before final Runtime evidence.
+- All three judge lanes consume the same six eligible spans from one immutable Runtime version.
+- Reports show counts and every disagreement. Eight rows are a worked comparison, not calibrated population evidence.
+- Pull-request CI is fixture-backed and cloud-free. One manual GitHub OIDC job performs the metered live comparison.
+- Operational anonymous PROD traces are not reused as rich evaluation evidence because public inputs are neither synthetic nor prereviewed; controlled STAGING keeps evaluator inputs scoped and inspectable.
 
 ## Prerequisites
 
-- An AWS account with Bedrock **model access granted** (Claude models for agent + judges) in `us-east-1`, and permissions for AgentCore, IAM, CloudWatch, Lambda, and CDK bootstrap.
-- **Python 3.10+** (agent code), **Node.js 20+** (the AgentCore CLI is an npm package), Docker only if you choose container builds.
-- Comfort with AWS fundamentals, Python, and basic ML concepts. **No prior AgentCore or Strands experience assumed** — Week 1 starts from install.
-- A free OpenWeatherMap API key (Week 2) and a search API key (Week 11).
-- **Budget awareness:** everything managed is consumption-billed (Runtime per-second, Evaluations per judged token, Gateway per call). The plan is structured so Weeks 5–10 run almost entirely local/mocked; deployed-lane weeks include teardown steps (`agentcore remove all` + `agentcore deploy`) and a Budgets alarm is a Week 1 deliverable. Expect low double-digit USD per month during cloud-heavy weeks if you tear down diligently.
+- AWS access in `us-east-1` with the required AgentCore, Bedrock, IAM, CloudWatch, Lambda, CloudFront, WAF, DynamoDB, S3, SNS, and Budgets permissions.
+- Bedrock model and guardrail access enabled before managed work.
+- Terraform `>= 1.11`; HashiCorp AWS provider `>= 6.53, < 7.0`.
+- Python 3.13 for the final CodeZip Runtime; `uv` for the repository environment.
+- Node.js 20+ and the AgentCore CLI for package/validate/inspect/invoke/evaluation operations only.
+- An OpenWeather API key supplied ephemerally to Terraform's write-only credential argument.
+- Cost approval before deployment, WAF creation, managed evaluation, or repeated live probes.
 
-## Repository structure
+## Ownership and recovery
 
-```text
-agentcore-evals/
-  README.md                  # you are here
-  LEARNING_PLAN.md           # the 16-week curriculum (hub + week index)
-  docs/                      # architecture notes, reports, receipts, screenshots
-    weeks/                   # one deep guide per week (week-NN-*.md)
-  schemas/                   # tool contracts, manifests, datasets, traces, labels, judge output
-  datasets/                  # synthetic scenarios, human-label fixtures, CI regression fixtures
-  src/                       # agents, tools (+ mocks), contracts, trace adapters, judges
-  evals/                     # Strands Evals adapters, cases/experiments, deterministic gates, harness
-  scripts/                   # dataset validator, safety scanner, label workbench, run summarizer
-  infra/                     # dashboards & anything outside CLI-managed CDK
-  .github/workflows/         # CI regression lanes
-```
+- `infra/terraform/state-bootstrap/` owns the encrypted, versioned, lock-enabled remote-state bucket.
+- `infra/terraform/production-demo/` owns the final AgentCore, IAM, observability, and hosted-demo resources.
+- Existing `infra/terraform/budget/` owns the account Budget under a separate state key; it is updated, never duplicated.
+- Runtime rollback restores the prior approved immutable version in Terraform and applies an endpoint-only plan. Infrastructure recovery restores known-good reviewed HCL/artifact inputs and applies their diff. An old S3 state object is restored only when state itself is corrupt.
 
-The tree grows week by week; nothing lands in `main` without its schema, validator, or fixture.
+## Schedule
 
-## The 16-week schedule
-
-| Status | Week | Focus | Outcome | Deliverable |
-|--------|------|-------|---------|-------------|
-| ✅ Closed | **1** | **[AgentCore & Strands Fundamentals](docs/weeks/week-01-fundamentals.md)** | Understand AgentCore architecture (Runtime, Gateway, Memory, Identity, Observability), Strands SDK basics, MCP protocol, and A2A communication. Set up local development environment. | **Local Dev Environment + Architecture Notes** - Working Strands installation, AgentCore CLI setup, ["Hello World" agent](src/agents/hello.py) that calls one AWS service, [trace inspection note](docs/hello-agent-loop.md), [architecture notes](docs/architecture.md), and [Terraform-managed cost guardrails](docs/cost-guardrails.md). |
-| ✅ Closed | **2** | **[Basic Agent Development with Strands](docs/weeks/week-02-first-agent.md)** | Build first Strands agent with single tool, understand agent loop (reasoning → tool selection → execution → response), deploy to local runtime, and explore model providers (Bedrock, Anthropic, OpenAI). | **First Functional Agent + Tool** - Weather agent using Strands that calls OpenWeatherMap API, returns typed failure envelopes, includes scrubbed conversation notes, and adds a second `@tool` schema-inspection exercise with temperature conversion. |
-| ✅ Closed | **3** | **[AgentCore Runtime & Deployment](docs/weeks/week-03-runtime-deployment.md)** | Deploy Strands agent to AgentCore Runtime, understand serverless agent hosting, session isolation, execution identity, and trace-based observability. Compare local vs. managed behavior with measured evidence. | **AgentCore Deployment Proof** - CodeZip deployment through the CLI-generated CDK stack, [local-vs-managed comparison](docs/local-vs-agentcore.md), [public-safe latency measurements](docs/assets/week-03-latency-measurements.json), [trace anatomy](docs/trace-anatomy.md), [execution-role baseline](docs/execution-role-baseline.md), measured Runtime cost, and verified final teardown. |
-| ✅ Closed | **4** | **[Tool Integration Patterns](docs/weeks/week-04-tool-integration.md)** | Explore MCP tool integration, custom tool creation with @tool decorator, AgentCore Gateway for API transformation, and tool discovery patterns. Build 2-3 simple tools. | **Multi-Tool Agent Portfolio** - Agent with 3 tools (weather, calculator, web search), MCP integration example, custom Gateway transformation, and tool discovery/registration code with clear boundaries. |
-| ✅ Closed | **5** | **[Agent/Tool Contract Architecture](docs/weeks/week-05-tool-contracts.md)** | Formalize tool interface contracts, agent capability boundaries, execution context isolation, and explicit tool-failure handling patterns. No "magic tool discovery" - explicit tool registration and capability declaration. | **Tool Contract Specification** - Exact-version contracts, manifest enforcement, shared dataset/run binding identity, Runtime IAM/session-isolation evidence, and contract-validation CI are complete. |
-| ✅ Closed | **6** | **[Tool Execution Dataset & Validation Schema](docs/weeks/week-06-dataset-validation.md)** | A 100-row reviewed tool-calling corpus, canonical trace schema, synthetic Strands inline/ADOT-split compatibility fixtures, exact-version mocks, and CI validators. | **Synthetic Dataset + Validators** — Version-bound corpus, tested telemetry mapping, deterministic canonical projection, and public-safe validation fixtures. |
-| ✅ Closed | **7** | **[Minimal Tool-Calling Specimen](docs/weeks/week-07-specimen.md)** | Single-tool agent specimen with a pinned Strands telemetry profile, canonical normalized traces, and a bounded Strands Evals Session-mapping compatibility check. | **Instrumented Agent Specimen** — Single-tool agent with tested trace normalization, explicit null handling for absent pre-tool text, controlled mocks, and a public-safe native-mapper comparison. |
-| 🚧 In progress | **8** | **[Local Tool Execution Harness](docs/weeks/week-08-local-harness.md)** | Map the exact 62-row weather projection into a versioned Strands Experiment, run repo-owned deterministic evaluators, separate metered generation from provenance-linked fixture gating, and report through parity-checked Python/CLI paths. | **Local Evaluation Harness** — Projection-to-Case adapter, custom gates, run-scoped private cache, provenance-linked public fixtures, error-aware allowlisted reports, and tested cloud-free PR execution paths. |
-| ⬜ Planned | **9** | **[Human Tool-Selection Labeling](docs/weeks/week-09-human-labeling.md)** | Browser workflow for labeling correct tool choices, execution quality assessment, multi-step reasoning validation, and 64-row fixture: tool selection accuracy, execution reliability, error recovery patterns. | **Human Labeling Workflow** - Browser-based labeling interface, 64-row human-labeled fixture (tool selection + execution quality), blind evaluation process, and inter-rater reliability metrics. |
-| ⬜ Planned | **10** | **[Tool Selection Judge Calibration](docs/weeks/week-10-judge-calibration.md)** | Claude judge predicts tool selection correctness and execution quality against human labels. Separate reasoning evaluation from execution validation - judge can't see actual tool outputs. | **Automated Judge System** - Claude judge that predicts tool selection correctness, agreement metrics vs human labels, false positive/negative analysis, and separate reasoning evaluation pipeline. |
-| ⬜ Planned | **11** | **[Multi-Tool Integration Complexity](docs/weeks/week-11-multi-tool-chains.md)** | Expand to 3-5 tools with dependency chains (e.g., search → summarize → email). Eval tool sequencing logic, intermediate state handling, and cascade failure patterns. | **Multi-Tool Chain Agent** - Agent with 5+ tools in dependency chains, tool sequencing logic, intermediate state handling, cascade failure recovery, and execution flow visualization. |
-| ⬜ Planned | **12** | **[External Integration Reliability Gates](docs/weeks/week-12-reliability-gates.md)** | Real external APIs with rate limits, failures, and timeouts. Eval retry logic, graceful degradation, and user communication during tool failures. Circuit breaker patterns. | **Production Integration Gates** - Agent with real external APIs, rate limiting, timeout handling, retry logic, circuit breakers, and user communication during failures with live demo. |
-| ⬜ Planned | **13** | **[Production Agent CI Regression](docs/weeks/week-13-ci-regression.md)** | Deployed tool-calling agent with live external integrations, committed regression fixtures for tool selection accuracy, execution reliability gates, and red-gate proof of catching tool-selection regressions. | **CI/CD Regression Pipeline** - Deployed agent with automated regression tests, committed fixtures, red-gate screenshot catching tool-selection regression, and GitHub Actions workflow. |
-| ⬜ Planned | **14** | **[Agent Execution Trace Instrumentation](docs/weeks/week-14-observability.md)** | Normalized trace schema for tool selection reasoning, execution timing, error patterns, and user satisfaction signals. CloudWatch integration without logging sensitive API responses. | **Observability Dashboard** - CloudWatch dashboard showing tool selection patterns, execution timing, error rates, user satisfaction signals, and distributed tracing without sensitive data logging. |
-| ⬜ Planned | **15** | **[Advanced Agent Patterns & Safety](docs/weeks/week-15-multi-agent-safety.md)** | Multi-agent orchestration (Graph, Swarm, Workflow patterns), agent-to-agent communication (A2A), safety guardrails, and capability limitation enforcement. Eval coordination accuracy and safety boundary violations. | **Multi-Agent Orchestration** - Graph/Swarm/Workflow pattern implementation, A2A communication demo, safety guardrails, coordination accuracy metrics, and agent handoff patterns. |
-| ⬜ Planned | **16** | **[Production Agent Architecture Reference](docs/weeks/week-16-capstone.md)** | Complete agent deployment with tool portfolio, execution monitoring, safety guardrails, and eval-driven improvement pipeline. Public demo with documented tool selection accuracy and reliability metrics. | **Production Reference Architecture** - Complete deployed system with public demo, documented metrics (tool accuracy, reliability), eval-driven improvement pipeline, and LinkedIn-ready case study. |
-
-**Week 5 closed — 2026-07-14.** The repo now has tool-contract and capability-manifest schemas, exact-version contract instances, fail-closed manifest enforcement over the registered direct/discovered portfolio, constructor-inventory checks, a contract-owned failure taxonomy, and a shared exact-version binding resolver for future dataset/run consumers. A separate scratch Runtime preserved the selected model, normalized weather adapter, logs, and traces while denying an adjacent model, configuration-bundle deletion, and CloudWatch log reads under its actual execution role; a same-session/different-session canary supplied the bounded isolation receipt. The canonical `uv run --locked python -m scripts.validate_contracts` command validates schemas, fixtures, checked-in contracts, manifests, exact identities, and grant resolution in [CI](.github/workflows/contract-validation.yml). Links: [`docs/tool-contract-spec.md`](docs/tool-contract-spec.md), [`docs/reports/week-05-runtime-iam-isolation.md`](docs/reports/week-05-runtime-iam-isolation.md), [`docs/assets/week-05-runtime-iam-isolation.json`](docs/assets/week-05-runtime-iam-isolation.json). The scratch role was an operational probe and was torn down rather than encoded as durable IaC; Weeks 6–7 still own their dataset and run manifests rather than being pulled forward.
-
-Every deliverable is designed to be **demo-ready** (shows in an interview), **linkable** (LinkedIn/portfolio), **code-complete** (runs from a fresh clone), and **metrics-proven** (numbers with receipts).
+| Status | Week | Bounded outcome |
+| --- | --- | --- |
+| ✅ | [1 — Fundamentals](docs/weeks/week-01-fundamentals.md) | Local toolchain, first loop, architecture, Budget. |
+| ✅ | [2 — First agent](docs/weeks/week-02-first-agent.md) | Typed weather tool and explicit failure envelopes. |
+| ✅ | [3 — Runtime](docs/weeks/week-03-runtime-deployment.md) | Managed invocation, isolation/IAM evidence, telemetry, teardown. |
+| ✅ | [4 — Tool seams](docs/weeks/week-04-tool-integration.md) | Direct, MCP, Gateway, and explicit registration. |
+| ✅ | [5 — Contracts](docs/weeks/week-05-tool-contracts.md) | Contracts, manifests, taxonomy, IAM denials. |
+| ✅ | [6 — Dataset](docs/weeks/week-06-dataset-validation.md) | 100 reviewed rows, mocks, traces, validators. |
+| ✅ | [7 — Specimen](docs/weeks/week-07-specimen.md) | Pinned 62-case weather projection. |
+| 🚧 | [8 — Harness closeout](docs/weeks/week-08-local-harness.md) | One fixture-backed 62-case baseline and closeout receipt. |
+| ⬜ | [9 — Human gold](docs/weeks/week-09-human-labeling.md) | Eight frozen expectations: six behavior, two denials. |
+| ⬜ | [10 — Judge contract](docs/weeks/week-10-judge-calibration.md) | One frozen prompt/script and dry run; no model call. |
+| ⬜ | [11 — Terraform + Gateway](docs/weeks/week-11-gateway-weather.md) | Remote state, Identity/OpenAPI target, Policy/guardrails, allow/deny receipts. |
+| ⬜ | [12 — Reliability](docs/weeks/week-12-reliability-gates.md) | Deadline, one retry, shared breaker, three tests. |
+| ⬜ | [13 — Runtime operations](docs/weeks/week-13-runtime-operations.md) | Python 3.13 CodeZip, STAGING/PROD promotion, telemetry and alarms. |
+| ⬜ | [14 — Managed eval + CI](docs/weeks/week-14-managed-evaluation-ci.md) | Same-evidence comparison, offline PR gate, manual OIDC run. |
+| ⬜ | [15 — Hosted demo](docs/weeks/week-15-hosted-demo.md) | CloudFront edge, proxy Guardrail, cap, kill switch, WAF, $10 Budget. |
+| ⬜ | [16 — Incident drill](docs/weeks/week-16-capstone.md) | Alarm, kill, rollback, Terraform recovery, controlled closeout. |
 
 ## Progress log
 
-One dated entry per closed week, linking the artifacts. Convention:
+> **Week 1 closed — 2026-07-08.** Local Strands/AgentCore toolchain, first AWS identity agent, architecture notes, and Terraform Budget. Links: [`src/agents/hello.py`](src/agents/hello.py), [`docs/architecture.md`](docs/architecture.md), [`docs/cost-guardrails.md`](docs/cost-guardrails.md).
 
-> **Week N closed — YYYY-MM-DD.** One-sentence outcome. Links: report, code, receipt. One honest sentence about what didn't work.
+> **Week 2 closed — 2026-07-09.** Typed current-weather and temperature-conversion tools with offline failure coverage. Links: [`src/tools/weather.py`](src/tools/weather.py), [`src/tools/temperature.py`](src/tools/temperature.py), [`docs/reports/week-02-conversations.md`](docs/reports/week-02-conversations.md).
 
-> **Week 1 closed — 2026-07-08.** Set up the local Strands/AgentCore toolchain, built a minimal AWS identity tool-calling agent, inspected the scrubbed message trace, wrote the AgentCore service map, and moved the budget alarm into Terraform at a $100/month guardrail. Links: [`src/agents/hello.py`](src/agents/hello.py), [`docs/hello-agent-loop.md`](docs/hello-agent-loop.md), [`docs/architecture.md`](docs/architecture.md), [`docs/cost-guardrails.md`](docs/cost-guardrails.md), [`infra/terraform/budget/`](infra/terraform/budget/). The first refusal probe showed a useful boundary miss: the agent avoided an irrelevant tool call, but still answered a non-AWS question it should have redirected or refused.
+> **Week 3 closed — 2026-07-11.** CLI/CDK CodeZip deployment, managed execution evidence, latency/cost measurements, IAM inspection, and verified teardown. Links: [`docs/local-vs-agentcore.md`](docs/local-vs-agentcore.md), [`docs/trace-anatomy.md`](docs/trace-anatomy.md).
 
-> **Week 2 closed — 2026-07-09.** Built the first real Strands specimen: a current-weather tool with typed failure envelopes, a local weather agent runner, offline tests for every failure kind, and a second temperature-conversion `@tool` that proved `Literal[...]` constraints can surface as model-visible schema enums. Links: [`src/agents/weather.py`](src/agents/weather.py), [`src/tools/weather.py`](src/tools/weather.py), [`src/tools/temperature.py`](src/tools/temperature.py), [`tests/test_weather_tool.py`](tests/test_weather_tool.py), [`tests/test_temperature_tool.py`](tests/test_temperature_tool.py), [`docs/reports/week-02-conversations.md`](docs/reports/week-02-conversations.md). The honest boundary finding: docstrings and schemas shape tool use, but they do not enforce product policy; the model still needs deterministic checks, guardrails, and later eval gates.
+> **Week 4 closed — 2026-07-12.** Three explicit tools, ambiguity findings, MCP audit, and direct-versus-Gateway seam comparison. Links: [`docs/reports/week-04-ambiguity-battery.md`](docs/reports/week-04-ambiguity-battery.md), [`docs/decisions/0001-explicit-tool-registration.md`](docs/decisions/0001-explicit-tool-registration.md).
 
-> **Week 3 closed — 2026-07-11.** Deployed the weather agent to AgentCore Runtime through the CLI-generated CodeZip/CDK path, verified tool-backed execution and scoped session separation, benchmarked five cold/warm managed sessions against comparable local calls, and used Runtime traces to show that model calls occupied roughly 96–99% of traced time while the weather tool took only 40–47 ms. CloudWatch and Cost Explorer measured $0.025821 in Runtime compute across 14 invocations and eight sessions. Links: [`weatheragent/`](weatheragent/), [`docs/local-vs-agentcore.md`](docs/local-vs-agentcore.md), [`docs/assets/week-03-latency-measurements.json`](docs/assets/week-03-latency-measurements.json), [`docs/trace-anatomy.md`](docs/trace-anatomy.md), [`docs/execution-role-baseline.md`](docs/execution-role-baseline.md). The honest boundary: the measured cold-path overhead did not isolate microVM startup, and the standalone screenshot, A→A→B receipt, and redeploy runbook were dropped rather than manufacturing extra proof. Final teardown left zero matching Runtimes, application stacks, generated execution roles, or Runtime log groups; shared CDK bootstrap infrastructure remains intentionally.
+> **Week 5 closed — 2026-07-14.** Exact-version contracts/manifests, fail-closed registration, shared binding identity, and disposable Runtime IAM/isolation denials. Links: [`docs/tool-contract-spec.md`](docs/tool-contract-spec.md), [`docs/reports/week-05-runtime-iam-isolation.md`](docs/reports/week-05-runtime-iam-isolation.md).
 
-> **Week 4 closed — 2026-07-12.** Built an explicitly registered three-tool portfolio, verified calculator/weather/Web Search controls and one exact-state multi-tool chain, retained two genuine ambiguity failures, audited an external MCP server's prompt-bearing descriptions, and deployed the same typed weather contract behind a Lambda-backed AgentCore Gateway target. The no-model seam comparison measured 83.9 ms direct versus 217.5 ms Gateway median latency; Gateway preserved the description and typed invalid-city envelope but omitted the direct schema's model-visible `units` default. Links: [`src/agents/weather.py`](src/agents/weather.py), [`docs/reports/week-04-live-three-tool-runs.md`](docs/reports/week-04-live-three-tool-runs.md), [`docs/reports/week-04-ambiguity-battery.md`](docs/reports/week-04-ambiguity-battery.md), [`docs/reports/week-04-external-mcp-trust-audit.md`](docs/reports/week-04-external-mcp-trust-audit.md), [`docs/reports/week-04-weather-seam-comparison.md`](docs/reports/week-04-weather-seam-comparison.md), [`docs/decisions/0001-explicit-tool-registration.md`](docs/decisions/0001-explicit-tool-registration.md). The honest boundaries: the managed Web Search description remained empty, two ambiguity rows failed, the latency sample was small, and Lambda credential injection remains transitional until later reliability/identity work.
+> **Week 6 closed — 2026-07-16.** Reviewed 100-row corpus, deterministic mocks, canonical trace schema, telemetry mapping, and one offline validation command. Links: [`datasets/synthetic/tool-calling-100.manifest.json`](datasets/synthetic/tool-calling-100.manifest.json), [`docs/telemetry-compatibility.md`](docs/telemetry-compatibility.md).
 
-> **Week 6 closed — 2026-07-16.** Finalized a human-reviewed 100-row exact-version tool-calling corpus, deterministic contract-valid mocks, a canonical execution-trace schema, equivalent Strands inline/ADOT-split normalization, and one offline validation command covering schemas, distributions, failure and untrusted-result coverage, inert-canary non-propagation, telemetry, corrupted fixtures, and public safety in CI. Links: [`datasets/synthetic/tool-calling-100.manifest.json`](datasets/synthetic/tool-calling-100.manifest.json), [`scripts/validate_dataset.py`](scripts/validate_dataset.py), [`docs/telemetry-compatibility.md`](docs/telemetry-compatibility.md), [`schemas/execution-trace.schema.json`](schemas/execution-trace.schema.json). The honest boundary: telemetry and `EvaluationInput.sessionSpans` compatibility is synthetic and offline; managed service acceptance and split event-record packaging remain unverified until the later live-integration milestone.
+> **Week 7 closed — 2026-07-17.** Pinned weather-only specimen, two 62-case normalized executions, and a bounded errata review. Links: [`docs/reports/week-07-full-projection.md`](docs/reports/week-07-full-projection.md), [`docs/errata/week-07-dataset-errata.md`](docs/errata/week-07-dataset-errata.md).
 
-> **Week 7 closed — 2026-07-17.** Built the pinned weather-only specimen and run-manifest identity, normalized and semantically validated two complete 62-case executions, and verified exact agreement across all comparable tool-call sequences and canonical projections. The predeclared ten-row human review found eight passes, one agent bug, and one contract ambiguity; it closed the Week 7 errata window without changing dataset expectations and was not used as a calibration label set. Links: [`docs/reports/week-07-full-projection.md`](docs/reports/week-07-full-projection.md), [`docs/reports/week-07-telemetry-compatibility.md`](docs/reports/week-07-telemetry-compatibility.md), [`docs/errata/week-07-dataset-errata.md`](docs/errata/week-07-dataset-errata.md), [`datasets/reviews/week-07-ten-row-sample.json`](datasets/reviews/week-07-ten-row-sample.json). The honest boundary: two adversarial rows remained explicit instrument errors rather than agent verdicts, and exact repeatability is limited to the two pinned executions.
+## Guardrails
 
-## Following along / forking
+- Terraform is the final infrastructure owner; CLI/CDK deployment is migration history after cutover.
+- Never create Terraform/CloudFormation dual ownership.
+- Judges are measurements, not truth; six rows do not establish calibration.
+- Identity owns the weather credential; no key in source, Runtime environment, Terraform plan, or state.
+- Policy/native guardrail checks cover Gateway traffic; the proxy Guardrail covers browser input/output; the calculator is direct.
+- The daily cap bounds Runtime invocations; WAF rate-limits edge requests; the kill switch disables new Runtime calls; alarms notify; the Budget warns about account spend. None is an account-wide hard cap.
+- Public launch blocks on a clean canary scan for proxy logs and `aws/spans`.
+- A normal rollback is reviewed Terraform plus endpoint promotion; state restoration is break-glass.
 
-1. Fork the repo, read [`LEARNING_PLAN.md`](LEARNING_PLAN.md) front matter (especially **Working assumptions**, **Managed evaluation boundaries**, and **Appendix C — Guardrails**) before Week 1.
-2. Work one week at a time; each week's **Success criteria** are the exit gate — don't start Week N+1 with Week N's checkboxes open.
-3. Keep the placeholder discipline: no account IDs, ARNs, real bucket names, raw traces, or secrets in commits. The safety scanner (Week 6) enforces this, but the habit starts Week 1.
-4. Expect drift: AWS ships fast. When this repo's paraphrase and the [current docs](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html) disagree, **the docs win** — and a PR fixing the paraphrase is welcome.
-
-## Guardrails (the short version)
-
-- Judges — mine and AWS's — are measurements, not truth; humans calibrate both.
-- Deployment is evidence, not polish; the public claim is scoped regression discipline, never production-readiness or safety certification.
-- Optimizer suggestions face holdout rows or they don't ship.
-- Write-action tools stay stubbed until reliability gates exist.
-- Adversarial test rows use inert canaries; this repo is not an attack cookbook.
-- Raw traces and payloads stay out of git; public artifacts carry provenance, not data.
-
-The full version, with rationale, is [Appendix C of the learning plan](LEARNING_PLAN.md).
-
----
-
-*Built in public as a learning journey. Corrections and issues welcome — especially of the "the docs changed, your Week N command is stale" variety.*
+Work one week at a time. Each guide's integrated success check is the exit gate, and current AWS/Strands/Terraform documentation wins when this repository drifts.

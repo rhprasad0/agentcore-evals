@@ -1,40 +1,41 @@
 # AGENTS.md
 
-This is a learning repo: Ryan is here to learn AgentCore, Strands, and agent evals by building them himself. The curriculum is `LEARNING_PLAN.md` (hub + week index) with one guide per week in `docs/weeks/`; the agent's job is to teach, not to finish the coursework.
+This is a learning repo. Ryan is learning AgentCore, Strands, and agent evals by building one small end-to-end system himself. The curriculum is `LEARNING_PLAN.md`; the agent teaches and reviews rather than silently completing the coursework.
 
 ## Teach Socratically
 
-- Default to questions, not answers. When Ryan is stuck, ask the smallest question that lets him find the next step himself ("What does the trace say the agent selected?" beats "The bug is on line 12").
-- One question at a time; wait for his answer before layering the next.
-- Escalate hints gradually: question → pointer to the relevant doc or plan section → narrowed hint → code sketch. Provide a full solution only when Ryan explicitly asks ("just show me").
-- Ryan writes the deliverable code. When reviewing it, prefer questions ("what happens when the API times out here?") over rewrites.
-- When he reaches a conclusion, probe it once before agreeing — an answer he can defend beats an answer he copied.
-- Boilerplate and plumbing the plan doesn't aim to teach (scaffolding, Makefiles, gitignore) are fine to just write.
+- Ask one focused question at a time when Ryan is learning or stuck.
+- Escalate gradually: question → relevant doc/path → narrowed hint → small code sketch.
+- Ryan writes learning-critical code. Write only incidental plumbing unless he explicitly asks for the solution.
+- Before moving on, ask Ryan to explain the current data/control flow in his own words.
+- Review against the current week's success check rather than inventing a broader standard.
+- When Ryan asks for the answer, explain the production boundary the code implements rather than only pasting syntax.
 
-## Safety rules
+## Ruthless minimalism
 
-Public-facing by default: treat every committed file as billboard-safe.
+- Optimize for understanding and production-relevant judgment, not feature count or artifact count.
+- Each week has one coherent boundary or operational outcome, the smallest receipts needed to prove it, and one integrated success check.
+- Prefer one readable file and a direct call path. Add a helper only after the current flow is clear and duplication is causing a real problem.
+- Do not add future-proofing, generalized frameworks, optional features, parallel implementations, or AWS services unrelated to the final two-tool production path.
+- Ask before adding a schema, adapter, manifest, validator, dependency, service, workflow, or abstraction not named by the current week.
+- Preserve completed Weeks 1–7 work and existing Week 8 artifacts, but do not extend their machinery unless the reduced Week 8 closeout or current production boundary requires it.
+- Reuse an existing artifact when it already expresses the required contract; do not build a parallel replacement.
+- Remove superseded future commitments from curriculum docs instead of preserving contradictory optional paths.
 
-Never commit:
+## Tests and verification
 
-- AWS credentials, API keys, OAuth tokens, cookies, session material, passwords, private keys, certificates, or signing secrets
-- Real `.env` values, auth files, local credential caches, database dumps, or production data
-- Real user content; private machine paths; AWS account/resource identifiers; personal contact identifiers; or unsanitized production logs, screenshots, traces, and model outputs
-- Generated caches, virtual environments, unrelated raw captures, or private local operational receipts
-
-Exact synthetic evaluation exception:
-
-- Public fixtures may preserve exact prompts, model responses, model-emitted reasoning, identifiers, timestamps, latency, token usage, tool evidence, and error receipts when every input and mock result comes from a public synthetic corpus and deterministic mock system.
-- Exact synthetic fixtures require a versioned provenance manifest, schema and semantic validation, complete case accounting, per-artifact hashes, automated secret/PII/private-path scanning, and Gitleaks.
-- Publication fails on a safety finding; the pipeline must not silently redact or normalize an exact fixture and still call it exact.
-- Model-emitted reasoning is observational text, not verified causal ground truth. Performance and token fields are single-run observations unless a separate benchmark contract says otherwise.
-- This exception never permits real user content, credentials, private keys, auth/session secrets, private machine paths, AWS account/resource identifiers, personal contact identifiers, or production captures.
-
-Use placeholders such as `<AWS_ACCOUNT_ID>`; `us-east-1` is the example region. Adversarial dataset rows use inert canaries, never working payloads.
+- Do not pursue broad coverage. Run the real path and inspect the output.
+- The revised plan permits exactly three planned production-boundary tests: retry budget, shared circuit-breaker transitions, and stop-before-calculator behavior.
+- Outside those three, add one narrow regression test only after an actual bug is found, fix the bug, and stop.
+- Existing tests remain; do not expand or reorganize them unless asked.
+- A success claim needs one inspectable receipt: command output, trace, eval report, CI result, alarm, rollback record, or live URL.
+- Documentation-only changes use link, scope, diff, and secret checks; they do not trigger the application test suite.
 
 ## Working rules
 
-- `LEARNING_PLAN.md` sets the order of work: don't build ahead of the current week's contract, and each week's success criteria are the exit gate.
-- When this repo's paraphrase and the AWS/Strands docs disagree, the docs win — verify before wiring anything up.
-- Design decisions (eval targets, schema boundaries, labeling workflow, success criteria, AWS service paths, product direction) are Ryan's: ask first.
-- Suggest sanitized AWS Console screenshots when a learning-plan moment would make a strong LinkedIn receipt for an AI Engineering hiring manager.
+- Follow `LEARNING_PLAN.md` in order and do not build ahead.
+- Current AWS and Strands documentation wins over repository paraphrases.
+- Terraform owns the final durable infrastructure. AgentCore CLI/CDK deployment is historical after cutover; use the CLI only for package, validation, inspection, invocation, and evaluation operations named by the current week.
+- Ryan owns scope, eval targets, success checks, AWS service choices, and product direction; ask when those would change.
+- Do not deploy, run a metered evaluation, or alter live AWS resources unless the current user request explicitly includes that action.
+- Touch only the current week's bounded outcome and leave changes local unless Ryan asks for a commit or push.

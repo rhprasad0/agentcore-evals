@@ -1,49 +1,48 @@
 # Weekly Guides
 
-The 16-week curriculum, one deep guide per week. The plan's front matter — North Star, specimen strategy, working assumptions, managed-evaluation boundaries, and appendices — lives in [`LEARNING_PLAN.md`](../../LEARNING_PLAN.md); read it before Week 1.
+The curriculum converges on one Terraform-owned weather→calculator AgentCore system. Completed Weeks 1–7 remain historical foundation; Week 8 closes the existing harness; Weeks 9–16 each add one bounded production boundary or operating outcome.
 
-Every guide follows the same template: **Objective · Why this week exists · Concepts · Build steps · Exercises (guided discovery) · Gotchas & drift watch · Deliverable checklist · Success criteria · Docs to consult · Self-check.** Each week's success criteria are the exit gate — don't start Week N+1 with Week N's checkboxes open. Doc references were verified against live AWS/Strands docs via the AWS documentation MCP server on the date noted in each file; when a guide and the current docs disagree, **the docs win**.
+Read [`LEARNING_PLAN.md`](../../LEARNING_PLAN.md) first. Each guide has one integrated success check; do not start the next week while it is open. Current AWS, Strands, and Terraform documentation wins when a guide drifts.
 
-## Phase 1 — Foundations (Weeks 1–4)
+## Phase 1 — Foundation and harness closeout (Weeks 1–8)
 
-Learn the SDK, runtime, and tool integration seams before formalizing anything.
-
-| Week | Guide | Deliverable |
+| Week | Guide | Outcome |
 | --- | --- | --- |
-| 1 | [AgentCore & Strands Fundamentals](week-01-fundamentals.md) | Local dev environment + architecture notes |
-| 2 | [Basic Agent Development with Strands](week-02-first-agent.md) | First functional agent + tool (typed failure envelope) |
-| 3 | [AgentCore Runtime & Deployment](week-03-runtime-deployment.md) | AgentCore deployment proof |
-| 4 | [Tool Integration Patterns](week-04-tool-integration.md) | Multi-tool agent portfolio (`@tool` / MCP / Gateway) |
+| 1 | [AgentCore & Strands Fundamentals](week-01-fundamentals.md) | Local toolchain, agent loop, architecture, Budget |
+| 2 | [Basic Agent Development with Strands](week-02-first-agent.md) | Typed weather tool and explicit failures |
+| 3 | [AgentCore Runtime & Deployment](week-03-runtime-deployment.md) | Managed execution, IAM/isolation evidence, teardown |
+| 4 | [Tool Integration Patterns](week-04-tool-integration.md) | Direct/MCP/Gateway seams and registration |
+| 5 | [Agent/Tool Contract Architecture](week-05-tool-contracts.md) | Contracts, manifests, taxonomy, IAM denials |
+| 6 | [Tool Execution Dataset & Validation](week-06-dataset-validation.md) | 100 rows, mocks, traces, validators |
+| 7 | [Minimal Tool-Calling Specimen](week-07-specimen.md) | Pinned 62-case weather projection |
+| 8 | [Local Harness Closeout](week-08-local-harness.md) | One fixture-backed 62-case baseline receipt |
 
-## Phase 2 — Eval contract (Weeks 5–10)
+## Phase 2 — Tiny gold set and judge contract (Weeks 9–10)
 
-One tool keeps tool-selection labels unambiguous. The eval contract is the work.
-
-| Week | Guide | Deliverable |
+| Week | Guide | Outcome |
 | --- | --- | --- |
-| 5 | [Agent/Tool Contract Architecture](week-05-tool-contracts.md) | Tool contract specification + capability manifests |
-| 6 | [Tool Execution Dataset & Validation Schema](week-06-dataset-validation.md) | 100-row synthetic dataset + validators + mocks |
-| 7 | [Minimal Tool-Calling Specimen](week-07-specimen.md) | Canonical trace specimen + Strands-native mapping compatibility check |
-| 8 | [Local Tool Execution Harness](week-08-local-harness.md) | 62-row Strands Experiment + deterministic gates + provenance-linked offline CI report |
-| 9 | [Human Tool-Selection Labeling](week-09-human-labeling.md) | Blind-labeled 64-row human fixture |
-| 10 | [Tool Selection Judge Calibration](week-10-judge-calibration.md) | Three-way judge calibration + trust policy |
+| 9 | [Human Gold for the Final Slice](week-09-human-labeling.md) | Eight frozen expectations: six behavior, two denials |
+| 10 | [One Custom Judge Contract](week-10-judge-calibration.md) | One frozen rubric/script and dry run; no model call |
 
-## Phase 3 — Complexity under contract (Weeks 11–13)
+## Phase 3 — Governed weather path (Weeks 11–12)
 
-Every new tool arrives with dataset rows, gates, and regression fixtures.
-
-| Week | Guide | Deliverable |
+| Week | Guide | Outcome |
 | --- | --- | --- |
-| 11 | [Multi-Tool Integration Complexity](week-11-multi-tool-chains.md) | 5-tool chain agent + sequencing/state/cascade gates |
-| 12 | [External Integration Reliability Gates](week-12-reliability-gates.md) | Real APIs, retries, breakers, honest degradation |
-| 13 | [Production Agent CI Regression](week-13-ci-regression.md) | Two-lane CI pipeline + red-gate receipt |
+| 11 | [Terraform, Identity, Gateway, and Policy](week-11-gateway-weather.md) | Remote state, OpenAPI target, Policy/guardrails, allow/deny receipts |
+| 12 | [Weather Reliability Boundary](week-12-reliability-gates.md) | Deadline, one retry, shared breaker, three focused tests |
 
-## Phase 4 — Production & orchestration (Weeks 14–16)
+## Phase 4 — Runtime, evaluation, and CI (Weeks 13–14)
 
-Deployment as evidence: live traces, online evals, red gates, documented metrics.
-
-| Week | Guide | Deliverable |
+| Week | Guide | Outcome |
 | --- | --- | --- |
-| 14 | [Agent Execution Trace Instrumentation](week-14-observability.md) | Observability dashboard + online evaluations |
-| 15 | [Advanced Agent Patterns & Safety](week-15-multi-agent-safety.md) | Multi-agent orchestration + Policy/guardrail boundaries |
-| 16 | [Production Agent Architecture Reference](week-16-capstone.md) | Reference architecture, public demo, case study |
+| 13 | [Runtime Operations](week-13-runtime-operations.md) | Python 3.13 CodeZip, STAGING/PROD promotion, telemetry, alarms |
+| 14 | [Same-Evidence Evaluation and CI](week-14-managed-evaluation-ci.md) | Custom/managed comparison, offline PR gate, manual OIDC run |
+
+## Phase 5 — Hosted demo and incident drill (Weeks 15–16)
+
+| Week | Guide | Outcome |
+| --- | --- | --- |
+| 15 | [Capped Hosted Demo](week-15-hosted-demo.md) | CloudFront edge, proxy Guardrail, cap, kill switch, WAF, $10 Budget |
+| 16 | [Capstone Incident Drill](week-16-capstone.md) | Alarm, kill, rollback, Terraform recovery, controlled closeout |
+
+The final system is a hosted learning demo. Passing its checks is scoped evidence about named cases and controls, not a production-readiness or safety certificate.
