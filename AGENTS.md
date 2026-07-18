@@ -17,8 +17,18 @@ Public-facing by default: treat every committed file as billboard-safe.
 
 Never commit:
 
-- AWS credentials, API keys, OAuth tokens, cookies, or session material
-- `.env` values, account IDs, ARNs, raw traces, provider responses, or generated raw eval outputs
+- AWS credentials, API keys, OAuth tokens, cookies, session material, passwords, private keys, certificates, or signing secrets
+- Real `.env` values, auth files, local credential caches, database dumps, or production data
+- Real user content; private machine paths; AWS account/resource identifiers; personal contact identifiers; or unsanitized production logs, screenshots, traces, and model outputs
+- Generated caches, virtual environments, unrelated raw captures, or private local operational receipts
+
+Exact synthetic evaluation exception:
+
+- Public fixtures may preserve exact prompts, model responses, model-emitted reasoning, identifiers, timestamps, latency, token usage, tool evidence, and error receipts when every input and mock result comes from a public synthetic corpus and deterministic mock system.
+- Exact synthetic fixtures require a versioned provenance manifest, schema and semantic validation, complete case accounting, per-artifact hashes, automated secret/PII/private-path scanning, and Gitleaks.
+- Publication fails on a safety finding; the pipeline must not silently redact or normalize an exact fixture and still call it exact.
+- Model-emitted reasoning is observational text, not verified causal ground truth. Performance and token fields are single-run observations unless a separate benchmark contract says otherwise.
+- This exception never permits real user content, credentials, private keys, auth/session secrets, private machine paths, AWS account/resource identifiers, personal contact identifiers, or production captures.
 
 Use placeholders such as `<AWS_ACCOUNT_ID>`; `us-east-1` is the example region. Adversarial dataset rows use inert canaries, never working payloads.
 
