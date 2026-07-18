@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "prompt": "What is the weather in Oslo?",
+  "counts": {
+    "projectedCases": 1,
+    "evidenceValidCases": 1,
+    "instrumentErrors": 0,
+    "gateErrors": 0
+  }
+}

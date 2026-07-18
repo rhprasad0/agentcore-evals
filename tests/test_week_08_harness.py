@@ -92,6 +92,15 @@ class StageBExecutionTests(unittest.TestCase):
 
         self.assertEqual(60, result.eligible_case_count)
         self.assertEqual(2, len(result.instrument_errors))
+        self.assertEqual(62, len(result.evidence.accounted_case_ids))
+        self.assertEqual(62, len(result.evidence.projected_cases))
+        self.assertEqual(60, len(result.evidence.eligible_cases))
+        self.assertEqual(2, len(result.evidence.instrument_errors))
+        self.assertEqual("evals.weather_only_regression", result.evidence.fixture_set_id)
+        self.assertEqual(
+            "sha256:44a9f913a720759748d57647f002b0e924d39b38b65a2fdfbe713774bfc2cca5",
+            result.evidence.experiment_id,
+        )
         self.assertTrue(result.report.cases)
         self.assertEqual(
             {

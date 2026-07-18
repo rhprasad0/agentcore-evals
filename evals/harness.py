@@ -45,11 +45,14 @@ class StageBEvidence:
     """Validated fixture data split into replayable traces and instrument receipts."""
 
     eligible_cases: tuple[Case, ...]
+    projected_cases: tuple[Case, ...]
     traces_by_case_name: Mapping[str, Mapping[str, Any]]
     instrument_errors: tuple[InstrumentErrorReceipt, ...]
     accounted_case_ids: tuple[str, ...]
     fixture_set_id: str
     experiment_id: str
+    source_run_id: str
+    projection: Mapping[str, str]
 
 
 @dataclass(frozen=True)
@@ -61,6 +64,7 @@ class StageBResult:
     instrument_errors: tuple[InstrumentErrorReceipt, ...]
     fixture_set_id: str
     experiment_id: str
+    evidence: StageBEvidence
 
 
 def load_stage_b_evidence(
@@ -141,11 +145,14 @@ def load_stage_b_evidence(
         raise HarnessEvidenceError("fixture replay order does not match manifest case IDs")
     return StageBEvidence(
         eligible_cases=tuple(eligible_cases),
+        projected_cases=tuple(all_cases),
         traces_by_case_name=traces_by_case_name,
         instrument_errors=tuple(instrument_errors),
         accounted_case_ids=tuple(accounted_ids),
         fixture_set_id=manifest["fixtureSetId"],
         experiment_id=manifest["experimentId"],
+        source_run_id=manifest["sourceRun"]["runId"],
+        projection=manifest["projection"],
     )
 
 
@@ -194,4 +201,5 @@ def run_stage_b(
         instrument_errors=evidence.instrument_errors,
         fixture_set_id=evidence.fixture_set_id,
         experiment_id=evidence.experiment_id,
+        evidence=evidence,
     )

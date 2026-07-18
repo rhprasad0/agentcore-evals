@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "1.0.0",
+  "experimentId": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "fixtureSetId": "evals.weather_only_regression",
+  "sourceRunId": "12345678-1234-4abc-8def-1234567890ab",
+  "projection": {
+    "projectionId": "datasets.weather_only",
+    "version": "1.0.0",
+    "artifactSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "counts": {
+    "projectedCases": 62,
+    "evidenceValidCases": 60,
+    "instrumentErrors": 2,
+    "gateErrors": 0
+  },
+  "metrics": {
+    "selection": {
+      "unit": "case",
+      "eligible": 60,
+      "numerator": 58,
+      "denominator": 60,
+      "rate": 0.9666666666666667,
+      "instrumentErrors": 0,
+      "gateErrors": 0
+    },
+    "parameter": {
+      "unit": "tool-call",
+      "eligible": 0,
+      "numerator": 0,
+      "denominator": 0,
+      "rate": null,
+      "instrumentErrors": 0,
+      "gateErrors": 0
+    },
+    "execution": {
+      "unit": "tool-call",
+      "eligible": 0,
+      "numerator": 0,
+      "denominator": 0,
+      "rate": null,
+      "instrumentErrors": 0,
+      "gateErrors": 0
+    },
+    "failureBehavior": {
+      "unit": "case",
+      "eligible": 0,
+      "numerator": 0,
+      "denominator": 0,
+      "rate": null,
+      "instrumentErrors": 0,
+      "gateErrors": 0
+    },
+    "noTool": {
+      "unit": "case",
+      "eligible": 0,
+      "numerator": 0,
+      "denominator": 0,
+      "rate": null,
+      "instrumentErrors": 0,
+      "gateErrors": 0
+    },
+    "instrumentValidity": {
+      "unit": "case",
+      "eligible": 62,
+      "numerator": 60,
+      "denominator": 62,
+      "rate": 0.967741935483871,
+      "instrumentErrors": 2,
+      "gateErrors": 0
+    }
+  },
+  "byTag": {
+    "straightforward": {
+      "selection": {
+        "unit": "case",
+        "eligible": 1,
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "instrumentErrors": 0,
+        "gateErrors": 0
+      },
+      "parameter": {
+        "unit": "tool-call",
+        "eligible": 0,
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "instrumentErrors": 0,
+        "gateErrors": 0
+      },
+      "execution": {
+        "unit": "tool-call",
+        "eligible": 0,
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "instrumentErrors": 0,
+        "gateErrors": 0
+      },
+      "failureBehavior": {
+        "unit": "case",
+        "eligible": 0,
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "instrumentErrors": 0,
+        "gateErrors": 0
+      },
+      "noTool": {
+        "unit": "case",
+        "eligible": 0,
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "instrumentErrors": 0,
+        "gateErrors": 0
+      },
+      "instrumentValidity": {
+        "unit": "case",
+        "eligible": 1,
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "instrumentErrors": 0,
+        "gateErrors": 0
+      }
+    }
+  },
+  "byFailureKind": {},
+  "honestyFooter": "Mechanical contract compliance only; response quality is out of scope until human labels exist (Week 9)."
+}

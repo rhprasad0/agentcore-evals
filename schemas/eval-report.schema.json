@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentcore-evals:schema:eval-report:1.0.0",
+  "$defs": {
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "rate": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "metric": {
+      "type": "object",
+      "properties": {
+        "unit": {
+          "enum": ["case", "tool-call"]
+        },
+        "eligible": {
+          "$ref": "#/$defs/count"
+        },
+        "numerator": {
+          "$ref": "#/$defs/count"
+        },
+        "denominator": {
+          "$ref": "#/$defs/count"
+        },
+        "rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "instrumentErrors": {
+          "$ref": "#/$defs/count"
+        },
+        "gateErrors": {
+          "$ref": "#/$defs/count"
+        }
+      },
+      "required": [
+        "unit",
+        "eligible",
+        "numerator",
+        "denominator",
+        "rate",
+        "instrumentErrors",
+        "gateErrors"
+      ],
+      "additionalProperties": false
+    },
+    "metricSlice": {
+      "type": "object",
+      "properties": {
+        "selection": {
+          "$ref": "#/$defs/metric"
+        },
+        "parameter": {
+          "$ref": "#/$defs/metric"
+        },
+        "execution": {
+          "$ref": "#/$defs/metric"
+        },
+        "failureBehavior": {
+          "$ref": "#/$defs/metric"
+        },
+        "noTool": {
+          "$ref": "#/$defs/metric"
+        },
+        "instrumentValidity": {
+          "$ref": "#/$defs/metric"
+        }
+      },
+      "required": [
+        "selection",
+        "parameter",
+        "execution",
+        "failureBehavior",
+        "noTool",
+        "instrumentValidity"
+      ],
+      "additionalProperties": false
+    },
+    "sha256ExperimentId": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    }
+  },
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "experimentId": {
+      "$ref": "#/$defs/sha256ExperimentId"
+    },
+    "fixtureSetId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]+$"
+    },
+    "sourceRunId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+    },
+    "projection": {
+      "type": "object",
+      "properties": {
+        "projectionId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+$"
+        },
+        "version": {
+          "$ref": "#/$defs/version"
+        },
+        "artifactSha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "required": ["projectionId", "version", "artifactSha256"],
+      "additionalProperties": false
+    },
+    "counts": {
+      "type": "object",
+      "properties": {
+        "projectedCases": {
+          "$ref": "#/$defs/count"
+        },
+        "evidenceValidCases": {
+          "$ref": "#/$defs/count"
+        },
+        "instrumentErrors": {
+          "$ref": "#/$defs/count"
+        },
+        "gateErrors": {
+          "$ref": "#/$defs/count"
+        }
+      },
+      "required": [
+        "projectedCases",
+        "evidenceValidCases",
+        "instrumentErrors",
+        "gateErrors"
+      ],
+      "additionalProperties": false
+    },
+    "metrics": {
+      "$ref": "#/$defs/metricSlice"
+    },
+    "byTag": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9._-]+$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/metricSlice"
+      }
+    },
+    "byFailureKind": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9._-]+$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/metricSlice"
+      }
+    },
+    "honestyFooter": {
+      "const": "Mechanical contract compliance only; response quality is out of scope until human labels exist (Week 9)."
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "experimentId",
+    "fixtureSetId",
+    "sourceRunId",
+    "projection",
+    "counts",
+    "metrics",
+    "byTag",
+    "byFailureKind",
+    "honestyFooter"
+  ],
+  "additionalProperties": false
+}

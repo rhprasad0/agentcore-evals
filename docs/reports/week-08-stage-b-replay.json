@@ -1,0 +1,1142 @@
+{
+  "byFailureKind": {
+    "auth": {
+      "execution": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": 0.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      }
+    },
+    "bad_input": {
+      "execution": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 1,
+        "eligible": 1,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": 0.0,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 1,
+        "eligible": 1,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 1,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 1,
+        "eligible": 1,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": 0.0,
+        "unit": "case"
+      }
+    },
+    "network": {
+      "execution": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": 0.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      }
+    },
+    "timeout": {
+      "execution": {
+        "denominator": 8,
+        "eligible": 8,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": 0.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 3,
+        "eligible": 3,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 3,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 3,
+        "eligible": 3,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 3,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 5,
+        "eligible": 5,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 5,
+        "rate": 1.0,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 3,
+        "eligible": 3,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 1,
+        "rate": 0.3333333333333333,
+        "unit": "case"
+      }
+    },
+    "upstream_4xx": {
+      "execution": {
+        "denominator": 3,
+        "eligible": 3,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": 0.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 4,
+        "eligible": 4,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 3,
+        "rate": 0.75,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 4,
+        "eligible": 4,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 4,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 4,
+        "eligible": 4,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 3,
+        "rate": 0.75,
+        "unit": "case"
+      }
+    },
+    "upstream_5xx": {
+      "execution": {
+        "denominator": 3,
+        "eligible": 3,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": 0.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 1,
+        "eligible": 1,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 1,
+        "rate": 1.0,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 1,
+        "rate": 0.5,
+        "unit": "case"
+      }
+    }
+  },
+  "byTag": {
+    "ambiguity": {
+      "execution": {
+        "denominator": 1,
+        "eligible": 1,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 1,
+        "rate": 1.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 4,
+        "eligible": 4,
+        "gateErrors": 0,
+        "instrumentErrors": 1,
+        "numerator": 3,
+        "rate": 0.75,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 1,
+        "eligible": 1,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 1,
+        "rate": 1.0,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 3,
+        "eligible": 3,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 3,
+        "rate": 1.0,
+        "unit": "case"
+      }
+    },
+    "comparison": {
+      "execution": {
+        "denominator": 32,
+        "eligible": 32,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 32,
+        "rate": 1.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 15,
+        "eligible": 15,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 15,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 32,
+        "eligible": 32,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 30,
+        "rate": 0.9375,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 15,
+        "eligible": 15,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 15,
+        "rate": 1.0,
+        "unit": "case"
+      }
+    },
+    "decline": {
+      "execution": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 4,
+        "eligible": 4,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 4,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 4,
+        "eligible": 4,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 4,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 4,
+        "eligible": 4,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 4,
+        "rate": 1.0,
+        "unit": "case"
+      }
+    },
+    "dependency": {
+      "execution": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": 0.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      }
+    },
+    "direct-answer": {
+      "execution": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 10,
+        "eligible": 10,
+        "gateErrors": 0,
+        "instrumentErrors": 1,
+        "numerator": 9,
+        "rate": 0.9,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 9,
+        "eligible": 9,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 9,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 9,
+        "eligible": 9,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 9,
+        "rate": 1.0,
+        "unit": "case"
+      }
+    },
+    "forced-choice": {
+      "execution": {
+        "denominator": 1,
+        "eligible": 1,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 1,
+        "rate": 1.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 1,
+        "eligible": 1,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 1,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 1,
+        "eligible": 1,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 1,
+        "rate": 1.0,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 1,
+        "eligible": 1,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 1,
+        "rate": 1.0,
+        "unit": "case"
+      }
+    },
+    "near-boundary": {
+      "execution": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 17,
+        "eligible": 17,
+        "gateErrors": 0,
+        "instrumentErrors": 2,
+        "numerator": 15,
+        "rate": 0.8823529411764706,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 15,
+        "eligible": 15,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 15,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 15,
+        "eligible": 15,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 15,
+        "rate": 1.0,
+        "unit": "case"
+      }
+    },
+    "no-fabrication": {
+      "execution": {
+        "denominator": 18,
+        "eligible": 18,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": 0.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 14,
+        "eligible": 14,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 12,
+        "rate": 0.8571428571428571,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 14,
+        "eligible": 14,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 14,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 6,
+        "eligible": 6,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 6,
+        "rate": 1.0,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 14,
+        "eligible": 14,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 9,
+        "rate": 0.6428571428571429,
+        "unit": "case"
+      }
+    },
+    "non-retryable": {
+      "execution": {
+        "denominator": 3,
+        "eligible": 3,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": 0.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 5,
+        "eligible": 5,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 3,
+        "rate": 0.6,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 5,
+        "eligible": 5,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 5,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 5,
+        "eligible": 5,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 3,
+        "rate": 0.6,
+        "unit": "case"
+      }
+    },
+    "retryable": {
+      "execution": {
+        "denominator": 13,
+        "eligible": 13,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": 0.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 7,
+        "eligible": 7,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 7,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 7,
+        "eligible": 7,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 7,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 4,
+        "eligible": 4,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 4,
+        "rate": 1.0,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 7,
+        "eligible": 7,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 4,
+        "rate": 0.5714285714285714,
+        "unit": "case"
+      }
+    },
+    "single-tool": {
+      "execution": {
+        "denominator": 15,
+        "eligible": 15,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 15,
+        "rate": 1.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 15,
+        "eligible": 15,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 15,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 15,
+        "eligible": 15,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 15,
+        "rate": 1.0,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 15,
+        "eligible": 15,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 15,
+        "rate": 1.0,
+        "unit": "case"
+      }
+    },
+    "stop-on-failure": {
+      "execution": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": 0.0,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 0,
+        "eligible": 0,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 0,
+        "rate": null,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 2,
+        "eligible": 2,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 2,
+        "rate": 1.0,
+        "unit": "case"
+      }
+    },
+    "weather": {
+      "execution": {
+        "denominator": 66,
+        "eligible": 66,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 48,
+        "rate": 0.7272727272727273,
+        "unit": "tool-call"
+      },
+      "failureBehavior": {
+        "denominator": 14,
+        "eligible": 14,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 12,
+        "rate": 0.8571428571428571,
+        "unit": "case"
+      },
+      "instrumentValidity": {
+        "denominator": 46,
+        "eligible": 46,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 46,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "noTool": {
+        "denominator": 1,
+        "eligible": 1,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 1,
+        "rate": 1.0,
+        "unit": "case"
+      },
+      "parameter": {
+        "denominator": 54,
+        "eligible": 54,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 52,
+        "rate": 0.9629629629629629,
+        "unit": "tool-call"
+      },
+      "selection": {
+        "denominator": 46,
+        "eligible": 46,
+        "gateErrors": 0,
+        "instrumentErrors": 0,
+        "numerator": 41,
+        "rate": 0.8913043478260869,
+        "unit": "case"
+      }
+    }
+  },
+  "counts": {
+    "evidenceValidCases": 60,
+    "gateErrors": 0,
+    "instrumentErrors": 2,
+    "projectedCases": 62
+  },
+  "experimentId": "sha256:44a9f913a720759748d57647f002b0e924d39b38b65a2fdfbe713774bfc2cca5",
+  "fixtureSetId": "evals.weather_only_regression",
+  "honestyFooter": "Mechanical contract compliance only; response quality is out of scope until human labels exist (Week 9).",
+  "metrics": {
+    "execution": {
+      "denominator": 66,
+      "eligible": 66,
+      "gateErrors": 0,
+      "instrumentErrors": 0,
+      "numerator": 48,
+      "rate": 0.7272727272727273,
+      "unit": "tool-call"
+    },
+    "failureBehavior": {
+      "denominator": 14,
+      "eligible": 14,
+      "gateErrors": 0,
+      "instrumentErrors": 0,
+      "numerator": 12,
+      "rate": 0.8571428571428571,
+      "unit": "case"
+    },
+    "instrumentValidity": {
+      "denominator": 62,
+      "eligible": 62,
+      "gateErrors": 0,
+      "instrumentErrors": 2,
+      "numerator": 60,
+      "rate": 0.967741935483871,
+      "unit": "case"
+    },
+    "noTool": {
+      "denominator": 15,
+      "eligible": 15,
+      "gateErrors": 0,
+      "instrumentErrors": 0,
+      "numerator": 15,
+      "rate": 1.0,
+      "unit": "case"
+    },
+    "parameter": {
+      "denominator": 54,
+      "eligible": 54,
+      "gateErrors": 0,
+      "instrumentErrors": 0,
+      "numerator": 52,
+      "rate": 0.9629629629629629,
+      "unit": "tool-call"
+    },
+    "selection": {
+      "denominator": 60,
+      "eligible": 60,
+      "gateErrors": 0,
+      "instrumentErrors": 0,
+      "numerator": 55,
+      "rate": 0.9166666666666666,
+      "unit": "case"
+    }
+  },
+  "projection": {
+    "artifactSha256": "e35782f8f81d06e191b9d29e3e489cf977ca3df810190295d09c22fdc37a22f4",
+    "projectionId": "datasets.weather_only",
+    "version": "1.0.0"
+  },
+  "schemaVersion": "1.0.0",
+  "sourceRunId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c"
+}

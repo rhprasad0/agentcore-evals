@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0.0",
+  "metrics": {
+    "selection": {
+      "unit": "case",
+      "eligible": 1,
+      "numerator": 1,
+      "rate": 1.0,
+      "instrumentErrors": 0,
+      "gateErrors": 0
+    }
+  }
+}
