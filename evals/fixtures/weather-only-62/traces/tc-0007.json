@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather in Tokyo using metric units.",
+  "response": "The current weather in Tokyo is cloudy with a temperature of -1.9°C.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0007",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301803821036077,
+      "latencyMs": 784.256054,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "cff8f3c656e85029",
+      "startTimeUnixNano": 1784301803036780023,
+      "tokenUsage": {
+        "input": 1261,
+        "output": 72,
+        "total": 1333
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301803471803878,
+      "latencyMs": 434.589557,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "cff8f3c656e85029",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "408063005201516e",
+      "startTimeUnixNano": 1784301803037214321,
+      "tokenUsage": {
+        "input": 574,
+        "output": 53,
+        "total": 627
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Tokyo",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301803472724374,
+      "latencyMs": 0.726309,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "cff8f3c656e85029",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Tokyo",
+          "conditions": "cloudy",
+          "ok": true,
+          "temp": -1.9,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user has requested the current weather in Tokyo using metric units. I will use the provided weather tool to get this information. </thinking>\n",
+      "sequence": 2,
+      "spanId": "8993e2975ddf8a26",
+      "startTimeUnixNano": 1784301803471998065,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301803820738016,
+      "latencyMs": 347.463591,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "cff8f3c656e85029",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "53d7786c15847128",
+      "startTimeUnixNano": 1784301803473274425,
+      "tokenUsage": {
+        "input": 687,
+        "output": 19,
+        "total": 706
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "3fc5e9a95786b6ba6038b2166be84bb2"
+}

@@ -1,0 +1,150 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Compare the current temperatures in Osaka, and Kyoto using metric units.",
+  "response": "The current temperatures in the cities are as follows:\n\n- **Osaka**: The temperature is 26.8°C and the weather is cloudy.\n- **Kyoto**: The temperature is 34.6°C and the weather is clear.\n\nIf you need any more information or further comparisons, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0052",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301830241560824,
+      "latencyMs": 2373.169909,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "1e98bbadc62a0ab6",
+      "startTimeUnixNano": 1784301827868390915,
+      "tokenUsage": {
+        "input": 1361,
+        "output": 166,
+        "total": 1527
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301829442526020,
+      "latencyMs": 1573.627041,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "1e98bbadc62a0ab6",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "0555d406201df9d0",
+      "startTimeUnixNano": 1784301827868898979,
+      "tokenUsage": {
+        "input": 576,
+        "output": 98,
+        "total": 674
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Osaka",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301829446753201,
+      "latencyMs": 3.658595,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "1e98bbadc62a0ab6",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Osaka",
+          "conditions": "cloudy",
+          "ok": true,
+          "temp": 26.8,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user wants to compare the current temperatures in Osaka and Kyoto using metric units. To do this, I will use the `get_current_weather` tool twice, once for each city. I will set the `units` parameter to \"metric\" for both calls.</thinking>\n",
+      "sequence": 2,
+      "spanId": "7b6930e461580096",
+      "startTimeUnixNano": 1784301829443094606,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Kyoto",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301829447000686,
+      "latencyMs": 3.077622,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "1e98bbadc62a0ab6",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Kyoto",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 34.6,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "16c284abacdda82c",
+      "startTimeUnixNano": 1784301829443923064,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301830240840417,
+      "latencyMs": 791.986817,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "1e98bbadc62a0ab6",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "3729f8b9d6d647ff",
+      "startTimeUnixNano": 1784301829448853600,
+      "tokenUsage": {
+        "input": 785,
+        "output": 68,
+        "total": 853
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "152cb799089e24a8e83f2caceb53de7c"
+}

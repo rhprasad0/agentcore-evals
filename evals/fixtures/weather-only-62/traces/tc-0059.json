@@ -1,0 +1,183 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Compare the current temperatures in New York, Boston, and Philadelphia using imperial units.",
+  "response": "<thinking> I have received the current weather information for each city in imperial units. Now I can provide the user with the temperatures in each city.</thinking>\n\nHere are the current temperatures in the cities you requested, in imperial units:\n- New York: 78.6°F\n- Boston: 64.6°F\n- Philadelphia: 60.1°F\n\nAll temperatures are currently under rainy conditions except Philadelphia, which is cloudy.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0059",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301839964876367,
+      "latencyMs": 1403.021899,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "9bb01cac000aa5fb",
+      "startTimeUnixNano": 1784301838561854468,
+      "tokenUsage": {
+        "input": 1433,
+        "output": 213,
+        "total": 1646
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301839256485856,
+      "latencyMs": 694.179476,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "9bb01cac000aa5fb",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "d0ddc4ffc1613d15",
+      "startTimeUnixNano": 1784301838562306380,
+      "tokenUsage": {
+        "input": 579,
+        "output": 117,
+        "total": 696
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "New York",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301839263677517,
+      "latencyMs": 6.568993,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "9bb01cac000aa5fb",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "New York",
+          "conditions": "rain",
+          "ok": true,
+          "temp": 78.6,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user wants to compare the current temperatures in three cities: New York, Boston, and Philadelphia, using imperial units. To fulfill this request, I will need to use the weather tool three times, once for each city. The tool will provide the current weather information including the temperature in the requested units.</thinking>\n",
+      "sequence": 2,
+      "spanId": "04ce6726b6d75740",
+      "startTimeUnixNano": 1784301839257108524,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Boston",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301839263983923,
+      "latencyMs": 5.958258,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "9bb01cac000aa5fb",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Boston",
+          "conditions": "rain",
+          "ok": true,
+          "temp": 64.6,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "c527a96bdc10ef1f",
+      "startTimeUnixNano": 1784301839258025665,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Philadelphia",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301839264187475,
+      "latencyMs": 3.145939,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "9bb01cac000aa5fb",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Philadelphia",
+          "conditions": "cloudy",
+          "ok": true,
+          "temp": 60.1,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "6c122189356ee60b",
+      "startTimeUnixNano": 1784301839261041536,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301839964139327,
+      "latencyMs": 697.855176,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "9bb01cac000aa5fb",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 5,
+      "spanId": "cc506d25d8a884f0",
+      "startTimeUnixNano": 1784301839266284151,
+      "tokenUsage": {
+        "input": 854,
+        "output": 96,
+        "total": 950
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "217d383bc7e1d228ac5df6244a6208d6"
+}

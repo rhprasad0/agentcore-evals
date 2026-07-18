@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentcore-evals:schema:eval-fixture-manifest:1.0.0",
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-((?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(?:\\.(?:0|[1-9][0-9]*|[0-9A-Za-z-][0-9A-Za-z-]*))*))?(?:\\+([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?$",
+      "not": {"pattern": "[\\r\\n]"}
+    },
+    "namespacedId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9_]*)+$"
+    },
+    "exampleId": {
+      "type": "string",
+      "pattern": "^tc-[0-9]{4}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "uuid4": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "artifactPath": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)+$"
+    },
+    "canonicalTraceFixture": {
+      "type": "object",
+      "properties": {
+        "exampleId": {"$ref": "#/$defs/exampleId"},
+        "status": {"const": "canonical-trace"},
+        "path": {"$ref": "#/$defs/artifactPath"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "required": ["exampleId", "status", "path", "sha256"],
+      "additionalProperties": false
+    },
+    "instrumentErrorFixture": {
+      "type": "object",
+      "properties": {
+        "exampleId": {"$ref": "#/$defs/exampleId"},
+        "status": {"const": "instrument-error"},
+        "path": {"$ref": "#/$defs/artifactPath"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "errorKind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Za-z][A-Za-z0-9]+$"
+        }
+      },
+      "required": ["exampleId", "status", "path", "sha256", "errorKind"],
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "fixtureSetId": {"$ref": "#/$defs/namespacedId"},
+    "version": {"$ref": "#/$defs/semver"},
+    "experimentId": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "sourceRun": {
+      "type": "object",
+      "properties": {
+        "runId": {"$ref": "#/$defs/uuid4"},
+        "executedAt": {"type": "string", "format": "date-time"}
+      },
+      "required": ["runId", "executedAt"],
+      "additionalProperties": false
+    },
+    "projection": {
+      "type": "object",
+      "properties": {
+        "projectionId": {"$ref": "#/$defs/namespacedId"},
+        "version": {"$ref": "#/$defs/semver"},
+        "artifactSha256": {"$ref": "#/$defs/sha256"}
+      },
+      "required": ["projectionId", "version", "artifactSha256"],
+      "additionalProperties": false
+    },
+    "traceContract": {
+      "type": "object",
+      "properties": {
+        "schemaId": {
+          "const": "urn:agentcore-evals:schema:execution-trace:1.0.0"
+        },
+        "schemaVersion": {"const": "1.0.0"},
+        "canonicalizerVersion": {"$ref": "#/$defs/semver"},
+        "sourceProfile": {
+          "type": "object",
+          "properties": {
+            "profileId": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            },
+            "version": {"$ref": "#/$defs/semver"}
+          },
+          "required": ["profileId", "version"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["schemaId", "schemaVersion", "canonicalizerVersion", "sourceProfile"],
+      "additionalProperties": false
+    },
+    "expectedCaseIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/exampleId"}
+    },
+    "fixtures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {"$ref": "#/$defs/canonicalTraceFixture"},
+          {"$ref": "#/$defs/instrumentErrorFixture"}
+        ]
+      }
+    },
+    "counts": {
+      "type": "object",
+      "properties": {
+        "expected": {"type": "integer", "minimum": 1},
+        "canonicalTrace": {"type": "integer", "minimum": 0},
+        "instrumentError": {"type": "integer", "minimum": 0}
+      },
+      "required": ["expected", "canonicalTrace", "instrumentError"],
+      "additionalProperties": false
+    },
+    "publicSafety": {
+      "type": "object",
+      "properties": {
+        "policyId": {"const": "safety.exact_synthetic_fixture"},
+        "version": {"const": "1.0.0"},
+        "publicationMode": {"const": "exact-source-artifacts"},
+        "automatedChecks": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "prefixItems": [
+            {"const": "schema"},
+            {"const": "semantics"},
+            {"const": "provenance"},
+            {"const": "secrets"},
+            {"const": "privatePaths"},
+            {"const": "awsIdentifiers"},
+            {"const": "contactIdentifiers"}
+          ],
+          "items": false
+        }
+      },
+      "required": ["policyId", "version", "publicationMode", "automatedChecks"],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "fixtureSetId",
+    "version",
+    "experimentId",
+    "sourceRun",
+    "projection",
+    "traceContract",
+    "expectedCaseIds",
+    "fixtures",
+    "counts",
+    "publicSafety"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,150 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Compare the current temperatures in Berlin, and Prague using metric units.",
+  "response": "<thinking> Both calls to the `get_current_weather` tool were successful, and I have the current temperatures for both Berlin and Prague in metric units. I can now provide the comparison as requested by the user. </thinking>\n\nThe current temperature in Berlin is 0.8°C, and in Prague, it is 22.8°C.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0053",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301831710822233,
+      "latencyMs": 1445.427341,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "de3bbd42f26c488f",
+      "startTimeUnixNano": 1784301830265394892,
+      "tokenUsage": {
+        "input": 1358,
+        "output": 174,
+        "total": 1532
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301831095990189,
+      "latencyMs": 830.103885,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "de3bbd42f26c488f",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "f0a27500e81e2b0a",
+      "startTimeUnixNano": 1784301830265886304,
+      "tokenUsage": {
+        "input": 576,
+        "output": 98,
+        "total": 674
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Berlin",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301831101407152,
+      "latencyMs": 4.845637,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "de3bbd42f26c488f",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Berlin",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 0.8,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user wants to compare the current temperatures in Berlin and Prague using metric units. To do this, I will use the `get_current_weather` tool twice, once for each city. I will set the `units` parameter to \"metric\" for both calls. </thinking>\n",
+      "sequence": 2,
+      "spanId": "b2754989fd5424d3",
+      "startTimeUnixNano": 1784301831096561515,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Prague",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301831101679423,
+      "latencyMs": 4.210759,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "de3bbd42f26c488f",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Prague",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 22.8,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "69d2d7d933a3fb17",
+      "startTimeUnixNano": 1784301831097468664,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301831710091419,
+      "latencyMs": 606.371046,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "de3bbd42f26c488f",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "274cd4e26e171626",
+      "startTimeUnixNano": 1784301831103720373,
+      "tokenUsage": {
+        "input": 782,
+        "output": 76,
+        "total": 858
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "adfb3acb9d0908b0f9ccab24cf720c96"
+}

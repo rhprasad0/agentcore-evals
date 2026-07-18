@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is the current weather in Madrid?",
+  "response": "<thinking> The tool returned an error indicating that the provider could not satisfy the request. This means that I was unable to retrieve the current weather information for Madrid. I will inform the user honestly about this failure. </thinking>\n\nI'm sorry, but I couldn't retrieve the current weather information for Madrid. The tool returned an error indicating that the provider could not satisfy this request. If you need this information again, you might want to try later.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0080",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301856425552415,
+      "latencyMs": 1082.495883,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "161180a6b0d244ef",
+      "startTimeUnixNano": 1784301855343056532,
+      "tokenUsage": {
+        "input": 1266,
+        "output": 155,
+        "total": 1421
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301855819626167,
+      "latencyMs": 476.130577,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "161180a6b0d244ef",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "8790c1ffee89a960",
+      "startTimeUnixNano": 1784301855343495590,
+      "tokenUsage": {
+        "input": 571,
+        "output": 61,
+        "total": 632
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Madrid"
+      },
+      "endTimeUnixNano": 1784301855820549699,
+      "latencyMs": 0.714961,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "161180a6b0d244ef",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "upstream_4xx",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "upstream_4xx",
+            "message": "The provider could not satisfy this request.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The user has asked for the current weather in Madrid. To provide this information, I will use the \"get_current_weather\" tool with the city parameter set to \"Madrid\". </thinking>\n",
+      "sequence": 2,
+      "spanId": "41fca460773aef3d",
+      "startTimeUnixNano": 1784301855819834738,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301856425311424,
+      "latencyMs": 604.191525,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "161180a6b0d244ef",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "a3af35e924a25bd0",
+      "startTimeUnixNano": 1784301855821119899,
+      "tokenUsage": {
+        "input": 695,
+        "output": 94,
+        "total": 789
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "0c876243eb19677e1572044355a5cda1"
+}

@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is the current weather in Riga?",
+  "response": "<thinking> The tool returned an error indicating that the external service could not be reached. This means I cannot directly fetch the current weather for Riga at this moment. I will inform the user about this issue and suggest they try again later. </thinking>\n\nI'm currently unable to provide the current weather in Riga because the external service is not reachable. This could be a temporary issue. Please try again later. If you need further assistance, just let me know.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0086",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301863985590976,
+      "latencyMs": 1177.72133,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "67571af0a68a4200",
+      "startTimeUnixNano": 1784301862807869646,
+      "tokenUsage": {
+        "input": 1264,
+        "output": 158,
+        "total": 1422
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301863325969957,
+      "latencyMs": 517.642026,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "67571af0a68a4200",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "c9c9979d9413d522",
+      "startTimeUnixNano": 1784301862808327931,
+      "tokenUsage": {
+        "input": 571,
+        "output": 63,
+        "total": 634
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Riga"
+      },
+      "endTimeUnixNano": 1784301863328757897,
+      "latencyMs": 2.214222,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "67571af0a68a4200",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "network",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "network",
+            "message": "The external service could not be reached.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The user has asked for the current weather in Riga. To provide this information, I will use the \"get_current_weather\" tool with the city parameter set to \"Riga\". </thinking>\n",
+      "sequence": 2,
+      "spanId": "83ac7677a69a31e4",
+      "startTimeUnixNano": 1784301863326543675,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301863984941926,
+      "latencyMs": 654.362874,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "67571af0a68a4200",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "4a7c86d93e4eec2b",
+      "startTimeUnixNano": 1784301863330579052,
+      "tokenUsage": {
+        "input": 693,
+        "output": 95,
+        "total": 788
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "d5a623694258211a5da20b7c7ba52093"
+}

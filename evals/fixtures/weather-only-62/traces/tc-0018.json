@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather in Singapore using metric units.",
+  "response": "The current weather in Singapore is clear with a temperature of 3.2 degrees Celsius. If you need more details or information about another location, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0018",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301817234375679,
+      "latencyMs": 1973.003146,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "a4e192b60ce152bf",
+      "startTimeUnixNano": 1784301815261372533,
+      "tokenUsage": {
+        "input": 1283,
+        "output": 111,
+        "total": 1394
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301816750134607,
+      "latencyMs": 1488.294845,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "a4e192b60ce152bf",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "b98b9d67688696e5",
+      "startTimeUnixNano": 1784301815261839762,
+      "tokenUsage": {
+        "input": 574,
+        "output": 76,
+        "total": 650
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Singapore",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301816752940257,
+      "latencyMs": 2.260153,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "a4e192b60ce152bf",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Singapore",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 3.2,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user has requested the current weather in Singapore using metric units. I need to use the provided weather tool to get this information. The tool requires the city name and units. I will use the city \"Singapore\" and units \"metric\". </thinking>\n",
+      "sequence": 2,
+      "spanId": "d5286df92d9dd4bc",
+      "startTimeUnixNano": 1784301816750680104,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301817233638674,
+      "latencyMs": 478.826928,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "a4e192b60ce152bf",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "36e1b28c70502b7f",
+      "startTimeUnixNano": 1784301816754811746,
+      "tokenUsage": {
+        "input": 709,
+        "output": 35,
+        "total": 744
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "e1fa28e53187697d1aed1a3be232523c"
+}

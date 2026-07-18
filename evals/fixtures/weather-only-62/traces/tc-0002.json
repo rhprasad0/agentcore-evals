@@ -1,0 +1,150 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Which is warmer right now, Oslo or Bergen? Use metric units.",
+  "response": "The current weather in Oslo is clear with a temperature of -6.3°C, and in Bergen, it is cloudy with a temperature of 5.3°C. Therefore, Bergen is warmer than Oslo right now.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0002",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301797722281524,
+      "latencyMs": 1069.374159,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "9826a01bfaf92fc0",
+      "startTimeUnixNano": 1784301796652907365,
+      "tokenUsage": {
+        "input": 1346,
+        "output": 130,
+        "total": 1476
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301797270635822,
+      "latencyMs": 617.187355,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "9826a01bfaf92fc0",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "7897b6d0e80a25e2",
+      "startTimeUnixNano": 1784301796653448467,
+      "tokenUsage": {
+        "input": 577,
+        "output": 83,
+        "total": 660
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Oslo",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301797275952109,
+      "latencyMs": 4.680078,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "9826a01bfaf92fc0",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Oslo",
+          "conditions": "clear",
+          "ok": true,
+          "temp": -6.3,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> To determine which city, Oslo or Bergen, is currently warmer, I need to use the weather tool to get the current weather information for both cities in metric units. I will then compare the temperatures.</thinking>\n",
+      "sequence": 2,
+      "spanId": "ae48839872ea4395",
+      "startTimeUnixNano": 1784301797271272031,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Bergen",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301797276239571,
+      "latencyMs": 4.087232,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "9826a01bfaf92fc0",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Bergen",
+          "conditions": "cloudy",
+          "ok": true,
+          "temp": 5.3,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "aa0c73b864acc8c0",
+      "startTimeUnixNano": 1784301797272152339,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301797721550392,
+      "latencyMs": 443.258393,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "9826a01bfaf92fc0",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "97b61c6f94ce3743",
+      "startTimeUnixNano": 1784301797278291999,
+      "tokenUsage": {
+        "input": 769,
+        "output": 47,
+        "total": 816
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "a6af1fa42262c1f333102d1a00c52a1b"
+}

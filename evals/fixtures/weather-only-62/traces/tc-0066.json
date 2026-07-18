@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Tell me yesterday's temperature in Oslo.",
+  "response": "<thinking> The User is asking for historical weather data, which is not supported by the available tool. The tool only provides current weather information for a specified city. Therefore, I cannot fulfill this request using the provided tool.</thinking>\n\n\nI'm sorry, but I cannot provide historical weather data as it is outside the capabilities of the available tool. The tool only provides current weather information for a specified city. If you need current weather information for Oslo or any other city, I can assist with that.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0066",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301846411644385,
+      "latencyMs": 688.191779,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "403af4c29beb5c47",
+      "startTimeUnixNano": 1784301845723452606,
+      "tokenUsage": {
+        "input": 572,
+        "output": 111,
+        "total": 683
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301846411414010,
+      "latencyMs": 687.526483,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "403af4c29beb5c47",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "4cd9c2c22dc95814",
+      "startTimeUnixNano": 1784301845723887527,
+      "tokenUsage": {
+        "input": 572,
+        "output": 111,
+        "total": 683
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "12fb0715c5345d48cd6cc4cb832c7c5f"
+}

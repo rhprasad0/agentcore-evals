@@ -1,0 +1,118 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is the current weather in El Dorado?",
+  "response": "<thinking> The tool returned an error indicating that the provider could not satisfy the request. This means there was an issue retrieving the current weather for El Dorado. Since the tool cannot provide the requested information, I need to inform the user honestly.</thinking> \n\nI'm sorry, but I couldn't retrieve the current weather for El Dorado. The tool reported an issue in getting the data. If you need information on another city or have any other questions, feel free to ask.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0079",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301855312118784,
+      "latencyMs": 1160.850505,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "d8e053f7ea5785bc",
+      "startTimeUnixNano": 1784301854151268279,
+      "tokenUsage": {
+        "input": 1276,
+        "output": 168,
+        "total": 1444
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301854662236674,
+      "latencyMs": 510.518258,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "d8e053f7ea5785bc",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "f98ad27cf2cd6ba7",
+      "startTimeUnixNano": 1784301854151718416,
+      "tokenUsage": {
+        "input": 572,
+        "output": 69,
+        "total": 641
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "El Dorado",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301854663354328,
+      "latencyMs": 0.875911,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "d8e053f7ea5785bc",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "upstream_4xx",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "upstream_4xx",
+            "message": "The provider could not satisfy this request.",
+            "retryable": false
+          },
+          "ok": false
+        },
+        "retryable": false
+      },
+      "selectionReasoning": "<thinking> The user has asked for the current weather in El Dorado. I need to use the weather tool to get this information. The city name is provided, so I can directly call the tool with this information.</thinking>\n",
+      "sequence": 2,
+      "spanId": "87f7bd8c711b60fc",
+      "startTimeUnixNano": 1784301854662478417,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301855311591499,
+      "latencyMs": 647.526026,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "d8e053f7ea5785bc",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "9a1353446b200971",
+      "startTimeUnixNano": 1784301854664065473,
+      "tokenUsage": {
+        "input": 704,
+        "output": 99,
+        "total": 803
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "a934ac7eefd16061cf4eaa51582f2006"
+}

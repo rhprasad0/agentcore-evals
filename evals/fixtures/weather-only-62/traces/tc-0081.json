@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is the current weather in Warsaw?",
+  "response": "<thinking> The tool returned an error indicating that the provider could not satisfy the request. This means that I cannot provide the current weather for Warsaw at this moment. I will inform the User about this issue honestly. </thinking>\n\nI'm sorry, but I currently cannot provide the current weather for Warsaw. The tool returned an error indicating that the provider could not satisfy this request. If you need this information later, you might want to try again.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0081",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301858294773174,
+      "latencyMs": 1849.7943,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "a518ed3ab3d02197",
+      "startTimeUnixNano": 1784301856444978874,
+      "tokenUsage": {
+        "input": 1268,
+        "output": 155,
+        "total": 1423
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301856879220481,
+      "latencyMs": 433.813681,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "a518ed3ab3d02197",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "bd34e763becdb4e0",
+      "startTimeUnixNano": 1784301856445406800,
+      "tokenUsage": {
+        "input": 571,
+        "output": 63,
+        "total": 634
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Warsaw"
+      },
+      "endTimeUnixNano": 1784301856880329340,
+      "latencyMs": 0.861918,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "a518ed3ab3d02197",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "upstream_4xx",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "upstream_4xx",
+            "message": "The provider could not satisfy this request.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The User has asked for the current weather in Warsaw. To provide this information, I will use the \"get_current_weather\" tool with the city parameter set to \"Warsaw\". </thinking>\n",
+      "sequence": 2,
+      "spanId": "b83a5016bad4f434",
+      "startTimeUnixNano": 1784301856879467422,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301858294099745,
+      "latencyMs": 1413.092496,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "a518ed3ab3d02197",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "fa10b5b659db870e",
+      "startTimeUnixNano": 1784301856881007249,
+      "tokenUsage": {
+        "input": 697,
+        "output": 92,
+        "total": 789
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "3bcee380035a5467f310a666d49527db"
+}

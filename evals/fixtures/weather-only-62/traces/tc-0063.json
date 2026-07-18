@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is a barometer used for?",
+  "response": "A barometer is an instrument used to measure atmospheric pressure. It is commonly used in weather forecasting to predict changes in weather patterns. By measuring the changes in atmospheric pressure, meteorologists can infer whether a high-pressure or low-pressure system is approaching, which can indicate fair or stormy weather, respectively. Barometers are also used in various fields such as aviation, marine navigation, and scientific research to monitor atmospheric conditions.\n\nIf you have any more questions about weather tools or need information on current weather conditions, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0063",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301844321754944,
+      "latencyMs": 625.226572,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "733974762ba145ee",
+      "startTimeUnixNano": 1784301843696528372,
+      "tokenUsage": {
+        "input": 570,
+        "output": 106,
+        "total": 676
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301844321421934,
+      "latencyMs": 624.142988,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "733974762ba145ee",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "d387a8a793ca6fe7",
+      "startTimeUnixNano": 1784301843697278946,
+      "tokenUsage": {
+        "input": 570,
+        "output": 106,
+        "total": 676
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "6d8195fd683077767738c715f54ec7d0"
+}

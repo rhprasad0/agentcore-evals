@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather in Chicago using imperial units.",
+  "response": "The current weather in Chicago is clear with a temperature of 43.9 degrees Fahrenheit.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0008",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301804679908122,
+      "latencyMs": 837.964458,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "d73ba04a602b381b",
+      "startTimeUnixNano": 1784301803841943664,
+      "tokenUsage": {
+        "input": 1261,
+        "output": 73,
+        "total": 1334
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301804306845763,
+      "latencyMs": 464.452662,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "d73ba04a602b381b",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "d146a2bb783e4198",
+      "startTimeUnixNano": 1784301803842393101,
+      "tokenUsage": {
+        "input": 574,
+        "output": 53,
+        "total": 627
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Chicago",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301804307823868,
+      "latencyMs": 0.767668,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "d73ba04a602b381b",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Chicago",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 43.9,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user has requested the current weather in Chicago using imperial units. I will use the provided weather tool to get this information. </thinking>\n",
+      "sequence": 2,
+      "spanId": "1a6412e08cc62bf8",
+      "startTimeUnixNano": 1784301804307056200,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301804679167317,
+      "latencyMs": 370.742107,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "d73ba04a602b381b",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "9b0c46787e8fb918",
+      "startTimeUnixNano": 1784301804308425210,
+      "tokenUsage": {
+        "input": 687,
+        "output": 20,
+        "total": 707
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "b2f1186c08b7810866012e6af06c0191"
+}

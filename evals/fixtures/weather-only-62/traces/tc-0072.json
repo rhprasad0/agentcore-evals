@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Look it up for me.",
+  "response": "<thinking> The user has asked for the current weather but did not specify a city. To provide accurate weather information, I need to ask for the city name. The available tool can provide weather data for a specified city, but I need the city name to proceed.</thinking>\n \n\nI need to know the city for which you want the current weather. Could you please provide the name of the city?\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0072",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301849525802795,
+      "latencyMs": 615.907027,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "ed5d40ab74510d50",
+      "startTimeUnixNano": 1784301848909895768,
+      "tokenUsage": {
+        "input": 569,
+        "output": 91,
+        "total": 660
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301849525571148,
+      "latencyMs": 615.24743,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "ed5d40ab74510d50",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "42234fb7bd610344",
+      "startTimeUnixNano": 1784301848910323718,
+      "tokenUsage": {
+        "input": 569,
+        "output": 91,
+        "total": 660
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "e2d1822d5a99466bb7eba694ebf5a95b"
+}

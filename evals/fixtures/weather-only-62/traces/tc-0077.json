@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is the current weather in Zurich?",
+  "response": "<thinking> The tool returned an error indicating that access configuration failed, which means the current weather information for Zurich cannot be retrieved at this time. I will inform the user about this issue honestly. </thinking>\n\nI'm sorry, but I currently cannot provide the current weather information for Zurich due to an access configuration failure. This issue is not something I can resolve on my own. Please try again later.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0077",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301853375256878,
+      "latencyMs": 1062.612276,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "fd3ee7eaece0f567",
+      "startTimeUnixNano": 1784301852312644602,
+      "tokenUsage": {
+        "input": 1261,
+        "output": 142,
+        "total": 1403
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301852778981780,
+      "latencyMs": 465.799591,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "fd3ee7eaece0f567",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "9dcb38cca70bb73f",
+      "startTimeUnixNano": 1784301852313182189,
+      "tokenUsage": {
+        "input": 571,
+        "output": 59,
+        "total": 630
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Zurich"
+      },
+      "endTimeUnixNano": 1784301852780117021,
+      "latencyMs": 0.917097,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "fd3ee7eaece0f567",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "auth",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "auth",
+            "message": "The capability is unavailable because access configuration failed.",
+            "retryable": false
+          },
+          "ok": false
+        },
+        "retryable": false
+      },
+      "selectionReasoning": "<thinking> The user has asked for the current weather in Zurich. To provide this information, I will use the available weather tool to get the current weather for the city of Zurich. </thinking>\n",
+      "sequence": 2,
+      "spanId": "6bbe20d8eb5da358",
+      "startTimeUnixNano": 1784301852779199924,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301853375010473,
+      "latencyMs": 594.249563,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "fd3ee7eaece0f567",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "9bdfe4646ee3b032",
+      "startTimeUnixNano": 1784301852780760910,
+      "tokenUsage": {
+        "input": 690,
+        "output": 83,
+        "total": 773
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "9928ed84898a2dc27b5fc5a88cb64d4d"
+}

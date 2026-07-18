@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather in Anchorage using imperial units.",
+  "response": "The current weather in Anchorage is cloudy with a temperature of 15.8°F. If you need more details or have any other questions, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0019",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301818254661316,
+      "latencyMs": 976.428524,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "53841268e7ffbe1f",
+      "startTimeUnixNano": 1784301817278232792,
+      "tokenUsage": {
+        "input": 1264,
+        "output": 90,
+        "total": 1354
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301817774538375,
+      "latencyMs": 495.817326,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "53841268e7ffbe1f",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "0f2af0a248baee05",
+      "startTimeUnixNano": 1784301817278721049,
+      "tokenUsage": {
+        "input": 574,
+        "output": 54,
+        "total": 628
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Anchorage",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301817777345504,
+      "latencyMs": 2.232482,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "53841268e7ffbe1f",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Anchorage",
+          "conditions": "cloudy",
+          "ok": true,
+          "temp": 15.8,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user has requested the current weather in Anchorage using imperial units. I will use the provided weather tool to get this information. </thinking>\n",
+      "sequence": 2,
+      "spanId": "9ee31507830362db",
+      "startTimeUnixNano": 1784301817775113022,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301818253955484,
+      "latencyMs": 474.778506,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "53841268e7ffbe1f",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "7069787928e90e10",
+      "startTimeUnixNano": 1784301817779176978,
+      "tokenUsage": {
+        "input": 690,
+        "output": 36,
+        "total": 726
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "5c25918cc44d6a8d9ca62e9bc9b0d3de"
+}

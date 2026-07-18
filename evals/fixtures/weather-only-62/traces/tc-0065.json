@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Can the current-weather tool provide next week's forecast?",
+  "response": "<thinking> The current-weather tool is designed to provide only the current weather for a specified city. It does not offer forecasts, historical weather, climate averages, or any information beyond the present moment. Therefore, it cannot provide next week's forecast. I should inform the user about this limitation.</thinking>\n\n\nNo, the current-weather tool cannot provide next week's forecast. It is only designed to give the current weather conditions for a specified city. If you need a weather forecast, you may need to use a different tool or service that specializes in forecasts.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0065",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301845705894189,
+      "latencyMs": 663.549006,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "7f9bf46e57086131",
+      "startTimeUnixNano": 1784301845042345183,
+      "tokenUsage": {
+        "input": 576,
+        "output": 125,
+        "total": 701
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301845705652331,
+      "latencyMs": 662.538254,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "7f9bf46e57086131",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "3fe28f456527ea2f",
+      "startTimeUnixNano": 1784301845043114077,
+      "tokenUsage": {
+        "input": 576,
+        "output": 125,
+        "total": 701
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "0388449001cf476e1f9cead631a71aa3"
+}

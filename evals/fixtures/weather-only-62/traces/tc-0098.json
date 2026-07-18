@@ -1,0 +1,118 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Get Delhi's current temperature in Celsius, then convert it to Fahrenheit only if weather succeeds.",
+  "response": "<thinking> The weather tool returned an error indicating an upstream failure. Since the tool cannot provide the current weather data, I cannot proceed with the conversion to Fahrenheit. I will inform the User about the failure and suggest retrying later. </thinking> \n\nI'm sorry, but I encountered an error while trying to fetch the current weather for Delhi. The upstream capability failed to return a usable result. This might be a temporary issue, and I recommend trying again later. If you need further assistance, just let me know.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0098",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301871336322897,
+      "latencyMs": 1298.246014,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "d0e47ba2760ebdf9",
+      "startTimeUnixNano": 1784301870038076883,
+      "tokenUsage": {
+        "input": 1316,
+        "output": 194,
+        "total": 1510
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301870648636145,
+      "latencyMs": 610.025443,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "d0e47ba2760ebdf9",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "a167473afccd4875",
+      "startTimeUnixNano": 1784301870038610702,
+      "tokenUsage": {
+        "input": 582,
+        "output": 87,
+        "total": 669
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Delhi",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301870651505042,
+      "latencyMs": 2.278216,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "d0e47ba2760ebdf9",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "upstream_5xx",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "upstream_5xx",
+            "message": "The upstream capability failed to return a usable result.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The User wants the current temperature in Delhi in Celsius and then a conversion to Fahrenheit if the weather tool succeeds. To achieve this, I will first use the weather tool to get the current temperature in Delhi in Celsius. If the tool succeeds, I will then convert the temperature from Celsius to Fahrenheit. </thinking>\n",
+      "sequence": 2,
+      "spanId": "6206a711aed970a0",
+      "startTimeUnixNano": 1784301870649226826,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301871335562757,
+      "latencyMs": 682.174431,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "d0e47ba2760ebdf9",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "4a9d7898594fbd1a",
+      "startTimeUnixNano": 1784301870653388326,
+      "tokenUsage": {
+        "input": 734,
+        "output": 107,
+        "total": 841
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "193d486d1e44a6de696d1158fc21df8a"
+}

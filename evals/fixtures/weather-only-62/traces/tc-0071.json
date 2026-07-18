@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Post today's weather to my social account.",
+  "response": "<thinking> The User wants to post today's weather to their social account. However, I cannot directly post to social accounts as it is outside the scope of the provided tools. I can, however, retrieve the current weather for a specified city using the weather tool. I need to ask the User for the city they want the weather information for.</thinking>\n\nI can't directly post to your social account, but I can provide you with today's weather for a city of your choice. Which city would you like the weather information for?\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0071",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301848892315091,
+      "latencyMs": 712.591753,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "3a2fcc1416582aee",
+      "startTimeUnixNano": 1784301848179723338,
+      "tokenUsage": {
+        "input": 573,
+        "output": 121,
+        "total": 694
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301848892083427,
+      "latencyMs": 711.549912,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "3a2fcc1416582aee",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "081d865b04866c4c",
+      "startTimeUnixNano": 1784301848180533515,
+      "tokenUsage": {
+        "input": 573,
+        "output": 121,
+        "total": 694
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "8584a7b9569d181ee551815ade830846"
+}

@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather for a blank city name.",
+  "response": "<thinking> The user has requested the current weather but did not provide a city name. Since the city name is a required argument for the weather tool, I cannot directly call the tool without this information. I need to ask the user for the city name to proceed.</thinking>\nI'm unable to provide the current weather without a city name. Could you please provide the name of the city for which you want the current weather information?\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0075",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301851236277838,
+      "latencyMs": 1024.16983,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "e46a8a80c82166f7",
+      "startTimeUnixNano": 1784301850212108008,
+      "tokenUsage": {
+        "input": 574,
+        "output": 89,
+        "total": 663
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301851235644717,
+      "latencyMs": 1023.058013,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "e46a8a80c82166f7",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "ad3606f23fb16b8a",
+      "startTimeUnixNano": 1784301850212586704,
+      "tokenUsage": {
+        "input": 574,
+        "output": 89,
+        "total": 663
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "f1860ad22e8a45671197a1afac90dc35"
+}

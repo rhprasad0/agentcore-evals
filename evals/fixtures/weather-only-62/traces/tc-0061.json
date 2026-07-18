@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What does Celsius measure?",
+  "response": "Celsius is a unit of temperature measurement in the metric system. It is used to measure the temperature of an environment. In Celsius, the freezing point of water is 0°C and the boiling point is 100°C. If you need the current weather in a specific city, I can provide that information using the weather tool. Please let me know if you need the current weather in a particular city.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0061",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301841801273466,
+      "latencyMs": 565.449511,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "c109a8ae7793daa9",
+      "startTimeUnixNano": 1784301841235823955,
+      "tokenUsage": {
+        "input": 568,
+        "output": 85,
+        "total": 653
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301841800563269,
+      "latencyMs": 564.207707,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "c109a8ae7793daa9",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "7d0bb86e8d8f2e68",
+      "startTimeUnixNano": 1784301841236355562,
+      "tokenUsage": {
+        "input": 568,
+        "output": 85,
+        "total": 653
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "f289bc1e17d236944d26d918cf1cc8a4"
+}

@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather in Seoul using metric units.",
+  "response": "The current weather in Seoul is clear with a temperature of 9.1°C.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0013",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301810890868954,
+      "latencyMs": 1122.431234,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "8f06d7b8d1b8e119",
+      "startTimeUnixNano": 1784301809768437720,
+      "tokenUsage": {
+        "input": 1300,
+        "output": 111,
+        "total": 1411
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301810475102278,
+      "latencyMs": 706.114328,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "8f06d7b8d1b8e119",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "7a1bf1931059ec3c",
+      "startTimeUnixNano": 1784301809768987950,
+      "tokenUsage": {
+        "input": 574,
+        "output": 92,
+        "total": 666
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Seoul",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301810477928462,
+      "latencyMs": 2.263167,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "8f06d7b8d1b8e119",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Seoul",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 9.1,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user has requested the current weather in Seoul using metric units. I need to use the provided weather tool to get this information. The tool requires the city name and units. I will use the \"get_current_weather\" tool with the city set to \"Seoul\" and units set to \"metric\". </thinking>\n",
+      "sequence": 2,
+      "spanId": "614772a8c477d2cb",
+      "startTimeUnixNano": 1784301810475665295,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301810890133365,
+      "latencyMs": 410.328428,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "8f06d7b8d1b8e119",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "791c12a1c255338e",
+      "startTimeUnixNano": 1784301810479804937,
+      "tokenUsage": {
+        "input": 726,
+        "output": 19,
+        "total": 745
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "a296236cff0772a2d6ca0d8828decff6"
+}

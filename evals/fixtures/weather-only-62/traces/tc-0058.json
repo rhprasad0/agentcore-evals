@@ -1,0 +1,183 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Compare the current temperatures in Stockholm, Copenhagen, and Oslo using metric units.",
+  "response": "Here are the current temperatures in the cities you mentioned, all in metric units:\n\n- **Stockholm**: 24.5°C\n- **Copenhagen**: -6.1°C\n- **Oslo**: -6.3°C\n\nIf you need any more information or further comparisons, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0058",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301838513165077,
+      "latencyMs": 1205.201001,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "70184f9e6d7fa3ff",
+      "startTimeUnixNano": 1784301837307964076,
+      "tokenUsage": {
+        "input": 1426,
+        "output": 180,
+        "total": 1606
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301837945157610,
+      "latencyMs": 636.633504,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "70184f9e6d7fa3ff",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "eb9f6238909ff3d1",
+      "startTimeUnixNano": 1784301837308524106,
+      "tokenUsage": {
+        "input": 578,
+        "output": 111,
+        "total": 689
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Stockholm",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301837953234816,
+      "latencyMs": 7.437825,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "70184f9e6d7fa3ff",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Stockholm",
+          "conditions": "windy",
+          "ok": true,
+          "temp": 24.5,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The User wants to compare the current temperatures in three cities: Stockholm, Copenhagen, and Oslo. To do this, I will use the weather tool to get the current weather information for each city in metric units. I will then present the temperatures for each city. </thinking>\n",
+      "sequence": 2,
+      "spanId": "bca3f616f781145e",
+      "startTimeUnixNano": 1784301837945796991,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Copenhagen",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301837953632237,
+      "latencyMs": 5.734652,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "70184f9e6d7fa3ff",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Copenhagen",
+          "conditions": "windy",
+          "ok": true,
+          "temp": -6.1,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "7085c15c072eaaca",
+      "startTimeUnixNano": 1784301837947897585,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Oslo",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301837953901643,
+      "latencyMs": 3.786538,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "70184f9e6d7fa3ff",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Oslo",
+          "conditions": "clear",
+          "ok": true,
+          "temp": -6.3,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "06b516bf67774182",
+      "startTimeUnixNano": 1784301837950115105,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301838512497987,
+      "latencyMs": 556.426748,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "70184f9e6d7fa3ff",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 5,
+      "spanId": "ade50a35b3336076",
+      "startTimeUnixNano": 1784301837956071239,
+      "tokenUsage": {
+        "input": 848,
+        "output": 69,
+        "total": 917
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "cce298170c2e0b876b815a4ece4f6d30"
+}

@@ -1,0 +1,4 @@
+{
+  "kind": "TelemetryNormalizationError",
+  "message": "tool result must decode to a normalized object with boolean ok"
+}

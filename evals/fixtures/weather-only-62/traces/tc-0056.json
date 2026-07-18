@@ -1,0 +1,150 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Compare the current temperatures in Bangkok, and Hanoi using metric units.",
+  "response": "The current temperatures in the cities you requested are as follows:\n\n- **Bangkok**: The current temperature is 17.5°C.\n- **Hanoi**: The current temperature is 33.3°C.\n\nIf you need any more information or further comparisons, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0056",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301836170049466,
+      "latencyMs": 1888.501399,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "eb8aeef45626f5f5",
+      "startTimeUnixNano": 1784301834281548067,
+      "tokenUsage": {
+        "input": 1354,
+        "output": 154,
+        "total": 1508
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301835578661263,
+      "latencyMs": 1296.639697,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "eb8aeef45626f5f5",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "9204b937c87e79db",
+      "startTimeUnixNano": 1784301834282021566,
+      "tokenUsage": {
+        "input": 576,
+        "output": 92,
+        "total": 668
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Bangkok",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301835582839267,
+      "latencyMs": 3.624566,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "eb8aeef45626f5f5",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Bangkok",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 17.5,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user wants to compare the current temperatures in Bangkok and Hanoi using metric units. To do this, I will use the weather tool to get the current weather information for both cities in metric units. I will then provide the temperatures for both cities.</thinking>\n",
+      "sequence": 2,
+      "spanId": "f34716c406a2bea0",
+      "startTimeUnixNano": 1784301835579214701,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Hanoi",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301835583081132,
+      "latencyMs": 3.052445,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "eb8aeef45626f5f5",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Hanoi",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 33.3,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "1da0799144fb71bd",
+      "startTimeUnixNano": 1784301835580028687,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301836169302670,
+      "latencyMs": 584.411752,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "eb8aeef45626f5f5",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "e61363a49cfc0107",
+      "startTimeUnixNano": 1784301835584890918,
+      "tokenUsage": {
+        "input": 778,
+        "output": 62,
+        "total": 840
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "2b1e6883d875f75d368e6e28c5c8e7e9"
+}

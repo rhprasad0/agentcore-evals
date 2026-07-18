@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather in Boston using imperial units.",
+  "response": "The current weather in Boston is rainy with a temperature of 64.6°F.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0016",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301814319452563,
+      "latencyMs": 1587.737375,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "4367fdbdf34c6bae",
+      "startTimeUnixNano": 1784301812731715188,
+      "tokenUsage": {
+        "input": 1291,
+        "output": 103,
+        "total": 1394
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301813916327321,
+      "latencyMs": 1184.029201,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "4367fdbdf34c6bae",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "e4b7737860f180ae",
+      "startTimeUnixNano": 1784301812732298120,
+      "tokenUsage": {
+        "input": 574,
+        "output": 83,
+        "total": 657
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Boston",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301813919056138,
+      "latencyMs": 2.116778,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "4367fdbdf34c6bae",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Boston",
+          "conditions": "rain",
+          "ok": true,
+          "temp": 64.6,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user has requested the current weather in Boston using imperial units. I need to use the provided weather tool to get this information. The tool requires the city name and units. I will call the tool with the city set to \"Boston\" and units set to \"imperial\". </thinking>\n",
+      "sequence": 2,
+      "spanId": "1191b873634e5023",
+      "startTimeUnixNano": 1784301813916939360,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301814319207107,
+      "latencyMs": 398.487652,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "4367fdbdf34c6bae",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "c1f81341f5be16ab",
+      "startTimeUnixNano": 1784301813920719455,
+      "tokenUsage": {
+        "input": 717,
+        "output": 20,
+        "total": 737
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "af5fcfd183fd1f4baa7acd8c087ddd4f"
+}

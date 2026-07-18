@@ -1,0 +1,118 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Get Lima's current Celsius temperature and convert it to Fahrenheit; stop if the weather request times out.",
+  "response": "<thinking> The weather request for Lima timed out. Since the tool did not return a valid weather result, I cannot proceed with the conversion to Fahrenheit. I'll inform the user about the failure and suggest retrying the request. </thinking>\nSorry, but I was unable to retrieve the current weather for Lima due to a timeout. Please try again later. If the issue persists, it might be a temporary service disruption.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0100",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301872607254966,
+      "latencyMs": 1229.404164,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "f0498d2ec7238db8",
+      "startTimeUnixNano": 1784301871377850802,
+      "tokenUsage": {
+        "input": 1308,
+        "output": 166,
+        "total": 1474
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301872013530238,
+      "latencyMs": 635.213284,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "f0498d2ec7238db8",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "31423e784076996e",
+      "startTimeUnixNano": 1784301871378316954,
+      "tokenUsage": {
+        "input": 584,
+        "output": 79,
+        "total": 663
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Lima",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301872016381011,
+      "latencyMs": 2.27563,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "f0498d2ec7238db8",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "timeout",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "timeout",
+            "message": "The operation timed out before a result was confirmed.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The user wants the current weather in Lima and a conversion from Celsius to Fahrenheit. The tool provided can get the current weather but does not directly convert units. I will first get the current weather in Lima in Celsius and then manually convert it to Fahrenheit. </thinking>\n",
+      "sequence": 2,
+      "spanId": "04b4e44ccd626d40",
+      "startTimeUnixNano": 1784301872014105381,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301872606996615,
+      "latencyMs": 588.744863,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "f0498d2ec7238db8",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "dbe66ca5dbf0a9a9",
+      "startTimeUnixNano": 1784301872018251752,
+      "tokenUsage": {
+        "input": 724,
+        "output": 87,
+        "total": 811
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "1cf6fa8027b46fd4b8f0fc5016e7de26"
+}

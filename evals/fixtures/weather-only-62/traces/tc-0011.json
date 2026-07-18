@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather in Phoenix using imperial units.",
+  "response": "The current weather in Phoenix is 41.7°F with windy conditions. If you need more details or have another request, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0011",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301808015713502,
+      "latencyMs": 1042.30912,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "2e09daa4c99d928e",
+      "startTimeUnixNano": 1784301806973404382,
+      "tokenUsage": {
+        "input": 1285,
+        "output": 109,
+        "total": 1394
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301807554492064,
+      "latencyMs": 580.647822,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "2e09daa4c99d928e",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "d1fa9adf29e15ec1",
+      "startTimeUnixNano": 1784301806973844242,
+      "tokenUsage": {
+        "input": 574,
+        "output": 76,
+        "total": 650
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Phoenix",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301807557319965,
+      "latencyMs": 2.227258,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "2e09daa4c99d928e",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Phoenix",
+          "conditions": "windy",
+          "ok": true,
+          "temp": 41.7,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user has requested the current weather in Phoenix using imperial units. I need to use the provided weather tool to get this information. The tool requires the city name and units. I will use the city \"Phoenix\" and units \"imperial\". </thinking>\n",
+      "sequence": 2,
+      "spanId": "6dc31caa2aa89afb",
+      "startTimeUnixNano": 1784301807555092707,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301808014978542,
+      "latencyMs": 455.808584,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "2e09daa4c99d928e",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "cc7d92e6d60a12b9",
+      "startTimeUnixNano": 1784301807559169958,
+      "tokenUsage": {
+        "input": 711,
+        "output": 33,
+        "total": 744
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "cd3b7df9a42dad40a24bd8b3bf161b2d"
+}

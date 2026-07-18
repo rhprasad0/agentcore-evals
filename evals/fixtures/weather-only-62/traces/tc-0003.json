@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What does OWM stand for in the name OpenWeatherMap?",
+  "response": "<thinking> The user is asking about the meaning of \"OWM\" in the name \"OpenWeatherMap\". However, the available tool is only for getting current weather information and does not provide any information about the name or origin of the weather service. Therefore, I cannot directly answer the user's question using the provided tool. I will inform the user that I cannot provide this information.</thinking>\n<response> I cannot directly provide the meaning of \"OWM\" in \"OpenWeatherMap\" using the available tool, as it is focused on current weather data and not on the origin or name of the weather service. If you need information about current weather, I can assist with that.</response>\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0003",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301798552725375,
+      "latencyMs": 785.525008,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "545ad08a37932fe0",
+      "startTimeUnixNano": 1784301797767200367,
+      "tokenUsage": {
+        "input": 576,
+        "output": 143,
+        "total": 719
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301798551953450,
+      "latencyMs": 784.283769,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "545ad08a37932fe0",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "6af9a1facb0fb67b",
+      "startTimeUnixNano": 1784301797767669681,
+      "tokenUsage": {
+        "input": 576,
+        "output": 143,
+        "total": 719
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "da86e3109eb77cc1fc4a24fca16fc7a5"
+}

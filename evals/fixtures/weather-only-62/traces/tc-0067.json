@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is usually the nicest month to visit Bergen?",
+  "response": "<thinking> The User is asking about the nicest month to visit Bergen, which is a question about climate and travel preferences. However, the available tool only provides current weather information for a specific city, not historical or average climate data. Therefore, I cannot directly answer the question using the provided tool. I will inform the User about this limitation.</thinking>\nI don't have the capability to provide historical or average climate data to determine the nicest month to visit Bergen. However, I can provide the current weather for Bergen if you'd like. What city would you like the current weather for instead?\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0067",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301847113299904,
+      "latencyMs": 684.190111,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "b08567039abd5539",
+      "startTimeUnixNano": 1784301846429109793,
+      "tokenUsage": {
+        "input": 573,
+        "output": 122,
+        "total": 695
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301847113047930,
+      "latencyMs": 683.264506,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "b08567039abd5539",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "6a46328e7520b76b",
+      "startTimeUnixNano": 1784301846429783424,
+      "tokenUsage": {
+        "input": 573,
+        "output": 122,
+        "total": 695
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "247574c9ca00905270d949aacecf58df"
+}

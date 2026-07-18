@@ -1,0 +1,277 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is the current weather in Reykjavík?",
+  "response": "<thinking> The weather tool has returned a timeout error for the fourth time. Since the error is persistent and retrying is not helping, I will inform the user honestly about the failure. </thinking>\n\nUser: I'm sorry, but I'm currently unable to retrieve the current weather for Reykjavík due to a persistent timeout error from the weather tool. If you need this information, I recommend checking another source or trying again later.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0004",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301801964867907,
+      "latencyMs": 3370.671202,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "e75c90b0658419ee",
+      "startTimeUnixNano": 1784301798594196705,
+      "tokenUsage": {
+        "input": 4289,
+        "output": 479,
+        "total": 4768
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301799138239167,
+      "latencyMs": 543.35318,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "e75c90b0658419ee",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "75224bd839758a28",
+      "startTimeUnixNano": 1784301798594885987,
+      "tokenUsage": {
+        "input": 575,
+        "output": 73,
+        "total": 648
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Reykjavík",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301799141004794,
+      "latencyMs": 2.207965,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "e75c90b0658419ee",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "timeout",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "timeout",
+            "message": "The operation timed out before a result was confirmed.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The user has asked for the current weather in Reykjavík. To provide this information, I will use the weather tool to get the current weather for the city of Reykjavík. </thinking>\n",
+      "sequence": 2,
+      "spanId": "1c14d162b593d0d1",
+      "startTimeUnixNano": 1784301799138796829,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301799687804282,
+      "latencyMs": 545.063819,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "e75c90b0658419ee",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "34d3f437aed48067",
+      "startTimeUnixNano": 1784301799142740463,
+      "tokenUsage": {
+        "input": 709,
+        "output": 66,
+        "total": 775
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Reykjavík",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301799690658252,
+      "latencyMs": 2.26236,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "e75c90b0658419ee",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "timeout",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "timeout",
+            "message": "The operation timed out before a result was confirmed.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The weather tool returned an error indicating a timeout. Since the error is retryable, I will attempt to get the current weather information again for Reykjavík. </thinking> ",
+      "sequence": 4,
+      "spanId": "93f2e07f8dd6d167",
+      "startTimeUnixNano": 1784301799688395892,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301800317082857,
+      "latencyMs": 624.118895,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "e75c90b0658419ee",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 5,
+      "spanId": "6347dc472ae5d075",
+      "startTimeUnixNano": 1784301799692963962,
+      "tokenUsage": {
+        "input": 836,
+        "output": 68,
+        "total": 904
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Reykjavík",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301800318476675,
+      "latencyMs": 1.09164,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "e75c90b0658419ee",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "timeout",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "timeout",
+            "message": "The operation timed out before a result was confirmed.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The weather tool has returned a timeout error again. Since the error is retryable, I will attempt to get the current weather information one more time for Reykjavík. </thinking> ",
+      "sequence": 6,
+      "spanId": "957711382e158da7",
+      "startTimeUnixNano": 1784301800317385035,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301801249679187,
+      "latencyMs": 930.121141,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "e75c90b0658419ee",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 7,
+      "spanId": "70bd8d46313876ff",
+      "startTimeUnixNano": 1784301800319558046,
+      "tokenUsage": {
+        "input": 965,
+        "output": 179,
+        "total": 1144
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Reykjavík",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301801252541091,
+      "latencyMs": 2.258816,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "e75c90b0658419ee",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "timeout",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "timeout",
+            "message": "The operation timed out before a result was confirmed.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The weather tool has returned a timeout error for the third time. Since the error is retryable, I will attempt one final time to get the current weather information for Reykjavík. If the error persists, I will inform the user honestly about the failure. </thinking> ",
+      "sequence": 8,
+      "spanId": "af5303b29cab62ea",
+      "startTimeUnixNano": 1784301801250282275,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301801963996623,
+      "latencyMs": 708.754918,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "e75c90b0658419ee",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 9,
+      "spanId": "f49089fef1f08ab8",
+      "startTimeUnixNano": 1784301801255241705,
+      "tokenUsage": {
+        "input": 1204,
+        "output": 93,
+        "total": 1297
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "8ce7c50760e44b01ef7e7fd835b86d17"
+}

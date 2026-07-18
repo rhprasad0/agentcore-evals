@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is the current weather in Vienna?",
+  "response": "<thinking> The tool returned an error indicating that access configuration failed, which means the current weather information for Vienna cannot be retrieved at this time. I will inform the user about this issue honestly. </thinking> \n\nI'm sorry, but I currently cannot provide the current weather information for Vienna due to an access configuration issue. This information is unavailable at the moment. If you need this information later, please try again.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0076",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301852293152503,
+      "latencyMs": 1034.756107,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "14a46e99f53ef1d6",
+      "startTimeUnixNano": 1784301851258396396,
+      "tokenUsage": {
+        "input": 1263,
+        "output": 147,
+        "total": 1410
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301851664497507,
+      "latencyMs": 405.65393,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "14a46e99f53ef1d6",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "fc2bfa3d1da66b73",
+      "startTimeUnixNano": 1784301851258843577,
+      "tokenUsage": {
+        "input": 571,
+        "output": 61,
+        "total": 632
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Vienna"
+      },
+      "endTimeUnixNano": 1784301851665432017,
+      "latencyMs": 0.725808,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "14a46e99f53ef1d6",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "auth",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "auth",
+            "message": "The capability is unavailable because access configuration failed.",
+            "retryable": false
+          },
+          "ok": false
+        },
+        "retryable": false
+      },
+      "selectionReasoning": "<thinking> The user has asked for the current weather in Vienna. To provide this information, I will use the \"get_current_weather\" tool with the city parameter set to \"Vienna\". </thinking>\n",
+      "sequence": 2,
+      "spanId": "779de70f71c04207",
+      "startTimeUnixNano": 1784301851664706209,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301852292910158,
+      "latencyMs": 626.907331,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "14a46e99f53ef1d6",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "751b3d224e3a48d2",
+      "startTimeUnixNano": 1784301851666002827,
+      "tokenUsage": {
+        "input": 692,
+        "output": 86,
+        "total": 778
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "9398a593d9635c0401140f700c085b7b"
+}

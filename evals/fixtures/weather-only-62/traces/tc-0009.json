@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather in Nairobi using metric units.",
+  "response": "<thinking> The weather tool has returned the current weather information for Nairobi. The temperature is reported in metric units, as requested. I will now provide the user with this information. </thinking>\n\nThe current weather in Nairobi is rainy with a temperature of -2.6°C. Please note that the temperature value seems incorrect for Nairobi, as it is typically much higher. If you need further assistance or verification, feel free to ask.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0009",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301805872364141,
+      "latencyMs": 1149.2316,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "7d214525632ae570",
+      "startTimeUnixNano": 1784301804723132541,
+      "tokenUsage": {
+        "input": 1264,
+        "output": 144,
+        "total": 1408
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301805210925742,
+      "latencyMs": 487.170871,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "7d214525632ae570",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "e6814eaa2d1c7d84",
+      "startTimeUnixNano": 1784301804723754871,
+      "tokenUsage": {
+        "input": 574,
+        "output": 55,
+        "total": 629
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Nairobi",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301805214252902,
+      "latencyMs": 2.523547,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "7d214525632ae570",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Nairobi",
+          "conditions": "rain",
+          "ok": true,
+          "temp": -2.6,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user has requested the current weather in Nairobi using metric units. I will use the provided weather tool to get this information. </thinking>\n",
+      "sequence": 2,
+      "spanId": "c959d2dec9f92866",
+      "startTimeUnixNano": 1784301805211729355,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301805871569056,
+      "latencyMs": 655.499204,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "7d214525632ae570",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "f5e6a0c5b99d4d52",
+      "startTimeUnixNano": 1784301805216069852,
+      "tokenUsage": {
+        "input": 690,
+        "output": 89,
+        "total": 779
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "e1f72ef52a98bed1e22c36e38d7c902d"
+}

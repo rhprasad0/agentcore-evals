@@ -1,0 +1,150 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Compare the current temperatures in Seattle, and Portland using imperial units.",
+  "response": "The current temperatures in the cities are as follows:\n- **Seattle**: 43.5°F\n- **Portland**: 71.6°F\n\nBoth cities are experiencing windy weather. If you need more information or have any other questions, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0049",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301825236007761,
+      "latencyMs": 1233.225774,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "01aea568d631f93e",
+      "startTimeUnixNano": 1784301824002781987,
+      "tokenUsage": {
+        "input": 1362,
+        "output": 158,
+        "total": 1520
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301824683867796,
+      "latencyMs": 680.660567,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "01aea568d631f93e",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "817309356ddc628c",
+      "startTimeUnixNano": 1784301824003207229,
+      "tokenUsage": {
+        "input": 576,
+        "output": 100,
+        "total": 676
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Seattle",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301824688487834,
+      "latencyMs": 4.03563,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "01aea568d631f93e",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Seattle",
+          "conditions": "windy",
+          "ok": true,
+          "temp": 43.5,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user wants to compare the current temperatures in Seattle and Portland using imperial units. To do this, I will use the `get_current_weather` tool twice, once for each city, specifying the `units` parameter as `imperial`. I will then provide the temperatures for both cities.</thinking>\n",
+      "sequence": 2,
+      "spanId": "3b399df0af9f1d4b",
+      "startTimeUnixNano": 1784301824684452204,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Portland",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301824688775200,
+      "latencyMs": 3.431391,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "01aea568d631f93e",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Portland",
+          "conditions": "windy",
+          "ok": true,
+          "temp": 71.6,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "5c7a17b782cc5d9b",
+      "startTimeUnixNano": 1784301824685343809,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301825235248044,
+      "latencyMs": 544.322692,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "01aea568d631f93e",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "c755a8785871bdaf",
+      "startTimeUnixNano": 1784301824690925352,
+      "tokenUsage": {
+        "input": 786,
+        "output": 58,
+        "total": 844
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "f2680a2654d83d69979c982e9239d656"
+}

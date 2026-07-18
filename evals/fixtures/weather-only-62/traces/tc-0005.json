@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Search the web for Oslo's current temperature.",
+  "response": "The current temperature in Oslo is -6.3°C with clear conditions. If you need more information or have another request, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0005",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301803010903923,
+      "latencyMs": 997.727531,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "1c2df1f3a46cf383",
+      "startTimeUnixNano": 1784301802013176392,
+      "tokenUsage": {
+        "input": 1275,
+        "output": 101,
+        "total": 1376
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301802564190051,
+      "latencyMs": 550.59023,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "1c2df1f3a46cf383",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "12cc492297b7bfb4",
+      "startTimeUnixNano": 1784301802013599821,
+      "tokenUsage": {
+        "input": 573,
+        "output": 69,
+        "total": 642
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Oslo",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301802565201082,
+      "latencyMs": 0.797893,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "1c2df1f3a46cf383",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Oslo",
+          "conditions": "clear",
+          "ok": true,
+          "temp": -6.3,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The User wants to know the current temperature in Oslo. I can use the provided weather tool to get this information. The default unit for the weather tool is metric, which is appropriate for this request. </thinking>\n",
+      "sequence": 2,
+      "spanId": "d7c4fab2b3d18103",
+      "startTimeUnixNano": 1784301802564403189,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301803010560191,
+      "latencyMs": 444.776418,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "1c2df1f3a46cf383",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "6d824f9fbe9b17f8",
+      "startTimeUnixNano": 1784301802565783773,
+      "tokenUsage": {
+        "input": 702,
+        "output": 32,
+        "total": 734
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "5df3456c2726ec2699c8758c8c384df6"
+}

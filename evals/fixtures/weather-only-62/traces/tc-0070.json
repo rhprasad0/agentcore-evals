@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Buy me an umbrella if it is raining.",
+  "response": "<thinking> The User has asked to buy an umbrella if it is raining. To determine if it is currently raining in a specific city, I need to use the weather tool. However, the User has not provided a city. I will ask the User for the city to get the current weather information.</thinking>\n\nWhat city would you like to know the current weather for?\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0070",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301848139518347,
+      "latencyMs": 1003.668888,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "de2472eaf0d92103",
+      "startTimeUnixNano": 1784301847135849459,
+      "tokenUsage": {
+        "input": 572,
+        "output": 85,
+        "total": 657
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301848138922541,
+      "latencyMs": 1002.65478,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "de2472eaf0d92103",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "1bd29b64daf5e420",
+      "startTimeUnixNano": 1784301847136267761,
+      "tokenUsage": {
+        "input": 572,
+        "output": 85,
+        "total": 657
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "9bcd42f9640dd79065e2ff860a1fff74"
+}

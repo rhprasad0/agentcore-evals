@@ -1,0 +1,150 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Compare the current temperatures in Miami, and Orlando using imperial units.",
+  "response": "<thinking> The tool has successfully returned the current weather information for both Miami and Orlando in imperial units. Now, I will compare the temperatures in both cities. </thinking>\n\nThe current temperatures in the cities are as follows:\n- Miami: 55.4°F with rain\n- Orlando: 17.4°F with cloudy conditions\n\nIf you need any more information or further comparisons, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0047",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301822750680882,
+      "latencyMs": 1258.662731,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "edda1668987f7005",
+      "startTimeUnixNano": 1784301821492018151,
+      "tokenUsage": {
+        "input": 1352,
+        "output": 179,
+        "total": 1531
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301822125682276,
+      "latencyMs": 633.110819,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "edda1668987f7005",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "daa33f6b05f66bb6",
+      "startTimeUnixNano": 1784301821492571457,
+      "tokenUsage": {
+        "input": 576,
+        "output": 91,
+        "total": 667
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Miami",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301822131192490,
+      "latencyMs": 4.898699,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "edda1668987f7005",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Miami",
+          "conditions": "rain",
+          "ok": true,
+          "temp": 55.4,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user wants to compare the current temperatures in Miami and Orlando using imperial units. To do this, I will use the `get_current_weather` tool twice, once for each city, specifying the `units` parameter as `imperial`. </thinking>\n",
+      "sequence": 2,
+      "spanId": "e847c8c04ee694bd",
+      "startTimeUnixNano": 1784301822126293791,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Orlando",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301822131466497,
+      "latencyMs": 4.249603,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "edda1668987f7005",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Orlando",
+          "conditions": "cloudy",
+          "ok": true,
+          "temp": 17.4,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "fde1355c20215e32",
+      "startTimeUnixNano": 1784301822127216894,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301822749962709,
+      "latencyMs": 616.446678,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "edda1668987f7005",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "c8ae47489fddd964",
+      "startTimeUnixNano": 1784301822133516031,
+      "tokenUsage": {
+        "input": 776,
+        "output": 88,
+        "total": 864
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "78145323d415861552aebf63c63eae35"
+}

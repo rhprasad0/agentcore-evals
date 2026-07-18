@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureSetId": "evals.weather_only_regression",
+  "version": "1.0.0",
+  "experimentId": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "sourceRun": {
+    "runId": "12345678-1234-4abc-8def-1234567890ab",
+    "executedAt": "2026-07-16T19:00:00Z"
+  },
+  "projection": {
+    "projectionId": "datasets.weather_only",
+    "version": "1.0.0",
+    "artifactSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "traceContract": {
+    "schemaId": "urn:agentcore-evals:schema:execution-trace:1.0.0",
+    "schemaVersion": "1.0.0",
+    "canonicalizerVersion": "1.0.0",
+    "sourceProfile": {
+      "profileId": "strands-inline",
+      "version": "1.0.0"
+    }
+  },
+  "expectedCaseIds": [
+    "tc-0001"
+  ],
+  "fixtures": [
+    {
+      "exampleId": "tc-0001",
+      "status": "canonical-trace",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0001.json",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    }
+  ],
+  "counts": {
+    "expected": 1,
+    "canonicalTrace": 1,
+    "instrumentError": 0
+  },
+  "publicSafety": {
+    "policyId": "safety.exact_synthetic_fixture",
+    "version": "1.0.0",
+    "publicationMode": "exact-source-artifacts",
+    "automatedChecks": [
+      "schema",
+      "semantics",
+      "provenance",
+      "secrets",
+      "privatePaths",
+      "awsIdentifiers",
+      "contactIdentifiers"
+    ]
+  },
+  "unexpected": true
+}

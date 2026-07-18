@@ -1,0 +1,224 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is the current weather in Tallinn?",
+  "response": "<thinking> Unfortunately, the weather tool has returned a timeout error for the third time in a row. Since the error is retryable but I've reached the maximum number of retries, I cannot provide the current weather information for Tallinn. I must inform the User honestly about the failure. </thinking> \n\nI'm sorry, but I'm currently unable to provide the current weather information for Tallinn due to a persistent timeout error from the weather tool. Please try again later.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0085",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301862757399590,
+      "latencyMs": 2470.350109,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "24780ca287cbe6f3",
+      "startTimeUnixNano": 1784301860287049481,
+      "tokenUsage": {
+        "input": 3087,
+        "output": 314,
+        "total": 3401
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301860881863754,
+      "latencyMs": 594.368371,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "24780ca287cbe6f3",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "65bb2df7a1a0b1e0",
+      "startTimeUnixNano": 1784301860287495383,
+      "tokenUsage": {
+        "input": 571,
+        "output": 81,
+        "total": 652
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Tallinn",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301860882757038,
+      "latencyMs": 0.699484,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "24780ca287cbe6f3",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "timeout",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "timeout",
+            "message": "The operation timed out before a result was confirmed.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The User has asked for the current weather in Tallinn. To provide this information, I will use the available weather tool to get the current weather for the city of Tallinn. The default units for the weather tool are metric, which is suitable for most users. </thinking>\n",
+      "sequence": 2,
+      "spanId": "fd56ef6575e67f52",
+      "startTimeUnixNano": 1784301860882057554,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301861450971492,
+      "latencyMs": 567.668405,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "24780ca287cbe6f3",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "9dc35249d6e99264",
+      "startTimeUnixNano": 1784301860883303087,
+      "tokenUsage": {
+        "input": 713,
+        "output": 60,
+        "total": 773
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Tallinn",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301861453499610,
+      "latencyMs": 2.011423,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "24780ca287cbe6f3",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "timeout",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "timeout",
+            "message": "The operation timed out before a result was confirmed.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The weather tool returned an error indicating a timeout. Since the error is retryable, I will attempt to get the current weather information again for Tallinn. </thinking> ",
+      "sequence": 4,
+      "spanId": "280353872a917b13",
+      "startTimeUnixNano": 1784301861451488187,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301862078275420,
+      "latencyMs": 622.86427,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "24780ca287cbe6f3",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 5,
+      "spanId": "d41faf5b90ea2f75",
+      "startTimeUnixNano": 1784301861455411150,
+      "tokenUsage": {
+        "input": 834,
+        "output": 74,
+        "total": 908
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Tallinn",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301862080837612,
+      "latencyMs": 2.026194,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "24780ca287cbe6f3",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "timeout",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "timeout",
+            "message": "The operation timed out before a result was confirmed.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The weather tool has returned a timeout error again, which means it was unable to provide the current weather information for Tallinn. Since the error is retryable, I will try one more time to get the current weather data. </thinking> ",
+      "sequence": 6,
+      "spanId": "28d7aa5a4efe0cd2",
+      "startTimeUnixNano": 1784301862078811418,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301862756684212,
+      "latencyMs": 673.793787,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "24780ca287cbe6f3",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 7,
+      "spanId": "1aef2636ef090ee3",
+      "startTimeUnixNano": 1784301862082890425,
+      "tokenUsage": {
+        "input": 969,
+        "output": 99,
+        "total": 1068
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "738c3a9b12b55815d85366ee137f1cde"
+}

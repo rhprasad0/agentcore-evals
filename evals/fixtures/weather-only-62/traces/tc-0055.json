@@ -1,0 +1,148 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Compare the current temperatures in Dublin, and Edinburgh using metric units.",
+  "response": "<thinking> I have successfully retrieved the current weather information for both Dublin and Edinburgh. Now I will compare the temperatures in metric units.</thinking>\n\nThe current temperature in Dublin is 34.9°C and it is cloudy. In Edinburgh, the current temperature is 11.2°C and the weather is clear.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0055",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301834259447289,
+      "latencyMs": 1257.784962,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "e4b9971cc632b507",
+      "startTimeUnixNano": 1784301833001662327,
+      "tokenUsage": {
+        "input": 1359,
+        "output": 166,
+        "total": 1525
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301833699563169,
+      "latencyMs": 697.306111,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "e4b9971cc632b507",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "d613863b1080a22e",
+      "startTimeUnixNano": 1784301833002257058,
+      "tokenUsage": {
+        "input": 576,
+        "output": 98,
+        "total": 674
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Dublin"
+      },
+      "endTimeUnixNano": 1784301833703582611,
+      "latencyMs": 3.483819,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "e4b9971cc632b507",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Dublin",
+          "conditions": "cloudy",
+          "ok": true,
+          "temp": 34.9,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user wants to compare the current temperatures in Dublin and Edinburgh using metric units. To do this, I will use the weather tool to get the current weather information for both cities. The tool requires the city name as a parameter and defaults to metric units. I will first get the current weather for Dublin and then for Edinburgh.</thinking>\n",
+      "sequence": 2,
+      "spanId": "c89fed3eee177260",
+      "startTimeUnixNano": 1784301833700098792,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Edinburgh"
+      },
+      "endTimeUnixNano": 1784301833703878516,
+      "latencyMs": 2.965239,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "e4b9971cc632b507",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Edinburgh",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 11.2,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "6fff47fac2b3e0ec",
+      "startTimeUnixNano": 1784301833700913277,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301834259193254,
+      "latencyMs": 553.544596,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "e4b9971cc632b507",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "daf32a93485537f0",
+      "startTimeUnixNano": 1784301833705648658,
+      "tokenUsage": {
+        "input": 783,
+        "output": 68,
+        "total": 851
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "0a7265cb16c9976ebe10e7dbd7667931"
+}

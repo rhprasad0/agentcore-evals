@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Tell me about Mercury right now.",
+  "response": "<thinking> The User's request is about Mercury, which is not a city but a planet. The available tool is designed to provide current weather information for a city, not astronomical data about planets. Therefore, I cannot directly provide the requested information using the provided tool. I will inform the User that I cannot help with this request.</thinking>\nYou have asked about Mercury, which is a planet and not a city. The available tool is designed to provide current weather information for a city, not astronomical data about planets. I cannot provide the requested information using the provided tool. If you have any weather-related questions about a city, I can assist with that.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0091",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301866797720837,
+      "latencyMs": 639.422091,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "0daee18473a907b1",
+      "startTimeUnixNano": 1784301866158298746,
+      "tokenUsage": {
+        "input": 570,
+        "output": 135,
+        "total": 705
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301866797479200,
+      "latencyMs": 638.751455,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "0daee18473a907b1",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "032de40fb0639cd9",
+      "startTimeUnixNano": 1784301866158727745,
+      "tokenUsage": {
+        "input": 570,
+        "output": 135,
+        "total": 705
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "b00ef4f57657e0446e220f69b697b4d4"
+}

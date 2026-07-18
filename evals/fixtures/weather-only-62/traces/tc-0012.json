@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather in Lisbon using metric units.",
+  "response": "The current weather in Lisbon is clear with a temperature of 25.2 degrees Celsius.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0012",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301809719247264,
+      "latencyMs": 1679.113389,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "596e4cd5c1b74c18",
+      "startTimeUnixNano": 1784301808040133875,
+      "tokenUsage": {
+        "input": 1289,
+        "output": 99,
+        "total": 1388
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301808609758072,
+      "latencyMs": 569.203481,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "596e4cd5c1b74c18",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "ec3246026bc330b3",
+      "startTimeUnixNano": 1784301808040554591,
+      "tokenUsage": {
+        "input": 574,
+        "output": 79,
+        "total": 653
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Lisbon",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301808612557076,
+      "latencyMs": 2.243023,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "596e4cd5c1b74c18",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Lisbon",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 25.2,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user has requested the current weather in Lisbon using metric units. I need to use the weather tool to get this information. The tool requires the city name and units. I will use the city \"Lisbon\" and units \"metric\". </thinking>\n",
+      "sequence": 2,
+      "spanId": "e36e745e900c9094",
+      "startTimeUnixNano": 1784301808610314053,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301809718534127,
+      "latencyMs": 1104.109663,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "596e4cd5c1b74c18",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "a534368870991ffa",
+      "startTimeUnixNano": 1784301808614424464,
+      "tokenUsage": {
+        "input": 715,
+        "output": 20,
+        "total": 735
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "009a461ce9788acc9f74ff511de793a6"
+}

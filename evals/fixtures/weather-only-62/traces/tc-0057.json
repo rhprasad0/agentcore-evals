@@ -1,0 +1,150 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Compare the current temperatures in Minneapolis, and Milwaukee using imperial units.",
+  "response": "<thinking> The tool has successfully returned the current weather data for both Minneapolis and Milwaukee in imperial units. Now, I will compare the temperatures from the results. </thinking>\n\nThe current temperatures are:\n- Minneapolis: 87.1°F\n- Milwaukee: 76.3°F\n\nMinneapolis is warmer than Milwaukee.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0057",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301837264140092,
+      "latencyMs": 1068.485813,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "28236d002acd4cac",
+      "startTimeUnixNano": 1784301836195654279,
+      "tokenUsage": {
+        "input": 1351,
+        "output": 158,
+        "total": 1509
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301836725158486,
+      "latencyMs": 528.97173,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "28236d002acd4cac",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "e5003adeb34efbae",
+      "startTimeUnixNano": 1784301836196186756,
+      "tokenUsage": {
+        "input": 576,
+        "output": 89,
+        "total": 665
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Minneapolis",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301836729800044,
+      "latencyMs": 4.048577,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "28236d002acd4cac",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Minneapolis",
+          "conditions": "windy",
+          "ok": true,
+          "temp": 87.1,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user wants to compare the current temperatures in Minneapolis and Milwaukee using imperial units. To do this, I will use the `get_current_weather` tool twice, once for each city, specifying the units as 'imperial'. </thinking>\n",
+      "sequence": 2,
+      "spanId": "105ec775588eae0c",
+      "startTimeUnixNano": 1784301836725751467,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Milwaukee",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301836730068594,
+      "latencyMs": 3.438589,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "28236d002acd4cac",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Milwaukee",
+          "conditions": "windy",
+          "ok": true,
+          "temp": 76.3,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "a93332447fdb86f6",
+      "startTimeUnixNano": 1784301836726630005,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301837263468773,
+      "latencyMs": 531.379388,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "28236d002acd4cac",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "108cc7de8fa2ea9d",
+      "startTimeUnixNano": 1784301836732089385,
+      "tokenUsage": {
+        "input": 775,
+        "output": 69,
+        "total": 844
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "51ebe987b20216bee8fee482ee246ee8"
+}

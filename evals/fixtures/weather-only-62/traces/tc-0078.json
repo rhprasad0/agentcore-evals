@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is the current weather in Atlantis?",
+  "response": "<thinking> The User has asked for the current weather in a city named \"Atlantis.\" However, \"Atlantis\" is a mythical city and not a real location. Since the tool can only provide weather information for real cities, I cannot directly fulfill this request. I will inform the User about this limitation.</thinking>\n\n\nI'm sorry, but I cannot provide weather information for \"Atlantis\" as it is a mythical city and not a real location. If you have a question about the weather in a real city, I'd be happy to help with that.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0078",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301854133773984,
+      "latencyMs": 738.874842,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "f88ba7580623cc11",
+      "startTimeUnixNano": 1784301853394899142,
+      "tokenUsage": {
+        "input": 571,
+        "output": 129,
+        "total": 700
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301854133534718,
+      "latencyMs": 738.200295,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "f88ba7580623cc11",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "4598b0fdfbd8d637",
+      "startTimeUnixNano": 1784301853395334423,
+      "tokenUsage": {
+        "input": 571,
+        "output": 129,
+        "total": 700
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "930f9832bc332f7e42e5113baa03aefd"
+}

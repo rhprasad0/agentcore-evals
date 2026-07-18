@@ -1,0 +1,118 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is the current weather in Vilnius?",
+  "response": "<thinking> The tool returned an error indicating that the external weather service could not be reached. Since the error is retryable, I will inform the User and suggest trying again later. </thinking>\nI'm sorry, but I'm currently unable to provide the current weather in Vilnius due to a network issue with the weather service. Please try again later.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0087",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301865084926124,
+      "latencyMs": 1051.250248,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "4a403ed3f03a196f",
+      "startTimeUnixNano": 1784301864033675876,
+      "tokenUsage": {
+        "input": 1265,
+        "output": 138,
+        "total": 1403
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301864540736879,
+      "latencyMs": 506.511907,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "4a403ed3f03a196f",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "a6784778cf7c4108",
+      "startTimeUnixNano": 1784301864034224972,
+      "tokenUsage": {
+        "input": 571,
+        "output": 64,
+        "total": 635
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Vilnius",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301864543216712,
+      "latencyMs": 1.962215,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "4a403ed3f03a196f",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "network",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "network",
+            "message": "The external service could not be reached.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The User has asked for the current weather in Vilnius. To provide this information, I will use the available weather tool to get the current weather for the city of Vilnius. </thinking>\n",
+      "sequence": 2,
+      "spanId": "5b51b0896405589f",
+      "startTimeUnixNano": 1784301864541254497,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301865084648745,
+      "latencyMs": 539.790521,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "4a403ed3f03a196f",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "d2d923c222b0a4df",
+      "startTimeUnixNano": 1784301864544858224,
+      "tokenUsage": {
+        "input": 694,
+        "output": 74,
+        "total": 768
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "96626e0e8a32375c6d24fc75284b0c8e"
+}

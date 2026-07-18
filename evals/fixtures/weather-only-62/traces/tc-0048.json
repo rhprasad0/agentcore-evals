@@ -1,0 +1,150 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Compare the current temperatures in Rome, and Athens using metric units.",
+  "response": "<thinking> I have obtained the current weather information for both Rome and Athens in metric units. Now I will compare the temperatures in both cities. </thinking>\n\nThe current temperature in Rome is **7.9°C** with clear conditions.\nThe current temperature in Athens is **9.6°C** with cloudy conditions.\n\nIf you need any further information, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0048",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301823977163239,
+      "latencyMs": 1176.861798,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "4e87a029f08fd571",
+      "startTimeUnixNano": 1784301822800301441,
+      "tokenUsage": {
+        "input": 1340,
+        "output": 160,
+        "total": 1500
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301823387769429,
+      "latencyMs": 586.978702,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "4e87a029f08fd571",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "a460174d85077617",
+      "startTimeUnixNano": 1784301822800790727,
+      "tokenUsage": {
+        "input": 576,
+        "output": 81,
+        "total": 657
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Rome",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301823392572236,
+      "latencyMs": 4.205471,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "4e87a029f08fd571",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Rome",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 7.9,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user wants to compare the current temperatures in Rome and Athens using metric units. To do this, I will use the weather tool to get the current weather information for both cities in metric units. </thinking>\n",
+      "sequence": 2,
+      "spanId": "0ad2d969c318a8de",
+      "startTimeUnixNano": 1784301823388366765,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Athens",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301823392880806,
+      "latencyMs": 3.572213,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "4e87a029f08fd571",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Athens",
+          "conditions": "cloudy",
+          "ok": true,
+          "temp": 9.6,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "2485c8d626f6443a",
+      "startTimeUnixNano": 1784301823389308593,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301823976410245,
+      "latencyMs": 581.422492,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "4e87a029f08fd571",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "66d2e7854a304742",
+      "startTimeUnixNano": 1784301823394987753,
+      "tokenUsage": {
+        "input": 764,
+        "output": 79,
+        "total": 843
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "7303c5484d29941b0b571d266e9b2d14"
+}

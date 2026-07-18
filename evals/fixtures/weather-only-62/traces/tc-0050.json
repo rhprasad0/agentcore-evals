@@ -1,0 +1,150 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Compare the current temperatures in Cairo, and Casablanca using metric units.",
+  "response": "<thinking> The tool has returned the current weather information for both Cairo and Casablanca in metric units. I will now compare the temperatures for both cities. </thinking>\n\nThe current temperature in Cairo is -6.8°C and in Casablanca it is -6.5°C. Both cities are experiencing cloudy weather. \n\nPlease note that the temperatures provided are in metric units and seem to be incorrect as temperatures in these regions typically do not fall below 0°C. If you need accurate weather information, I recommend checking a reliable weather source.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0050",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301826585470356,
+      "latencyMs": 1306.52891,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "4a5c37c2083c737a",
+      "startTimeUnixNano": 1784301825278941446,
+      "tokenUsage": {
+        "input": 1347,
+        "output": 195,
+        "total": 1542
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301825872594656,
+      "latencyMs": 593.211501,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "4a5c37c2083c737a",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "4eba12c757c964c7",
+      "startTimeUnixNano": 1784301825279383155,
+      "tokenUsage": {
+        "input": 576,
+        "output": 84,
+        "total": 660
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Cairo",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301825877978524,
+      "latencyMs": 4.793044,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "4a5c37c2083c737a",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Cairo",
+          "conditions": "cloudy",
+          "ok": true,
+          "temp": -6.8,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user wants to compare the current temperatures in Cairo and Casablanca using metric units. To do this, I will use the weather tool to get the current weather information for both cities in metric units. </thinking>\n",
+      "sequence": 2,
+      "spanId": "006615be49eb932e",
+      "startTimeUnixNano": 1784301825873185480,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Casablanca",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301825878251537,
+      "latencyMs": 4.169129,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "4a5c37c2083c737a",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Casablanca",
+          "conditions": "cloudy",
+          "ok": true,
+          "temp": -6.5,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "2026732b6187d63a",
+      "startTimeUnixNano": 1784301825874082408,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301826584744183,
+      "latencyMs": 704.473729,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "4a5c37c2083c737a",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "8e84e1e3fdcab61a",
+      "startTimeUnixNano": 1784301825880270454,
+      "tokenUsage": {
+        "input": 771,
+        "output": 111,
+        "total": 882
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "acc3dc6ffa92439cad06c1e03521f9cf"
+}

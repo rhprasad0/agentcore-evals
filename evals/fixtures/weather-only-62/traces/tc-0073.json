@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Is it warm there right now?",
+  "response": "<thinking> The user wants to know if it is warm in a specific city right now. To answer this, I need to use the weather tool to get the current weather for the city in question. However, the user has not provided a city name. I will ask the user to provide the city name to proceed. </thinking>\n\nCould you please provide the name of the city you are interested in?\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0073",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301850190613527,
+      "latencyMs": 646.603935,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "26934ae101221ab2",
+      "startTimeUnixNano": 1784301849544009592,
+      "tokenUsage": {
+        "input": 570,
+        "output": 92,
+        "total": 662
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301850190294284,
+      "latencyMs": 645.603266,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "26934ae101221ab2",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "17246d2f1029a59f",
+      "startTimeUnixNano": 1784301849544691018,
+      "tokenUsage": {
+        "input": 570,
+        "output": 92,
+        "total": 662
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "9ef12330b8a3c54ed03d0f7f0a6478fc"
+}

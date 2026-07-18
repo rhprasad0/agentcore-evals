@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather in Toronto using metric units.",
+  "response": "The current weather in Toronto is clear with a temperature of -3.5°C. If you need any more information or have another request, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0010",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301806949332279,
+      "latencyMs": 1032.774992,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "caf13f0714f73d08",
+      "startTimeUnixNano": 1784301805916557287,
+      "tokenUsage": {
+        "input": 1285,
+        "output": 113,
+        "total": 1398
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301806519425270,
+      "latencyMs": 602.268524,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "caf13f0714f73d08",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "834784951a0941ad",
+      "startTimeUnixNano": 1784301805917156746,
+      "tokenUsage": {
+        "input": 574,
+        "output": 78,
+        "total": 652
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Toronto",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301806522280448,
+      "latencyMs": 2.270754,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "caf13f0714f73d08",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Toronto",
+          "conditions": "clear",
+          "ok": true,
+          "temp": -3.5,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user has requested the current weather in Toronto using metric units. I need to use the provided weather tool to get this information. The tool requires the city name and the units. I will use the city \"Toronto\" and the units \"metric\". </thinking>\n",
+      "sequence": 2,
+      "spanId": "a27449498c6569a7",
+      "startTimeUnixNano": 1784301806520009694,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301806948578472,
+      "latencyMs": 424.437697,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "caf13f0714f73d08",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "40d682cf11a8d349",
+      "startTimeUnixNano": 1784301806524140775,
+      "tokenUsage": {
+        "input": 711,
+        "output": 35,
+        "total": 746
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "6864ca928121bf807cd1c92094443707"
+}

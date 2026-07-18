@@ -1,0 +1,150 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Compare the current temperatures in San Diego, and Los Angeles using imperial units.",
+  "response": "<thinking> I have obtained the current weather information for both San Diego and Los Angeles in imperial units. Now, I will compare the temperatures from the results. </thinking>\n\nThe current temperature in San Diego is 25.2°F, and in Los Angeles, it is 67.5°F.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0054",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301832955383811,
+      "latencyMs": 1200.390488,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "006192b4b819a2b1",
+      "startTimeUnixNano": 1784301831754993323,
+      "tokenUsage": {
+        "input": 1355,
+        "output": 155,
+        "total": 1510
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301832392783335,
+      "latencyMs": 637.32283,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "006192b4b819a2b1",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "13efaa6f929a1847",
+      "startTimeUnixNano": 1784301831755460505,
+      "tokenUsage": {
+        "input": 578,
+        "output": 89,
+        "total": 667
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "San Diego",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301832397468766,
+      "latencyMs": 4.104675,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "006192b4b819a2b1",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "San Diego",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 25.2,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The User wants to compare the current temperatures in two cities, San Diego and Los Angeles, using imperial units. To do this, I will use the weather tool to get the current weather information for both cities in imperial units. </thinking>\n",
+      "sequence": 2,
+      "spanId": "aaddbcb99a83ff58",
+      "startTimeUnixNano": 1784301832393364091,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Los Angeles",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301832397779304,
+      "latencyMs": 3.503718,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "006192b4b819a2b1",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Los Angeles",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 67.5,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "8e301395c16c6bea",
+      "startTimeUnixNano": 1784301832394275586,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301832954634961,
+      "latencyMs": 554.807106,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "006192b4b819a2b1",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "edee4312feb3ac9c",
+      "startTimeUnixNano": 1784301832399827855,
+      "tokenUsage": {
+        "input": 777,
+        "output": 66,
+        "total": 843
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "3a4507ace30274ca39c286b276f9956a"
+}

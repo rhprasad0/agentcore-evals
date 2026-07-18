@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather in Helsinki using standard units.",
+  "response": "The current weather in Helsinki is clear with a temperature of 293.95 Kelvin, which is equivalent to 20.77°C in standard units.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0020",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301819315289674,
+      "latencyMs": 1029.064695,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "0a1688f7ef0c0488",
+      "startTimeUnixNano": 1784301818286224979,
+      "tokenUsage": {
+        "input": 1294,
+        "output": 118,
+        "total": 1412
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301818866054291,
+      "latencyMs": 579.384461,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "0a1688f7ef0c0488",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "41dcdafc17a80de5",
+      "startTimeUnixNano": 1784301818286669830,
+      "tokenUsage": {
+        "input": 574,
+        "output": 81,
+        "total": 655
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Helsinki",
+        "units": "standard"
+      },
+      "endTimeUnixNano": 1784301818868862784,
+      "latencyMs": 2.251567,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "0a1688f7ef0c0488",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Helsinki",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 293.95,
+          "units": "standard"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user has requested the current weather in Helsinki using standard units. I need to use the weather tool to get this information. The tool requires the city name and units. I will use the city \"Helsinki\" and units \"standard\". </thinking>\n",
+      "sequence": 2,
+      "spanId": "2423a176bf5a2821",
+      "startTimeUnixNano": 1784301818866611217,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301819314567620,
+      "latencyMs": 443.838773,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "0a1688f7ef0c0488",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "5128c9fe8e5f0e83",
+      "startTimeUnixNano": 1784301818870728847,
+      "tokenUsage": {
+        "input": 720,
+        "output": 37,
+        "total": 757
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "a4b6e121629eb4f2301d6c701785839d"
+}

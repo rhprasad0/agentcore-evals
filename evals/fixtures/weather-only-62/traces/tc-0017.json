@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather in Madrid using metric units.",
+  "response": "The current weather in Madrid is 12.4°C with rain. If you need more details or information about another location, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0017",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301815236496961,
+      "latencyMs": 897.637943,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "0d681c21f7493c40",
+      "startTimeUnixNano": 1784301814338859018,
+      "tokenUsage": {
+        "input": 1260,
+        "output": 85,
+        "total": 1345
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301814805284552,
+      "latencyMs": 465.873845,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "0d681c21f7493c40",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "58cb8bcd0381461c",
+      "startTimeUnixNano": 1784301814339410707,
+      "tokenUsage": {
+        "input": 574,
+        "output": 52,
+        "total": 626
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Madrid",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301814808076176,
+      "latencyMs": 2.220203,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "0d681c21f7493c40",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Madrid",
+          "conditions": "rain",
+          "ok": true,
+          "temp": 12.4,
+          "units": "metric"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user has requested the current weather in Madrid using metric units. I will use the provided tool to get this information. </thinking>\n",
+      "sequence": 2,
+      "spanId": "2136ef498c551c5d",
+      "startTimeUnixNano": 1784301814805855973,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301815235663127,
+      "latencyMs": 425.745877,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "0d681c21f7493c40",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "c895e8c81eccc4a0",
+      "startTimeUnixNano": 1784301814809917250,
+      "tokenUsage": {
+        "input": 686,
+        "output": 33,
+        "total": 719
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "28bdd28bb71e3bd5de1258df45ea1f12"
+}

@@ -1,0 +1,117 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Give me the current weather in Denver using imperial units.",
+  "response": "The current weather in Denver is clear with a temperature of 89.1°F.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0014",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301811753115871,
+      "latencyMs": 838.060782,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "bff6167633797fb6",
+      "startTimeUnixNano": 1784301810915055089,
+      "tokenUsage": {
+        "input": 1261,
+        "output": 73,
+        "total": 1334
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301811370355265,
+      "latencyMs": 454.784873,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "bff6167633797fb6",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "0552a46077cde6be",
+      "startTimeUnixNano": 1784301810915570392,
+      "tokenUsage": {
+        "input": 574,
+        "output": 53,
+        "total": 627
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Denver",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301811372992808,
+      "latencyMs": 2.096136,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "bff6167633797fb6",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Denver",
+          "conditions": "clear",
+          "ok": true,
+          "temp": 89.1,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The user has requested the current weather in Denver using imperial units. I will use the provided weather tool to get this information. </thinking>\n",
+      "sequence": 2,
+      "spanId": "ca60fcde5615b971",
+      "startTimeUnixNano": 1784301811370896672,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301811752380433,
+      "latencyMs": 377.73695,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "bff6167633797fb6",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "f125d29509e219f6",
+      "startTimeUnixNano": 1784301811374643483,
+      "tokenUsage": {
+        "input": 687,
+        "output": 20,
+        "total": 707
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "143f3bd7b9018bb5754289c875b50454"
+}

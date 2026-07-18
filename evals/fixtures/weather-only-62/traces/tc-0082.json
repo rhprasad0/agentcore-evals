@@ -1,0 +1,171 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is the current weather in Brussels?",
+  "response": "<thinking> The tool has returned the same upstream error again, indicating that the weather tool is currently unable to provide the current weather for Brussels. Since the error is retryable but persists, I can't provide the current weather information directly. I'll inform the User about the issue and suggest they try again later. </thinking>\n\nI'm currently unable to provide the current weather for Brussels due to an upstream error. This issue might be temporary, so you could try again later. If you need assistance with something else, feel free to ask.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0082",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301860263588852,
+      "latencyMs": 1926.302002,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "a240e6834a2adf74",
+      "startTimeUnixNano": 1784301858337286850,
+      "tokenUsage": {
+        "input": 2134,
+        "output": 262,
+        "total": 2396
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301858900499210,
+      "latencyMs": 562.732979,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "a240e6834a2adf74",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "9f83cf4a136f7633",
+      "startTimeUnixNano": 1784301858337766231,
+      "tokenUsage": {
+        "input": 571,
+        "output": 77,
+        "total": 648
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Brussels",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301858902954224,
+      "latencyMs": 1.927422,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "a240e6834a2adf74",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "upstream_5xx",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "upstream_5xx",
+            "message": "The upstream capability failed to return a usable result.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The User has asked for the current weather in Brussels. To provide this information, I will use the weather tool with the city set to \"Brussels\". The default units are \"metric\", which is appropriate for current weather reports. </thinking>\n",
+      "sequence": 2,
+      "spanId": "fdbeca2d8e4715df",
+      "startTimeUnixNano": 1784301858901026802,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301859515842846,
+      "latencyMs": 611.269413,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "a240e6834a2adf74",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "c464475b1c054412",
+      "startTimeUnixNano": 1784301858904573433,
+      "tokenUsage": {
+        "input": 713,
+        "output": 72,
+        "total": 785
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Brussels",
+        "units": "metric"
+      },
+      "endTimeUnixNano": 1784301859516735815,
+      "latencyMs": 0.690633,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "a240e6834a2adf74",
+      "result": {
+        "diagnostic": null,
+        "failureKind": "upstream_5xx",
+        "ok": false,
+        "output": {
+          "error": {
+            "kind": "upstream_5xx",
+            "message": "The upstream capability failed to return a usable result.",
+            "retryable": true
+          },
+          "ok": false
+        },
+        "retryable": true
+      },
+      "selectionReasoning": "<thinking> The tool returned an error indicating an upstream failure. This means the weather tool was unable to provide the current weather for Brussels. Since the error is retryable, I will attempt to get the weather information again. </thinking> ",
+      "sequence": 4,
+      "spanId": "b0f2f6f8e98d4f0b",
+      "startTimeUnixNano": 1784301859516045182,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301860263326716,
+      "latencyMs": 745.949905,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "a240e6834a2adf74",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 5,
+      "spanId": "b6d23488812ab06b",
+      "startTimeUnixNano": 1784301859517376811,
+      "tokenUsage": {
+        "input": 850,
+        "output": 113,
+        "total": 963
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "79d304da96bf46d70f20428cdc206ba5"
+}

@@ -1,0 +1,483 @@
+{
+  "counts": {
+    "canonicalTrace": 60,
+    "expected": 62,
+    "instrumentError": 2
+  },
+  "expectedCaseIds": [
+    "tc-0001",
+    "tc-0002",
+    "tc-0003",
+    "tc-0004",
+    "tc-0005",
+    "tc-0007",
+    "tc-0008",
+    "tc-0009",
+    "tc-0010",
+    "tc-0011",
+    "tc-0012",
+    "tc-0013",
+    "tc-0014",
+    "tc-0015",
+    "tc-0016",
+    "tc-0017",
+    "tc-0018",
+    "tc-0019",
+    "tc-0020",
+    "tc-0046",
+    "tc-0047",
+    "tc-0048",
+    "tc-0049",
+    "tc-0050",
+    "tc-0051",
+    "tc-0052",
+    "tc-0053",
+    "tc-0054",
+    "tc-0055",
+    "tc-0056",
+    "tc-0057",
+    "tc-0058",
+    "tc-0059",
+    "tc-0060",
+    "tc-0061",
+    "tc-0062",
+    "tc-0063",
+    "tc-0064",
+    "tc-0065",
+    "tc-0066",
+    "tc-0067",
+    "tc-0070",
+    "tc-0071",
+    "tc-0072",
+    "tc-0073",
+    "tc-0075",
+    "tc-0076",
+    "tc-0077",
+    "tc-0078",
+    "tc-0079",
+    "tc-0080",
+    "tc-0081",
+    "tc-0082",
+    "tc-0085",
+    "tc-0086",
+    "tc-0087",
+    "tc-0090",
+    "tc-0091",
+    "tc-0093",
+    "tc-0096",
+    "tc-0098",
+    "tc-0100"
+  ],
+  "experimentId": "sha256:44a9f913a720759748d57647f002b0e924d39b38b65a2fdfbe713774bfc2cca5",
+  "fixtureSetId": "evals.weather_only_regression",
+  "fixtures": [
+    {
+      "exampleId": "tc-0001",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0001.json",
+      "sha256": "b431499b9629b2f5d71c634ea01688a90a8bae1ecee0d51b4311c4f305a9c175",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0002",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0002.json",
+      "sha256": "0233118d29db7861fff592e4f87067f6108a55cc36e67a70ccc66d526f49731f",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0003",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0003.json",
+      "sha256": "a03e4e75aeffd43745acea760d3aad9d79c2f95afa758c83f3435301f8f33252",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0004",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0004.json",
+      "sha256": "bd4ddefba4ba613ec471e83d08e1fcff9a31bd1e03ebc8a1fffdda503a7f5971",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0005",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0005.json",
+      "sha256": "21ebd654962eb810f1e5a30d84c8ac136b2c8c6fef53366875a470b47922484a",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0007",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0007.json",
+      "sha256": "e9434dd76516490aa7cd88307c995ab05126587ceab5595b8b17d62e84cf78c3",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0008",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0008.json",
+      "sha256": "0eefb78ef1ff4d851e16eab15d633a12d81911b53254c9007e273310f7027062",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0009",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0009.json",
+      "sha256": "9302fec9df25b105e1460231c41b8a501dedf122f786b52ab477badf8dec01c5",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0010",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0010.json",
+      "sha256": "43eff4434468e6b20e4368049cb7215f5002f404b72cf3840cc3a6eda36b3346",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0011",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0011.json",
+      "sha256": "1a902bc48b825de49abe79a6555dd2916d1e4f95d055f556fe40383d1e18bd36",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0012",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0012.json",
+      "sha256": "9d73ed7b7d3e0f29db2fabf0a9407ccabd91997d9c308b3ef8e1952deebd03a5",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0013",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0013.json",
+      "sha256": "41e9ac3afcb70614744c20614bc7678cf2b10fab5f99f72659b2764285ad6a0d",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0014",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0014.json",
+      "sha256": "579b7cef8a6478313e926a54186c1089f8ae1d58628427e1383d59feb7dee6ac",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0015",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0015.json",
+      "sha256": "3e7f1d116b3e665227792d80021baa8d2cffedcdd58bb907b19d29fb6a3ffdcc",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0016",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0016.json",
+      "sha256": "f9ea991149d2b06af9d4d6dca5b9563fb1990ae3b1273841fb707139487593fd",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0017",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0017.json",
+      "sha256": "a5e74c2f562bdbae3c673189b7037873ecb5dcd33e590eb7b1c4bc32102710a8",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0018",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0018.json",
+      "sha256": "571bafd48544d407c5f1345be534af71f1165f7229ce237fb120f1612a6f4eac",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0019",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0019.json",
+      "sha256": "ab94eaea9dd723e9b9adef10dd4da764587bc43c401ff798ec9421369f1c2fb6",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0020",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0020.json",
+      "sha256": "b904d5c9fd1aa4e145d6df093c47e0516c9b4f82feebe56197f2cb04b047576f",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0046",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0046.json",
+      "sha256": "49379e7fe85fa4450444cbf0ba58de26bacb9a684fa647c17abd9fdf781d1262",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0047",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0047.json",
+      "sha256": "e2a7f0e63fff9eda522dbe78af09b1f80c6e79d19f3080fdd5adec38de1bacc2",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0048",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0048.json",
+      "sha256": "32c1bd78ffc81d0c1221c52e25bdd0e8e9c839178605af002c4e29afe4bad303",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0049",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0049.json",
+      "sha256": "9733b156de31d3e24f03ace6f0d343587da32221363e01efd34290f6c2e84960",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0050",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0050.json",
+      "sha256": "e472eb64aa33eb536588458c5d13a6ce68410fa2f702900704a1ea8867c124c8",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0051",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0051.json",
+      "sha256": "4b46561a5916f40cb8e1819d7cf4c8e9ad022f9989676340f664d88f8744fb13",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0052",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0052.json",
+      "sha256": "ae360ac369335c2452203d8e7dc9fdabb3ecf1786b73eee75850bc2a87d9c50f",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0053",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0053.json",
+      "sha256": "385b6e29d24333b94fe006ed6ccffca714ddd6f35d8157a5fbcf75db00281f75",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0054",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0054.json",
+      "sha256": "db1f743cf49e7c709138c8c6e7758c963c1e034289a726dc93b08a4a54cc7dff",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0055",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0055.json",
+      "sha256": "a6c9c8a205a7ba05e719b8ba7df45f2a18b1ef4184191505b3d5bfb67bfc4e0d",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0056",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0056.json",
+      "sha256": "2e1b7a51306d3de0ac9ee6386f1211f1f4ebce3dec13b09ac296a48873f3ee32",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0057",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0057.json",
+      "sha256": "31cf6e21aaa92cfb4b2f85a8645ca78c2e5d00464ea0ce9293b0daf7cf4693d3",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0058",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0058.json",
+      "sha256": "a82bda106536a27cf85192e3896e5687c702fa21c938ce5dca9a3f928f101183",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0059",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0059.json",
+      "sha256": "372d9c5c738cb2192ff39638892aaeddc35b4bac93d2c9664a8772651ebde3a0",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0060",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0060.json",
+      "sha256": "eb0e279090444b0b659eab4e6f50fb1272072b7a1c9a058efb7706778293f6ac",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0061",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0061.json",
+      "sha256": "07f80099431983d66ee9be665879e4c82687805b2a355f9c006040ba102c48c2",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0062",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0062.json",
+      "sha256": "fe6b1ebba3403d946c53f61a4379c49ea9c5c0daa1d62adf6d4035a321697741",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0063",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0063.json",
+      "sha256": "a0d9670439fa6c2b1c0513496b1723c5fc36714ad8d80d96f1418974235633c0",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0064",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0064.json",
+      "sha256": "6102f2edabf446e65ed33ca6434199e0151ae8a4dd296f8602a7116268be9113",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0065",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0065.json",
+      "sha256": "3c8b474d1528e3f78c1ebd020eb6b1945bd117e92d424a5278b825d96dd268b5",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0066",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0066.json",
+      "sha256": "6d53029e05d3676960b95c7d25b246516d876c6b866dd0b3e141bca44cb5b6ea",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0067",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0067.json",
+      "sha256": "ad03c42eea3da9623da818ad8054137eabafc67a35df9bba573ad6bdd307a180",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0070",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0070.json",
+      "sha256": "51aec76f67a7d4c32f7cd5e4940b8bc62ea8c6e454ee559e7181fafaa907ac23",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0071",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0071.json",
+      "sha256": "b933f16bae2a4bdf05e320dc7c529394a78cc9eea6092418671cf4c8cb8c48b8",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0072",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0072.json",
+      "sha256": "532f630cee1eb96bea3335f14a43a06a82952e550bb10efc88bd25fbb1af6d87",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0073",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0073.json",
+      "sha256": "2d24772655ef5c9dd252d3c6f43bbadcec5bfd7474871d9362869ef11d51ea72",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0075",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0075.json",
+      "sha256": "dab5cc5cfe0e1f24d55b087f65b95e6f57c30b7b2e7b9c8fffd906625fb09caa",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0076",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0076.json",
+      "sha256": "05b73c77ccb1cc01451586438ae3651ea59b8a05d1b97b9e548b8cf1a5a1e21d",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0077",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0077.json",
+      "sha256": "b6cdf2566185d41ace2519fac783be2b6548f54c31606c8e9badab9e8f104327",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0078",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0078.json",
+      "sha256": "b621898583b8614bb441678871053a5bc65157b80885439e535b159788838a00",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0079",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0079.json",
+      "sha256": "cd0930b7fed9fafbafe5c2ae89b40c0518867a283254548c3d02aa8f2afc9a1c",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0080",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0080.json",
+      "sha256": "31c0f6aa33a63ec140af72d47546800e95c7ccd890e77ace2c7dcb3309d915d5",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0081",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0081.json",
+      "sha256": "b95e7aa61c31b604c3ba8ec2f79b412352a9597d5ae81da316320bb62a511d21",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0082",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0082.json",
+      "sha256": "2123175899a62254a3d025db8cd1ab599ee5523d70856974e3f8b643994d6723",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0085",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0085.json",
+      "sha256": "99790ac75a675a1644e62ea10a02645a29820521abc36d232faf0443811bb0aa",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0086",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0086.json",
+      "sha256": "0a620aa0e2b649fbb1fe18bdadaf654a419b4b9293efba76cf8419ff1570426a",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0087",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0087.json",
+      "sha256": "c6686ecea550f988b8eb789e0bc6dbb4df36ff508429ba248d002ec9f2aca5d1",
+      "status": "canonical-trace"
+    },
+    {
+      "errorKind": "TelemetryNormalizationError",
+      "exampleId": "tc-0090",
+      "path": "evals/fixtures/weather-only-62/errors/tc-0090.json",
+      "sha256": "ed0ac40714888720d4f0ffcf4cdfb513f6da35a072ebff0f976caf8b90c4cc48",
+      "status": "instrument-error"
+    },
+    {
+      "exampleId": "tc-0091",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0091.json",
+      "sha256": "ce8f6bb36ed04e413570887dcc93249f79e8e43df71e496656219891e2a6a113",
+      "status": "canonical-trace"
+    },
+    {
+      "errorKind": "TelemetryNormalizationError",
+      "exampleId": "tc-0093",
+      "path": "evals/fixtures/weather-only-62/errors/tc-0093.json",
+      "sha256": "ed0ac40714888720d4f0ffcf4cdfb513f6da35a072ebff0f976caf8b90c4cc48",
+      "status": "instrument-error"
+    },
+    {
+      "exampleId": "tc-0096",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0096.json",
+      "sha256": "2a057102ec89a87e6d9ef0b78ac15d230f9f7c1006d45495aa8567c5ca99df39",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0098",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0098.json",
+      "sha256": "c9d92d03801a5c96aa7685f4c00ebfac27a877d9964094fb4e8077c979bdf832",
+      "status": "canonical-trace"
+    },
+    {
+      "exampleId": "tc-0100",
+      "path": "evals/fixtures/weather-only-62/traces/tc-0100.json",
+      "sha256": "daf7cd1bb1b0fd2a492a7b5ae9f92e80c79bba666b2c6272812fc39f485b281a",
+      "status": "canonical-trace"
+    }
+  ],
+  "projection": {
+    "artifactSha256": "e35782f8f81d06e191b9d29e3e489cf977ca3df810190295d09c22fdc37a22f4",
+    "projectionId": "datasets.weather_only",
+    "version": "1.0.0"
+  },
+  "publicSafety": {
+    "automatedChecks": [
+      "schema",
+      "semantics",
+      "provenance",
+      "secrets",
+      "privatePaths",
+      "awsIdentifiers",
+      "contactIdentifiers"
+    ],
+    "policyId": "safety.exact_synthetic_fixture",
+    "publicationMode": "exact-source-artifacts",
+    "version": "1.0.0"
+  },
+  "schemaVersion": "1.0.0",
+  "sourceRun": {
+    "executedAt": "2026-07-17T15:23:15.405038Z",
+    "runId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c"
+  },
+  "traceContract": {
+    "canonicalizerVersion": "1.0.0",
+    "schemaId": "urn:agentcore-evals:schema:execution-trace:1.0.0",
+    "schemaVersion": "1.0.0",
+    "sourceProfile": {
+      "profileId": "strands-inline",
+      "version": "1.0.0"
+    }
+  },
+  "version": "1.0.0"
+}

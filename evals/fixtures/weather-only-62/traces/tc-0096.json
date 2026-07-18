@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Is it a good day for a walk?",
+  "response": "<thinking> The User is asking about the current weather in a city to determine if it's a good day for a walk. To answer this, I need to use the weather tool to get the current weather for a specific city. However, the city name is not provided in the request. I will ask the User for the city name to proceed.</thinking>\nCould you please provide the name of the city for which you want to know the current weather?\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0096",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301869995598228,
+      "latencyMs": 1434.934832,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "152114513ba7cc5c",
+      "startTimeUnixNano": 1784301868560663396,
+      "tokenUsage": {
+        "input": 572,
+        "output": 94,
+        "total": 666
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301869994926206,
+      "latencyMs": 1433.719461,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "152114513ba7cc5c",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "caa67c69d5bede47",
+      "startTimeUnixNano": 1784301868561206745,
+      "tokenUsage": {
+        "input": 572,
+        "output": 94,
+        "total": 666
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "86712349692f337bfcfbce2ffc657cbf"
+}

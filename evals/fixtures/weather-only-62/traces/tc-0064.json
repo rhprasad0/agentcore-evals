@@ -1,0 +1,65 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "What is the formula for converting Celsius to Fahrenheit?",
+  "response": "Sorry, but I cannot provide the formula for converting Celsius to Fahrenheit as it is not related to current weather information. If you need current weather information for a specific city, I can assist with that. Please provide the name of the city for which you want the current weather details.\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0064",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301845001584638,
+      "latencyMs": 654.329951,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "9dff67e30bbf4102",
+      "startTimeUnixNano": 1784301844347254687,
+      "tokenUsage": {
+        "input": 573,
+        "output": 57,
+        "total": 630
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301845000914533,
+      "latencyMs": 653.026714,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "9dff67e30bbf4102",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "4daffd33f76eead4",
+      "startTimeUnixNano": 1784301844347887819,
+      "tokenUsage": {
+        "input": 573,
+        "output": 57,
+        "total": 630
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "0430fd18c27aa91d770975d99cb37359"
+}

@@ -1,0 +1,150 @@
+{
+  "agentManifest": {
+    "manifestId": "agents.weather",
+    "version": "4.0.0"
+  },
+  "canonicalizerVersion": "1.0.0",
+  "prompt": "Compare the current temperatures in Dallas, and Houston using imperial units.",
+  "response": "Here are the current temperatures in the cities you requested:\n\n- **Dallas**: The current temperature is 45.0°F and it is raining.\n- **Houston**: The current temperature is 32.4°F and the weather is cloudy.\n\nIf you need any more information or have another request, feel free to ask!\n",
+  "schemaVersion": "1.0.0",
+  "sessionId": "5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c:tc-0051",
+  "sourceProfile": {
+    "collector": null,
+    "instrumentationScope": {
+      "name": "strands.telemetry.tracer",
+      "schemaUrl": "",
+      "version": ""
+    },
+    "name": "strands-inline",
+    "producer": {
+      "name": "strands-agents",
+      "version": "1.46.0"
+    }
+  },
+  "spans": [
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301827826178112,
+      "latencyMs": 1191.74412,
+      "observedToolName": null,
+      "operationName": "invoke_agent",
+      "parentSpanId": null,
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 0,
+      "spanId": "322b383c5b1a6f9f",
+      "startTimeUnixNano": 1784301826634433992,
+      "tokenUsage": {
+        "input": 1342,
+        "output": 150,
+        "total": 1492
+      },
+      "tool": null
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301827195828455,
+      "latencyMs": 560.85614,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "322b383c5b1a6f9f",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 1,
+      "spanId": "81380cabb277fd1f",
+      "startTimeUnixNano": 1784301826634972315,
+      "tokenUsage": {
+        "input": 576,
+        "output": 81,
+        "total": 657
+      },
+      "tool": null
+    },
+    {
+      "arguments": {
+        "city": "Dallas",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301827201230198,
+      "latencyMs": 4.822341,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "322b383c5b1a6f9f",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Dallas",
+          "conditions": "rain",
+          "ok": true,
+          "temp": 45.0,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": "<thinking> The User wants to compare the current temperatures in Dallas and Houston using imperial units. To do this, I will use the weather tool to get the current weather information for both cities in imperial units. </thinking>\n",
+      "sequence": 2,
+      "spanId": "494746d647edd578",
+      "startTimeUnixNano": 1784301827196407857,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": {
+        "city": "Houston",
+        "units": "imperial"
+      },
+      "endTimeUnixNano": 1784301827201503960,
+      "latencyMs": 4.194028,
+      "observedToolName": "get_current_weather",
+      "operationName": "execute_tool",
+      "parentSpanId": "322b383c5b1a6f9f",
+      "result": {
+        "diagnostic": null,
+        "failureKind": null,
+        "ok": true,
+        "output": {
+          "city": "Houston",
+          "conditions": "cloudy",
+          "ok": true,
+          "temp": 32.4,
+          "units": "imperial"
+        },
+        "retryable": null
+      },
+      "selectionReasoning": null,
+      "sequence": 3,
+      "spanId": "4cee7cde6fc211d4",
+      "startTimeUnixNano": 1784301827197309932,
+      "tokenUsage": null,
+      "tool": {
+        "contractVersion": "2.0.0",
+        "toolId": "weather.get_current_weather"
+      }
+    },
+    {
+      "arguments": null,
+      "endTimeUnixNano": 1784301827825429966,
+      "latencyMs": 621.881433,
+      "observedToolName": null,
+      "operationName": "chat",
+      "parentSpanId": "322b383c5b1a6f9f",
+      "result": null,
+      "selectionReasoning": null,
+      "sequence": 4,
+      "spanId": "d168de24124035db",
+      "startTimeUnixNano": 1784301827203548533,
+      "tokenUsage": {
+        "input": 766,
+        "output": 69,
+        "total": 835
+      },
+      "tool": null
+    }
+  ],
+  "traceId": "bff40893ec867c4c11cca60b7c608f96"
+}
