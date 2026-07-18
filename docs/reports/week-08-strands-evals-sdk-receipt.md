@@ -57,6 +57,16 @@ It was serialized through `Experiment.to_file`, restored through `Experiment.fro
 
 The executable regression test is `tests/test_week_08_strands_evals_sdk_contract.py`.
 
+## Concrete Stage B evaluator round trip
+
+The SDK contract now has a second executable receipt: `test_stage_b_round_trip_preserves_concrete_gate_bindings` builds the provenance-validated `weather-only-62` fixture lane, serializes its 60 eligible `Case` objects and the four real custom evaluators, then restores it using the explicit evaluator registry.
+
+- Case count: `60` canonical-trace cases; the two instrument-error receipts are excluded before `Experiment` construction.
+- Evaluators: `ExpectedToolsGate`, `ArgConstraintGate`, `FailureBehaviorGate`, and `NoToolGate`.
+- Case names and concrete evaluator type names: preserved across `Experiment.to_file` / `Experiment.from_file(..., custom_evaluators=...)`.
+
+This verifies serialization/binding only. Fixture integrity is still established by `evals.fixtures.manifest.validate_fixture_manifest(...)`, and the fixture-only runtime path is exercised separately by `tests/test_week_08_harness.py`.
+
 ## CLI contract
 
 `strands-evals --help` exposes `validate`, `report`, `diagnose`, `run`, `generate`, and `fetch`.
@@ -81,8 +91,8 @@ Observed result: `valid: true`, one case, one `Contains` evaluator, exit code `0
 
 ## Architecture consequence
 
-The SDK cache protocol is intentionally narrow: case name in, cached `EvaluationData` or null out. It has no repository experiment/projection provenance check, and its normal cache-miss behavior invokes the supplied task. Week 8 therefore keeps the SDK store behind a run-scoped repository preflight and gives PR Stage B a fixture-only entry point that fails before invoking `strands-evals run` on missing or invalid evidence. The checked-in Experiment is deferred until the four real gates exist; `evals.adapters.cases.build_projection_experiment` requires at least one evaluator.
+The SDK cache protocol is intentionally narrow: case name in, cached `EvaluationData` or null out. It has no repository experiment/projection provenance check, and its normal cache-miss behavior invokes the supplied task. Week 8 therefore keeps the SDK store behind a run-scoped repository preflight and gives PR Stage B a fixture-only `run_stage_b(...)` entry point that fails before constructing an `Experiment` on missing or invalid evidence. It does not use `strands-evals run`, a task-result store, or a cache-miss fallback. `evals.adapters.cases.build_projection_experiment` continues to require at least one evaluator.
 
 ## Claim boundary
 
-This receipt verifies the locked package/API/CLI shape and one synthetic metadata round trip. It does not prove the repository dataset, canonical traces, or public reports are valid; repository validators, fixture provenance checks, deterministic gates, report schemas, and offline-path tests own those claims. It also does not demonstrate managed AgentCore compatibility, current-model behavior, response quality, or production security.
+This receipt verifies the locked package/API/CLI shape, one synthetic metadata round trip, and one concrete 60-case/four-gate serialization round trip. It does not prove the repository dataset, canonical traces, or public reports are valid; repository validators, fixture provenance checks, deterministic gates, report schemas, and offline-path tests own those claims. It also does not demonstrate managed AgentCore compatibility, current-model behavior, response quality, or production security.

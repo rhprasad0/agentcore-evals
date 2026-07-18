@@ -92,7 +92,7 @@ Preflight decides whether evidence is judgeable before any gate produces an agen
 | Unexpected mock lookup miss or contract-invalid tool result | instrument error | Emit no agent verdicts. |
 | Evaluator raises or emits malformed/missing output | gate error | Exclude that gate verdict and fail the harness run. |
 | Trace-valid call has a wrong or missing argument | agent fail | `ArgConstraintGate` applies. |
-| Expected injected failure returns a contract-valid failure envelope | valid evidence | `FailureBehaviorGate` judges the response. |
+| Expected injected failure returns a contract-valid failure envelope | valid evidence | `FailureBehaviorGate` checks the normalized failure envelope only. |
 | Agent/model timeout leaves no valid canonical trace | instrument error | Emit no agent verdicts. |
 | Scripted contract-valid timeout result is observed | valid evidence | `FailureBehaviorGate` applies. |
 
@@ -108,6 +108,21 @@ Gate applicability is explicit; orthogonal verdicts remain separate metrics rath
 | Expected tool observed with valid args | pass | pass | independently applicable | N/A |
 
 Tests cover every matrix row. Mutation cases must prove that normalization cannot erase a forbidden call, attach a result to the wrong call, or turn an invalid trace into a behavioral fail.
+
+### Implemented deterministic gates and fixture replay (2026-07-18)
+
+`evals/evaluators/gates.py` now provides four custom Strands evaluators over the normalized trace contract:
+
+- `ExpectedToolsGate` checks required/forbidden tool identity and inclusive global call bounds;
+- `ArgConstraintGate` implements only the frozen root-property `equals`, `inSet`, `coversExactlyOnce`, `absent`, and `notContains` vocabulary;
+- `FailureBehaviorGate` checks the configured `toolId`, optional one-based occurrence, `failureKind`, and `retryable` envelope; it does **not** inspect response prose; and
+- `NoToolGate` applies only to no-tool cases and rejects any `execute_tool` span.
+
+`evals.harness.load_stage_b_evidence()` calls the existing manifest/provenance validator before constructing an SDK Experiment, joins the frozen 62-case projection by ID, and carries only the 60 canonical traces into replay. The two explicit error receipts remain `InstrumentErrorReceipt` values and never become agent-scored cases. `run_stage_b()` replays the in-memory validated traces through the real `Experiment.run_evaluations(...)` path; it accepts no agent factory, model, registry, cache miss, or live task fallback.
+
+Executable coverage lives in `tests/test_week_08_gates.py`, `tests/test_week_08_harness.py`, and `tests/test_week_08_strands_evals_sdk_contract.py`: synthetic pass/fail matrix cases, all 60 trace-shape smoke checks, hash/case-ID/prompt-drift preflight rejection, concrete four-gate Experiment round-trip, denied socket/HTTP/specimen/AWS paths, and repeatability over a public-safe mechanics projection. These tests show the defined Stage B path made no observed live dependency calls; they are not a process security sandbox.
+
+This is not Week 8 closeout: report schema/rendering, CI publication, Stage A baseline collection, and the sensitivity study remain pending. No baseline score is published by this implementation.
 
 ### The cloud-free boundary is Stage B
 

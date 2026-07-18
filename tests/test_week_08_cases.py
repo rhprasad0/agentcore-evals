@@ -176,6 +176,5 @@ class Week08CaseAdapterTests(unittest.TestCase):
             [(case.name, case.input, case.metadata) for case in restored.cases],
         )
 
-
 if __name__ == "__main__":
     unittest.main()

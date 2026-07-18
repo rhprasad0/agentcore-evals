@@ -14,6 +14,14 @@ from strands_evals import Case, Experiment, LocalFileTaskResultStore
 from strands_evals.evaluators import Contains, Evaluator
 from strands_evals.types.evaluation import EvaluationData, EvaluationOutput
 
+from evals.evaluators.gates import (
+    ArgConstraintGate,
+    ExpectedToolsGate,
+    FailureBehaviorGate,
+    NoToolGate,
+)
+from evals.harness import build_stage_b_experiment, load_stage_b_evidence
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PYPROJECT = REPO_ROOT / "pyproject.toml"
@@ -124,6 +132,37 @@ class Week08StrandsEvalsSdkContractTests(unittest.TestCase):
         self.assertEqual("tc-0001", restored.cases[0].name)
         self.assertEqual(expected_metadata, restored.cases[0].metadata)
 
+    def test_stage_b_round_trip_preserves_concrete_gate_bindings(self) -> None:
+        experiment = build_stage_b_experiment(load_stage_b_evidence(REPO_ROOT))
+
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "weather-only-stage-b.json"
+            experiment.to_file(str(path))
+            restored = Experiment.from_file(
+                str(path),
+                custom_evaluators=[
+                    ExpectedToolsGate,
+                    ArgConstraintGate,
+                    FailureBehaviorGate,
+                    NoToolGate,
+                ],
+            )
+
+        self.assertEqual(60, len(restored.cases))
+        self.assertEqual(
+            [case.name for case in experiment.cases],
+            [case.name for case in restored.cases],
+        )
+        self.assertEqual(
+            {
+                "ExpectedToolsGate",
+                "ArgConstraintGate",
+                "FailureBehaviorGate",
+                "NoToolGate",
+            },
+            {type(evaluator).__name__ for evaluator in restored.evaluators},
+        )
+
     def test_sdk_receipt_records_the_locked_contract_and_claim_boundary(self) -> None:
         text = SDK_RECEIPT.read_text(encoding="utf-8")
 
@@ -131,6 +170,8 @@ class Week08StrandsEvalsSdkContractTests(unittest.TestCase):
             "`strands-agents-evals==1.0.1`",
             "`strands-agents==1.48.0`",
             "Nested `Case.metadata`: preserved exactly",
+            "## Concrete Stage B evaluator round trip",
+            "`ExpectedToolsGate`, `ArgConstraintGate`, `FailureBehaviorGate`, and `NoToolGate`",
             "`LocalFileTaskResultStore.load(case_name) -> EvaluationData | None`",
             "`--data-store`",
             "`--fail-on`",
