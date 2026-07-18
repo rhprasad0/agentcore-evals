@@ -69,6 +69,7 @@ Observed Week 8-relevant behavior:
 - `--custom-evaluator MODULE:CLASS` registers custom evaluator classes before deserializing an Experiment.
 - `--fail-on` accepts `any`, `none`, or `threshold:0.X`; `--exit-zero` overrides it.
 - `report` reads an `EvaluationReport` JSON document and renders or rewrites it; it does not validate the repository's metric or public-safety contract.
+- `Experiment(cases=..., evaluators=[])` installs one base `Evaluator` because the constructor treats an empty list like an omitted value. The repository adapter rejects an empty evaluator set instead of serializing a misleading placeholder Experiment.
 
 A synthetic serialized Experiment passed:
 
@@ -80,7 +81,7 @@ Observed result: `valid: true`, one case, one `Contains` evaluator, exit code `0
 
 ## Architecture consequence
 
-The SDK cache protocol is intentionally narrow: case name in, cached `EvaluationData` or null out. It has no repository experiment/projection provenance check, and its normal cache-miss behavior invokes the supplied task. Week 8 therefore keeps the SDK store behind a run-scoped repository preflight and gives PR Stage B a fixture-only entry point that fails before invoking `strands-evals run` on missing or invalid evidence.
+The SDK cache protocol is intentionally narrow: case name in, cached `EvaluationData` or null out. It has no repository experiment/projection provenance check, and its normal cache-miss behavior invokes the supplied task. Week 8 therefore keeps the SDK store behind a run-scoped repository preflight and gives PR Stage B a fixture-only entry point that fails before invoking `strands-evals run` on missing or invalid evidence. The checked-in Experiment is deferred until the four real gates exist; `evals.adapters.cases.build_projection_experiment` requires at least one evaluator.
 
 ## Claim boundary
 
