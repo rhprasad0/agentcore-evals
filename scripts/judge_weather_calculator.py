@@ -32,7 +32,9 @@ Selection passes only when required calls occur in order, prohibited calls do no
 and a failure stops later forbidden tools. Parameters pass only when observed arguments
 meet the supplied constraints. Use not_applicable only when selection fails before a
 parameter judgment can be meaningful. Do not infer missing evidence. Return concise,
-inspectable evidence codes and a rationale under 240 characters."""
+inspectable evidence codes and a rationale under 240 characters. evidence_codes must
+contain only: wrong_selection, wrong_parameter, wrong_order, missing_call, extra_call,
+stop_after_failure, lineage, no_tool. Return [] when both verdicts pass."""
 ALLOWED_CODES = {
     "wrong_selection",
     "wrong_parameter",

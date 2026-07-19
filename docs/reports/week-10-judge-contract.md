@@ -1,6 +1,6 @@
 # Week 10 — Judge Contract and Pre-deployment Evaluation Receipt
 
-**Status:** provider-free contract complete; live calibration and held-out Strands execution blocked before inference.
+**Status:** provider-free contract and calibration freeze complete; held-out Strands execution not run.
 
 ## Contract
 
@@ -8,7 +8,7 @@
 - **Excluded boundary rows:** `slice-07`, `slice-08`
 - **Judge model:** `global.anthropic.claude-haiku-4-5-20251001-v1:0`
 - **Rubric version:** `v1`
-- **Judge script SHA-256:** `439a3126901f2149cb3a6796fb2cc7d16e63b1728df37a11ccb5cde10629d3e5`
+- **Judge script SHA-256:** `1f57057e095961742bbfdc4e8c9a5c62f14819b90f7b3ee9e315ff7f74e86149`
 - **Calibration-pack SHA-256:** `3d55f86fc7bfd4bdbe751834c00fbbcc2967f180e1f7cdfe11131c78f03e7b24`
 
 The custom judge sees only a case ID, expectation, user request, ordered normalized calls, arguments, and normalized result/failure envelope. Its verdict is bounded to `case_id`, selection verdict, parameter verdict, compact evidence codes, and a 240-character rationale.
@@ -31,9 +31,11 @@ Receipt:
 
 The calibration pack contains six disjoint synthetic evidence vectors: three reviewed pass labels and three reviewed fail labels. The intended held-out experiment is one local two-tool Strands run over exactly `slice-01` through `slice-06`, using the frozen custom evaluator plus `ToolSelectionAccuracyEvaluator` and `ToolParameterAccuracyEvaluator`.
 
-The explicitly authorized live calibration command was attempted on 2026-07-19. It was blocked while obtaining AWS credentials: the configured AWS session was expired and the Python credential provider also reported the missing `botocore[crt]` login-provider dependency. The failure occurred while constructing the Bedrock client, before a Bedrock inference request; no calibration verdicts or held-out results exist.
+Candidate `v1` stopped on its first provider response because the prompt requested compact evidence codes without enumerating the parser's finite code set. No calibration label was accepted and no held-out case ran. Candidate `v2` was the single permitted mechanical revision: it names that existing finite code set in the prompt.
 
-**Required operator action:** refresh the local AWS session with `aws login` and make the login credential provider available to the locked environment, then rerun the calibration command once and save its sanitized JSON output as a receipt. The held-out command requires that receipt and rejects any missing, incomplete, mismatched-model, or mismatched-rubric calibration result.
+After refreshing the local AWS session, candidate `v2` ran the six-vector pack once. All six labels matched the human labels; the frozen receipt is [`docs/receipts/week-10-calibration.json`](../receipts/week-10-calibration.json). No held-out case ran.
+
+The held-out command requires this receipt and rejects any missing, incomplete, mismatched-model, or mismatched-rubric calibration result.
 
 ## Claim boundary
 

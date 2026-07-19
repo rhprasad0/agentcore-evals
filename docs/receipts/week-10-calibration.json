@@ -1,0 +1,13 @@
+{
+  "rubricVersion": "v1",
+  "promptSha256": "d0a6a6e08ff5a028297a08bb4fb64ad65d662b1266e8045dadbd2dfa9e52aa9b",
+  "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+  "outcomes": [
+    {"vectorId": "cal-01", "expectedLabel": "pass", "actualLabel": "pass", "match": true, "label": "pass/pass"},
+    {"vectorId": "cal-02", "expectedLabel": "pass", "actualLabel": "pass", "match": true, "label": "pass/pass"},
+    {"vectorId": "cal-03", "expectedLabel": "pass", "actualLabel": "pass", "match": true, "label": "pass/pass"},
+    {"vectorId": "cal-04", "expectedLabel": "fail", "actualLabel": "fail", "match": true, "label": "fail/not_applicable"},
+    {"vectorId": "cal-05", "expectedLabel": "fail", "actualLabel": "fail", "match": true, "label": "pass/fail"},
+    {"vectorId": "cal-06", "expectedLabel": "fail", "actualLabel": "fail", "match": true, "label": "fail/not_applicable"}
+  ]
+}

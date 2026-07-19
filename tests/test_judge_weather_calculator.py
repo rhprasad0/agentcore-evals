@@ -9,6 +9,7 @@ from tempfile import TemporaryDirectory
 
 from scripts.judge_weather_calculator import (
     HELDOUT_EXAMPLE_IDS,
+    JUDGE_RUBRIC,
     JUDGE_MODEL_ID,
     JudgeInputError,
     judge_case,
@@ -23,6 +24,19 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 class JudgeCalibrationTests(unittest.TestCase):
+    def test_judge_rubric_enumerates_the_only_accepted_evidence_codes(self) -> None:
+        for code in (
+            "wrong_selection",
+            "wrong_parameter",
+            "wrong_order",
+            "missing_call",
+            "extra_call",
+            "stop_after_failure",
+            "lineage",
+            "no_tool",
+        ):
+            self.assertIn(code, JUDGE_RUBRIC)
+
     def test_calibration_vectors_are_six_balanced_and_disjoint_from_heldout(self) -> None:
         vectors = load_calibration_vectors(
             REPO_ROOT / "datasets/labels/week-10-judge-calibration.jsonl"
