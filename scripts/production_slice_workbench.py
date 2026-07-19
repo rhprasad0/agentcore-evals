@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-import copy
+import hashlib
 from collections import Counter
-from dataclasses import asdict
+from dataclasses import asdict, replace
+from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -22,6 +23,7 @@ from scripts.tool_calling_workbench import (
 )
 from src.production_slice_dataset import (
     SlicePaths,
+    gold_rows,
     load_slice,
     serialize_rows,
     slice_revision,
@@ -55,12 +57,7 @@ def create_server(paths: SlicePaths, *, port: int = 0) -> ThreadingHTTPServer:
 
         def do_POST(self) -> None:  # noqa: N802
             if self.path == "/api/finalize":
-                send_error(
-                    self,
-                    HTTPStatus.CONFLICT,
-                    "draft_not_finalizable",
-                    "This incomplete draft cannot be finalized; freeze human gold in the later Week 9 step.",
-                )
+                handle_finalize(self, paths)
                 return
             send_error(self, HTTPStatus.NOT_FOUND, "route_not_found", "No such workbench route.")
 
@@ -77,14 +74,15 @@ def dataset_payload(paths: SlicePaths) -> dict[str, Any]:
         raise ValueError("draft validation failed: " + "; ".join(f"{issue.path}: {issue.message}" for issue in issues))
     source_manifest = snapshot.source_manifest
     source_paths = DatasetPaths.from_repo_root(paths.repo_root)
+    finalized = paths.gold_path.exists()
     family_counts = Counter(row["scenarioFamily"] for row in snapshot.rows)
     review_counts = Counter(row["provenance"]["reviewStatus"] for row in snapshot.rows)
     return {
         "manifest": {
             "datasetId": "production-slice-8-draft",
             "version": "0.1.0",
-            "workbenchTitle": "Production-slice draft workbench",
-            "reviewStatus": "draft",
+            "workbenchTitle": "Week 9 human-gold workbench",
+            "reviewStatus": "human-reviewed" if finalized else "draft",
             "agentManifest": source_manifest["agentManifest"],
             "toolContracts": source_manifest["toolContracts"],
             "corpusPath": str(paths.draft_path.relative_to(paths.repo_root)),
@@ -92,10 +90,13 @@ def dataset_payload(paths: SlicePaths) -> dict[str, Any]:
         "rows": snapshot.rows,
         "revision": slice_revision(snapshot),
         "editorMetadata": editor_metadata(source_paths, load_dataset(source_paths)),
-        "capabilities": {"canFinalize": False},
+        "capabilities": {
+            "canEditGoldDraft": True,
+            "canFinalize": not finalized,
+        },
         "notice": (
-            "Draft projection only. tc-0065 and tc-0092 are placeholders for later Policy/Guardrail work; "
-            "they are not infrastructure evidence."
+            "Existing prompts and expectations are prefilled. Review the Week 9 gold additions; "
+            "slice-07 and slice-08 preregister later boundary checks and are not infrastructure evidence."
         ),
         "summary": {
             "rowCount": len(snapshot.rows),
@@ -136,6 +137,14 @@ def handle_row_update(
         return
 
     snapshot = load_slice(paths)
+    if paths.gold_path.exists():
+        send_error(
+            handler,
+            HTTPStatus.CONFLICT,
+            "dataset_finalized",
+            "The Week 9 human gold is frozen and read-only.",
+        )
+        return
     current_revision = slice_revision(snapshot)
     if revision != current_revision:
         send_error(
@@ -159,10 +168,9 @@ def handle_row_update(
         )
         return
 
-    candidate_rows = copy.deepcopy(snapshot.rows)
+    candidate_rows = [*snapshot.rows]
     candidate_rows[replacement_index] = row
-    candidate = copy.deepcopy(snapshot)
-    candidate.rows = candidate_rows
+    candidate = replace(snapshot, rows=candidate_rows)
     issues = validate_slice(candidate, paths)
     if issues:
         send_error(
@@ -186,6 +194,71 @@ def handle_row_update(
     )
 
 
+def handle_finalize(handler: BaseHTTPRequestHandler, paths: SlicePaths) -> None:
+    request_payload = read_json_body(handler)
+    if request_payload is None:
+        return
+    revision = request_payload.get("revision")
+    if not isinstance(revision, str):
+        send_error(handler, HTTPStatus.BAD_REQUEST, "invalid_request", "A revision string is required.")
+        return
+    if paths.gold_path.exists():
+        send_error(handler, HTTPStatus.CONFLICT, "dataset_finalized", "The Week 9 human gold is already frozen.")
+        return
+
+    snapshot = load_slice(paths)
+    if revision != slice_revision(snapshot):
+        send_error(handler, HTTPStatus.CONFLICT, "stale_revision", "Reload the draft before freezing it.")
+        return
+    issues = validate_slice(snapshot, paths)
+    if issues:
+        send_error(
+            handler,
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            "validation_failed",
+            "Every Week 9 row must validate before freezing.",
+            [asdict(issue) for issue in issues],
+        )
+        return
+    pending = [
+        row["goldDraft"]["caseId"]
+        for row in snapshot.rows
+        if row["provenance"]["reviewStatus"] != "reviewed"
+    ]
+    if pending:
+        send_error(
+            handler,
+            HTTPStatus.CONFLICT,
+            "reviews_pending",
+            "Every Week 9 row must be reviewed before freezing.",
+            [{"path": f"{case_id}.reviewStatus", "message": "must be reviewed"} for case_id in pending],
+        )
+        return
+
+    input_bytes = paths.draft_path.read_bytes()
+    gold_text = serialize_rows(gold_rows(snapshot))
+    input_digest = hashlib.sha256(input_bytes).hexdigest()
+    gold_digest = hashlib.sha256(gold_text.encode("utf-8")).hexdigest()
+    report = (
+        "# Week 9 Human-Gold Freeze\n\n"
+        f"- Freeze date: {datetime.now(timezone.utc).date().isoformat()} UTC\n"
+        "- Reviewer attestation: All prompts and expectations were reviewed blind before model output.\n"
+        "- Input rows: 8\n"
+        "- Behavioral / automated-judge eligible: 6\n"
+        "- Boundary / excluded from automated judges: 2\n"
+        f"- Input SHA-256: `{input_digest}`\n"
+        f"- Gold SHA-256: `{gold_digest}`\n\n"
+        "## Claim limits\n\n"
+        "This eight-row slice is an inspectable worked comparison, not evidence of broad calibration or generalization. "
+        "The two boundary rows preregister intended Week 11 observations; they are not observed security receipts.\n"
+    )
+    paths.report_path.parent.mkdir(parents=True, exist_ok=True)
+    paths.gold_path.parent.mkdir(parents=True, exist_ok=True)
+    atomic_write_text(paths.report_path, report)
+    atomic_write_text(paths.gold_path, gold_text)
+    send_json(handler, HTTPStatus.OK, dataset_payload(paths))
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     import argparse
 
@@ -194,7 +267,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     arguments = parser.parse_args(argv)
     paths = SlicePaths.from_repo_root(Path(__file__).resolve().parents[1])
     server = create_server(paths, port=arguments.port)
-    print(f"Production-slice draft workbench: http://{HOST}:{server.server_address[1]}")
+    print(f"Week 9 human-gold workbench: http://{HOST}:{server.server_address[1]}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

@@ -67,6 +67,9 @@ function visibleRows() {
   return state.dataset.rows.filter((row) => {
     const haystack = normalized([
       row.exampleId,
+      row.goldDraft?.caseId,
+      row.goldDraft?.evaluationKind,
+      row.goldDraft?.rationale,
       row.prompt,
       row.scenarioFamily,
       ...row.tags,
@@ -108,6 +111,7 @@ function selectRow(exampleId) {
   state.draftId = null;
   state.revealExpected = false;
   state.editorTab = "expected";
+  clearError();
   window.location.hash = encodeURIComponent(exampleId);
   render();
 }
@@ -239,8 +243,8 @@ function renderRowList(rows) {
       onClick: () => selectRow(row.exampleId),
     });
     const meta = element("span", { class: "row-meta" },
-      element("span", {}, element("span", { class: `review-dot ${row.provenance.reviewStatus}` }), ` ${row.exampleId}`),
-      element("span", { class: "family-badge", text: row.scenarioFamily }),
+      element("span", {}, element("span", { class: `review-dot ${row.provenance.reviewStatus}` }), ` ${row.exampleId}${row.goldDraft ? ` · ${row.goldDraft.caseId}` : ""}`),
+      element("span", { class: "family-badge", text: row.goldDraft?.evaluationKind || row.scenarioFamily }),
     );
     card.append(meta, element("span", { class: "prompt-excerpt", text: row.prompt }));
     list.append(card);
@@ -444,6 +448,41 @@ function renderFailureEditor() {
   return block;
 }
 
+function renderGoldEditor() {
+  const gold = state.draftRow.goldDraft;
+  const form = element("div", { class: "editor-form" });
+  const fixed = element("section", { class: "editor-block" }, element("h4", { text: "Fixed case metadata" }));
+  fixed.append(element("div", { class: "summary-strip" },
+    element("span", { class: "summary-item", text: gold.caseId }),
+    element("span", { class: "summary-item", text: gold.evaluationKind }),
+    element("span", { class: "summary-item", text: gold.automatedJudgeEligible ? "automated judge eligible" : "excluded from automated judges" }),
+    element("span", { class: "summary-item", text: `expectation ${gold.expectationVersion}` }),
+  ));
+
+  const expectation = Object.fromEntries(Object.entries(gold).filter(([key]) => ![
+    "automatedJudgeEligible", "caseId", "evaluationKind", "expectationVersion", "rationale",
+  ].includes(key)));
+  const details = element("section", { class: "editor-block" },
+    element("h4", { text: "Fixed human-gold expectation" }),
+    element("pre", { class: "gold-summary", text: JSON.stringify(expectation, null, 2) }),
+  );
+  if (gold.boundaryExpectation) {
+    details.append(element("p", { class: "notice", text: "Preregistration only. Week 11 owns observed evidence and receipts." }));
+  }
+  const rationale = element("section", { class: "editor-block" },
+    element("h4", { text: "Human rationale" }),
+    element("textarea", {
+      value: gold.rationale, disabled: isFinalized(), placeholder: "Why is this the correct expectation for this prompt?",
+      "aria-label": "Human rationale",
+      onInput: (event) => updateDraft((row) => {
+        row.goldDraft.rationale = event.target.value;
+      }, { renderAfter: false }),
+    }),
+  );
+  form.append(fixed, details, rationale);
+  return form;
+}
+
 function renderRawEditor() {
   const panel = element("div", {});
   const refreshRawError = () => {
@@ -504,13 +543,21 @@ function renderInspector() {
 
   const editorPanel = element("section", { class: "panel" });
   const tabs = element("div", { class: "tabs" });
-  for (const [key, label] of [["expected", "Expected behavior"], ["raw", "Advanced raw JSON"]]) {
+  const tabDefinitions = state.dataset.capabilities?.canEditGoldDraft
+    ? [["expected", "Existing expectations"], ["gold", "Week 9 gold"], ["raw", "Advanced raw JSON"]]
+    : [["expected", "Expected behavior"], ["raw", "Advanced raw JSON"]];
+  for (const [key, label] of tabDefinitions) {
     tabs.append(element("button", {
       type: "button", class: `tab ${state.editorTab === key ? "active" : ""}`, text: label,
       onClick: () => { state.editorTab = key; state.rawError = null; render(); },
     }));
   }
-  editorPanel.append(tabs, state.editorTab === "expected" ? renderExpectedEditor() : renderRawEditor());
+  const editor = state.editorTab === "expected"
+    ? renderExpectedEditor()
+    : state.editorTab === "gold"
+      ? renderGoldEditor()
+      : renderRawEditor();
+  editorPanel.append(tabs, editor);
   const serverError = renderError();
   if (serverError) editorPanel.append(serverError);
   const actions = element("div", { class: "action-row" });
@@ -520,7 +567,13 @@ function renderInspector() {
     element("button", { type: "button", text: "Return to pending", disabled: isFinalized(), onClick: () => markReviewStatus("pending") }),
   );
   if (canFinalize()) {
-    actions.append(element("button", { type: "button", class: "danger", text: "Finalize dataset review", disabled: isFinalized(), onClick: finalizeDataset }));
+    actions.append(element("button", {
+      type: "button",
+      class: "danger",
+      text: state.dataset.capabilities?.canEditGoldDraft ? "Freeze Week 9 human gold" : "Finalize dataset review",
+      disabled: isFinalized(),
+      onClick: finalizeDataset,
+    }));
   }
   editorPanel.append(actions);
   inspector.append(editorPanel);
@@ -556,6 +609,7 @@ async function markReviewStatus(reviewStatus) {
 }
 
 async function finalizeDataset() {
+  if (state.dataset.capabilities?.canEditGoldDraft && !window.confirm("Freeze the reviewed Week 9 human gold and make this workbench read-only?")) return;
   clearError();
   try {
     const response = await fetch("/api/finalize", {
@@ -591,6 +645,7 @@ window.addEventListener("hashchange", () => {
   const rows = visibleRows();
   synchronizeSelection(rows);
   state.draftId = null;
+  clearError();
   render();
 });
 

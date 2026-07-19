@@ -27,13 +27,13 @@ The behavioral roles remain distinct: `slice-01` checks one current-weather call
 
 ## Build
 
-### 1. Assemble the eight-row draft projection
+### 1. Review the eight-row human-gold draft
 
-The checked-in draft at `datasets/synthetic/production-slice-8.jsonl` projects the confirmed source rows `tc-0001`, `tc-0021`, `tc-0006`, `tc-0097`, `tc-0098`, `tc-0073`, `tc-0065`, and `tc-0092` from `datasets/synthetic/tool-calling-100.jsonl`. It preserves source IDs and row vocabulary while resetting review status to `pending`. Treat the 100-row source corpus as read-only; do not introduce the final `slice-##`/human-gold schema or claim that this draft is complete.
+The checked-in draft at `datasets/synthetic/production-slice-8.jsonl` projects the confirmed source rows `tc-0001`, `tc-0021`, `tc-0006`, `tc-0097`, `tc-0098`, `tc-0073`, and `tc-0065` from `datasets/synthetic/tool-calling-100.jsonl`, then adds the hand-authored `tc-0101` boundary preregistration for the final two-tool production path. It preserves reviewed source prompt and expectation vocabulary where applicable, resets new review status to `pending`, and adds a small `goldDraft` object for fixed `slice-##` metadata and Week 9-only expectations. Treat the 100-row source corpus as read-only.
 
-The last two selected rows are placeholders for later boundary work: `tc-0065` is an existing out-of-capability case and `tc-0092` is an inert untrusted-result canary. Neither is a Policy or Guardrail receipt. Keep that limitation visible in the review UI and any draft notes.
+The last two rows are placeholders for later boundary work: `tc-0065` is an existing out-of-capability case and `tc-0101` preregisters an inert canary on Gateway current-weather target input. Neither is a Policy or Guardrail receipt. The historical Web Search canary `tc-0092` is intentionally excluded because Web Search is not part of the final two-tool production path.
 
-### 1a. Review the draft locally
+### 1a. Author and freeze the draft locally
 
 Use the separate loopback-only workbench:
 
@@ -41,11 +41,13 @@ Use the separate loopback-only workbench:
 uv run --locked python -m scripts.production_slice_workbench --port 8766
 ```
 
-Open `http://127.0.0.1:8766/` to review and edit prompts, expectations, failure injection, and review status. The workbench supports durable draft saves and raw JSON editing, but deliberately disables finalization. It must not mutate the 100-row source corpus or imply that the two placeholders provide infrastructure evidence.
+Open `http://127.0.0.1:8766/`. Existing prompts and expectations are prefilled under **Existing expectations**; do not re-enter them. Use **Week 9 gold** to review the ordered sequence and applicable lineage, failure/stop, or boundary preregistration, then write a one-sentence human rationale. A row cannot be marked reviewed while its rationale or case-specific expectation is incomplete.
+
+After all eight rows are reviewed, **Freeze Week 9 human gold** writes `datasets/labels/production-slice-8-human.jsonl` and `docs/reports/week-09-human-labels.md` with exact-byte and per-expectation hashes, then makes the workbench read-only. The workbench must not mutate the 100-row source corpus or imply that the two boundary placeholders provide infrastructure evidence.
 
 Use `evaluation_kind` plus `automated_judge_eligible` with one fixed invariant: `slice-01` through `slice-06` are `behavior`/`true`, while `slice-07` and `slice-08` are `boundary`/`false`. Later consumers must require exact ID-set equality and filter on both fields before computing tool-selection or parameter denominators.
 
-### 2. Freeze the six behavioral expectations blind after draft review
+### 2. Review the six behavioral expectations blind
 
 Before seeing any model output, record for each eligible row:
 
@@ -68,17 +70,17 @@ Compare the source operand by exact numeric value: formatting differences such a
 
 Mechanical checks prove row shape, exact ID coverage, metadata consistency, and declared invariants. They cannot prove that natural-language gold follows from a prompt. Review every prompt beside its expectation and pinned tool contracts; attest that every city, unit, operation, stop condition, and bounded alternative is derivable without external knowledge. A prompt/expectation mismatch blocks the freeze even when JSON and joins are valid.
 
-### 3. Preregister the two boundary expectations after draft review
+### 3. Review the two boundary preregistrations
 
-Do not relabel the current `tc-0065` and `tc-0092` placeholders as boundary evidence. For the later final-gold projection, define `slice-07` as an unregistered forecast operation denied by a deterministic AgentCore Policy authorization rule under the intended principal context, and `slice-08` as an inert prompt-attack canary denied by an AgentCore Policy rule using a probabilistic Bedrock Guardrail check on Gateway target input.
+Do not relabel the current `tc-0065` and `tc-0101` placeholders as boundary evidence. For the final-gold projection, define `slice-07` as an unregistered forecast operation denied by a deterministic AgentCore Policy authorization rule under the intended principal context, and `slice-08` as an inert prompt-attack canary denied by an AgentCore Policy rule using a probabilistic Bedrock Guardrail check on Gateway current-weather target input.
 
 Record the intended control, tested action/input class, expected deny outcome, and `observation_owner: week_11` now. Do not place mutable evidence status, receipt references, or final boundary verdicts in the frozen Week 9 gold. Configuration text, planned Terraform, local simulation, or a synthetic denial is not observed proof.
 
 These controls answer different questions. Any future claim is bounded to the tested operation/input, principal/context, Gateway and policy versions, and observation time. Neither row proves comprehensive authorization, prompt-injection resistance, final-response safety, calculator governance, least privilege, or production security.
 
-### 4. Write the joined gold file and note
+### 4. Freeze the joined gold file and note
 
-Create `datasets/labels/production-slice-8-human.jsonl` with `case_id`, `expectation_version`, evaluation kind, automated-judge eligibility, human-gold expectation, and one-sentence rationale. The input file owns prompt, kind, and eligibility; duplicated metadata in gold must agree rather than becoming another source of truth. Require one-to-one coverage of the same eight IDs with no duplicate, missing, extra, or conflicting rows.
+The workbench creates `datasets/labels/production-slice-8-human.jsonl` with `case_id`, `expectation_version`, evaluation kind, automated-judge eligibility, human-gold expectation, and one-sentence rationale. The input file owns prompt, kind, and eligibility; duplicated metadata in gold must agree rather than becoming another source of truth. Finalization requires one-to-one coverage of the same eight IDs with no duplicate, missing, extra, or conflicting rows.
 
 Author both JSONL files as UTF-8 with LF endings, one object per line, final newline, ascending case ID, and recursively sorted object keys. After review, hash their exact checked-in bytes with SHA-256 and record the freeze date, reviewer attestation, input-file digest, and complete gold-file digest. Also compute one `expectation_sha256` per gold row over the UTF-8 canonical JSON projection containing only `case_id`, `expectation_version`, and `expectation`, using recursively sorted keys and compact separators. Week 11 joins against that digest. Do not normalize or reorder the reviewed files and then claim a digest covers their previous bytes.
 
@@ -86,21 +88,21 @@ Summarize composition, the semantic-review attestation, exact digests, and claim
 
 ## Deliverable
 
-The initial draft phase delivers:
+The editable phase delivers:
 
 - `datasets/synthetic/production-slice-8.jsonl`
 - `scripts/production_slice_workbench.py` plus the shared static workbench behavior
 
-The later final-gold phase delivers the reviewed artifact group:
+Freezing through the workbench delivers the reviewed artifact group:
 
 - `datasets/labels/production-slice-8-human.jsonl`
 - `docs/reports/week-09-human-labels.md`
 
-There is no agent execution, second rater, kappa target, synthetic denial receipt, or final boundary evidence in the initial draft phase. The browser workbench is for local review/editing only; it is not a finalization or evaluation lane.
+There is no agent execution, second rater, kappa target, synthetic denial receipt, or final boundary evidence. The browser workbench authors and freezes human gold locally; it is not an evaluation or evidence-observation lane.
 
 ## Success check
 
-For the initial draft phase, all eight selected rows load, validate, edit, and save through the loopback workbench without changing the source corpus; copied rows remain visibly pending; and the two placeholders are not presented as infrastructure evidence. For the later freeze, all eight expectations and eligibility rules must be frozen before model output: the six behavioral rows have explicit sequence, parameter, exact intermediate-lineage, typed failure/stop, and acceptable-response expectations with rationales; the two boundary rows name their future observation owner without fabricating evidence; exact-byte file and per-row expectation digests are recorded; and the report states that this tiny slice cannot establish broad calibration or generalization.
+All eight selected rows load, validate, edit, and save through the loopback workbench without changing the source corpus. The six behavioral rows expose explicit sequence, parameter, exact intermediate-lineage, typed failure/stop, acceptable-response expectations, and rationales; the two boundary rows name their future observation owner without fabricating evidence. Finalization remains blocked until every row is reviewed, then records exact-byte file and per-row expectation digests and a report stating that this tiny slice cannot establish broad calibration or generalization.
 
 ## Read
 

@@ -115,6 +115,7 @@ input, select, textarea { border: 1px solid #cbd3de; border-radius: 6px; padding
 input:focus, select:focus, textarea:focus { outline: 2px solid #a9c7fa; border-color: var(--accent); }
 textarea { width: 100%; min-height: 84px; resize: vertical; line-height: 1.45; }
 .raw-editor { min-height: 480px; font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+.gold-summary { overflow: auto; white-space: pre-wrap; font: 12px/1.5 "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 .constraint-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .constraint-table th, .constraint-table td { padding: 6px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
 .constraint-table select, .constraint-table input { width: 100%; min-width: 85px; }
