@@ -82,8 +82,8 @@ STAGING spans → custom judge + AgentCore Evaluations
 | ✅ | [6 — Dataset](docs/weeks/week-06-dataset-validation.md) | 100 reviewed rows, mocks, traces, validators. |
 | ✅ | [7 — Specimen](docs/weeks/week-07-specimen.md) | Pinned 62-case weather projection. |
 | ✅ | [8 — Harness closeout](docs/weeks/week-08-local-harness.md) | One fixture-backed 62-case baseline and closeout receipt. |
-| 🚧 | [9 — Human gold](docs/weeks/week-09-human-labeling.md) | Eight frozen expectations: six behavior, two denials. |
-| ⬜ | [10 — Judge contract](docs/weeks/week-10-judge-calibration.md) | One frozen prompt/script and dry run; no model call. |
+| ✅ | [9 — Human gold](docs/weeks/week-09-human-labeling.md) | Eight frozen expectations: six behavior, two denials. |
+| 🚧 | [10 — Judge calibration](docs/weeks/week-10-judge-calibration.md) | Provider-free dry run, disjoint judge calibration, then all-six held-out local Strands evaluation. |
 | ⬜ | [11 — Terraform + Gateway](docs/weeks/week-11-gateway-weather.md) | Remote state, Identity/OpenAPI target, Policy/guardrails, allow/deny receipts. |
 | ⬜ | [12 — Reliability](docs/weeks/week-12-reliability-gates.md) | Deadline, one retry, shared breaker, three tests. |
 | ⬜ | [13 — Runtime operations](docs/weeks/week-13-runtime-operations.md) | Python 3.13 CodeZip, STAGING/PROD promotion, telemetry and alarms. |
@@ -108,6 +108,10 @@ STAGING spans → custom judge + AgentCore Evaluations
 > **Week 7 closed — 2026-07-17.** Pinned weather-only specimen, two 62-case normalized executions, and a bounded errata review. Links: [`docs/reports/week-07-full-projection.md`](docs/reports/week-07-full-projection.md), [`docs/errata/week-07-dataset-errata.md`](docs/errata/week-07-dataset-errata.md).
 
 > **Week 8 closed — 2026-07-19.** Locked offline Stage B closeout: 57 focused tests passed; 62 projected cases accounted for; 60 evidence-valid traces; two instrument errors; zero gate errors; deterministic JSON/Markdown receipts. Link: [`docs/weeks/week-08-local-harness.md`](docs/weeks/week-08-local-harness.md).
+
+> **Week 9 closed — 2026-07-19.** Reviewed and froze eight human expectations before model output: six behavioral rows eligible for the future judge lanes and two boundary rows explicitly excluded. The checked-in report records the input, gold, and per-expectation SHA-256 digests and the scope limit. Link: [`docs/reports/week-09-human-labels.md`](docs/reports/week-09-human-labels.md).
+
+> **Week 10 in progress — 2026-07-19.** Provider-free all-eight-ID judge-contract dry run passed; the disjoint calibration pack and all-six local Strands evaluator are ready. The first live calibration attempt was blocked before inference by an expired AWS session. Link: [`docs/reports/week-10-judge-contract.md`](docs/reports/week-10-judge-contract.md).
 
 ## Guardrails
 

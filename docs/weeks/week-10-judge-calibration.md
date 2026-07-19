@@ -1,4 +1,4 @@
-# Week 10 — One Frozen Custom-Judge Contract
+# Week 10 — Calibrated Pre-deployment Strands Evaluation
 
 **Prerequisite:** Week 9's eight human expectations are reviewed and frozen. No final Runtime evidence exists yet.
 
@@ -6,63 +6,51 @@
 
 ## Concept
 
-A judge is useful only when its question and rubric exist before the evidence it will score. This week defines one custom judge for the six behavioral rows, proves its input/output plumbing locally, and freezes it. The only model-backed custom-judge execution happens in Week 14 over the same six Runtime spans sent to AgentCore Evaluations.
+Week 10 is **evals first**: calibrate one local custom judge against a distinct human-reviewed synthetic pack, freeze the selected rubric/model, then run that same judge and Strands' tool-level evaluators over all six frozen behavioral rows before deployment.
 
-The judge is a sanity-check lane, not a new source of truth. One run over six cases cannot establish stability, calibration, false-rate estimates, or generalization. Policy and Guardrail denials are infrastructure outcomes and remain explicitly ineligible.
+The calibration pack is separate from `slice-01` through `slice-06`; those six remain held-out local evidence. Neither six-vector calibration nor six-case heldout evaluation establishes stability, false rates, or generalization. `slice-07` and `slice-08` are infrastructure outcomes and remain ineligible.
 
 ## Build
 
-### 1. Define one normalized input
+### 1. Keep the provider-free contract gate
 
-Create `scripts/judge_weather_calculator.py`. It accepts one case ID plus the normalized evidence needed to judge tool selection and parameters: available model-visible tools, user request, observed tool sequence, normalized arguments, and the critical intermediate value when the case is two-step.
+`scripts/judge_weather_calculator.py --dry-run` accounts for all eight human-gold IDs, renders only the six eligible behavioral requests, and rejects the two boundary rows before any provider path. The receipt proves `providerTouched: false`.
 
-Do not expose infrastructure-denial evidence to the model judge. The script must reject duplicate, unknown, or ineligible case IDs before any model path is reachable.
+### 2. Calibrate a bounded custom judge
 
-### 2. Freeze one rubric and structured verdict
+`datasets/labels/week-10-judge-calibration.jsonl` contains six synthetic normalized-evidence vectors derived from non-heldout source scenarios: three known passes and three known failures. It never contains a Week 9 heldout row, raw model output, or credentials.
 
-Keep the prompt in the script, readable in one screen. Ask only:
+Run one pinned Haiku candidate against all six vectors. Record every expected-versus-actual label and the prompt/pack digest. A documented mechanical/rubric defect may receive one explicit revised candidate; do not retry until a preferred result appears. Freeze the selected digest before evaluating heldout rows.
 
-- did the observed tool sequence fit the request and human-gold constraints;
-- were critical parameters and intermediate values faithful; and
-- which compact evidence code explains a disagreement.
+### 3. Run all six heldout rows locally through Strands Evals
 
-Return a structured verdict with `case_id`, `selection_verdict`, `parameter_verdict`, `evidence_codes`, and a bounded rationale. Version the prompt once in the report. Do not add a prompt registry, evaluator hierarchy, output-manifest system, or second execution-quality judge.
+`scripts/run_week_10_predeployment_evals.py --confirm-live-bedrock --calibration-receipt <passed-receipt.json>` refuses to run until the receipt freezes the current model and rubric with all six calibration labels matched. It creates a fresh local two-tool agent per case: the custom judge evaluates exactly `slice-01` through `slice-06`; the two tool-level evaluators evaluate only rows whose expectation requires a tool call:
 
-### 3. Build a model-free dry run
+- the frozen `WeatherCalculatorJudgeEvaluator` adapter;
+- `ToolSelectionAccuracyEvaluator`; and
+- `ToolParameterAccuracyEvaluator`.
 
-`--dry-run` loads the frozen human-gold file, accounts for all eight IDs, excludes the two boundary IDs, validates the six normalized inputs, and renders the exact model request without calling Bedrock or another provider. A canned structured response may exercise parsing; it is not a judge result.
+No Gateway, Identity, Runtime, Policy, Guardrail, live weather provider, search tool, or deployed span is involved. Tool-level output for `slice-06` is recorded as `not_applicable`, not a zero score.
 
-The dry-run receipt must make the absence of a model call inspectable—for example, a provider callable that raises if touched plus captured command output.
+### 4. Report claim boundaries
 
-### 4. Review, report, and freeze
-
-Create `docs/reports/week-10-judge-contract.md` containing:
-
-- the human-gold fields the judge may inspect;
-- exact verdict fields and rubric;
-- six eligible IDs and two ineligible boundary IDs;
-- the dry-run receipt; and
-- the sentence: “One future run over six cases is a same-evidence sanity check, not robust calibration.”
-
-After review, record the script/prompt digest and do not tune it against Week 13 outputs. Week 14 may fix only a mechanical blocker, with the change disclosed before scoring.
+`docs/reports/week-10-judge-contract.md` records the dry-run receipt, calibration labels and selected digest, all six heldout case/evaluator results, model IDs, and every disagreement. It must say: “This is local pre-deployment evidence, not AgentCore deployment evidence or a calibration/reliability claim.”
 
 ## Deliverable
 
-One frozen judge-contract artifact group:
-
+- `datasets/labels/week-10-judge-calibration.jsonl`
 - `scripts/judge_weather_calculator.py`
+- `evals/evaluators/weather_calculator_judge.py`
+- `scripts/run_week_10_predeployment_evals.py`
 - `docs/reports/week-10-judge-contract.md`
-- the reused `datasets/labels/production-slice-8-human.jsonl`
-
-There is no Week 10 model call, repeat-run campaign, holdout split, trust-policy document, or new test.
 
 ## Success check
 
-The dry run accounts for all six judge-eligible IDs, excludes the two boundary IDs, validates and renders the frozen rubric without a model call, records the prompt/script digest, and leaves exactly one metered custom-judge execution for Week 14.
+The provider-free dry run accounts for all eight IDs; calibration uses only the disjoint six-vector pack and freezes one judge digest; local Strands execution evaluates all six heldout behavioral rows before deployment; and the report does not overclaim what six examples prove.
 
 ## Read
 
+- [Strands Evals](https://strandsagents.com/docs/user-guide/evals-sdk/quickstart/)
 - [Amazon Bedrock Converse tool use](https://docs.aws.amazon.com/bedrock/latest/userguide/tool-use-inference-call.html)
-- [AgentCore built-in prompt templates](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/prompt-templates-builtin.html)
 - [Week 9 human gold](week-09-human-labeling.md)
 - [Managed evaluation boundaries](../../LEARNING_PLAN.md#managed-evaluation-boundaries-read-before-week-8)

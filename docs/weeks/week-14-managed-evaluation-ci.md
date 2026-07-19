@@ -26,7 +26,7 @@ Validate exact case-set equality and uniqueness. These captured spans are the so
 
 ### 2. Define one same-evidence orchestration command
 
-Create `scripts/run_agentcore_managed_eval.py`. It loads exactly the six captured references, invokes the frozen `judge_weather_calculator.py` contract once, then sends the corresponding tool span IDs to AgentCore Evaluations with:
+Create `scripts/run_agentcore_managed_eval.py`. It loads exactly the six captured references, invokes the Week 10-frozen `judge_weather_calculator.py` contract once, then sends the corresponding tool span IDs to AgentCore Evaluations with:
 
 - `Builtin.ToolSelectionAccuracy`
 - `Builtin.ToolParameterAccuracy`
@@ -55,7 +55,7 @@ The job accepts exactly six unique case/trace/span references, runs the custom a
 
 After reviewing expected spend, run the manual job once. Create `docs/reports/week-14-managed-evaluation.md` with eight rows, counts over the six eligible rows, every human/custom/managed disagreement, the two separately joined boundary observations, evaluator IDs/dates, Runtime identity, and transport details.
 
-Do not infer calibration, stability, or false rates from six examples. A perfect six-of-six result still means only that the lanes agreed on this worked example.
+Do not infer calibration, stability, or false rates from six examples. Week 10's local calibrated-judge receipt is pre-deployment plumbing evidence only; a perfect six-of-six deployed result still means only that the lanes agreed on this worked example.
 
 ### 5. Prove the pull-request gate is alive
 

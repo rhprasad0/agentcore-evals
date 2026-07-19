@@ -112,10 +112,12 @@ Explicitly absent: a five-tool chain, write action, generalized resilience packa
 
 - A judge score is a measurement, not truth. Freeze human expectations before output and freeze the custom rubric before final Runtime evidence.
 - Week 9 human gold remains immutable. Week 11 records the two observed boundary verdicts in a separate joined evidence file rather than rewriting the frozen expectations.
+- Week 10's custom-judge `--dry-run` stays provider-free. A separate six-vector calibration pack, disjoint from the frozen behavioral rows, may tune one local judge candidate before one frozen version evaluates all six eligible rows against deterministic weather fixtures plus the direct calculator; `slice-07` and `slice-08` remain excluded before any model path.
+- The bounded calibration and held-out local Strands run are metered if they use Bedrock, record every case-level result, do not prove deployment behavior, and never enter Week 14 evidence.
 - Collect the six eligible synthetic STAGING spans once from one immutable Runtime version. The custom judge and both managed built-ins evaluate those exact spans.
 - Record case ID, Runtime version, trace/span identity, evaluator ID, run date, eligibility, and transport. If those joins are missing, the comparison is invalid.
 - `Builtin.ToolSelectionAccuracy` and `Builtin.ToolParameterAccuracy` are moving managed dependencies; a local schema pass does not prove service acceptance.
-- A single custom-judge run is a sanity check. It does not establish stability, calibration, or generalization.
+- The final single custom-judge run is a sanity check. Neither it nor Week 10's six-vector calibration/six-case local evaluation establishes stability, reliability, or generalization.
 - The manual OIDC job is the only metered comparison path. Pull-request CI remains fixture-backed and cloud-free.
 - Anonymous PROD telemetry is for operations, not evaluator-rich evidence. Block public launch if a harmless canary shows raw prompts or responses in proxy logs or `aws/spans`.
 
@@ -148,8 +150,8 @@ Each guide's success check is its exit gate. Completed guides may describe histo
 | [6](docs/weeks/week-06-dataset-validation.md) | Closed | Dataset | 100 reviewed rows, mocks, traces, validators. |
 | [7](docs/weeks/week-07-specimen.md) | Closed | Specimen | Pinned 62-case weather projection and normalized traces. |
 | [8](docs/weeks/week-08-local-harness.md) | Closed | Harness closeout | One provenance-accounted fixture-backed 62-case baseline. |
-| [9](docs/weeks/week-09-human-labeling.md) | Planned | Human gold | Eight preregistered expectations: six behavior, two denials. |
-| [10](docs/weeks/week-10-judge-calibration.md) | Planned | Judge contract | One frozen prompt/script and dry run; no model call. |
+| [9](docs/weeks/week-09-human-labeling.md) | Closed | Human gold | Eight frozen expectations: six behavior, two denials. |
+| [10](docs/weeks/week-10-judge-calibration.md) | In progress | Judge calibration | Provider-free dry run, disjoint calibration, then all-six held-out local Strands evaluation. |
 | [11](docs/weeks/week-11-gateway-weather.md) | Planned | Terraform + Gateway | Remote state, Identity/OpenAPI target, Policy, Guardrail checks, allow/deny receipts. |
 | [12](docs/weeks/week-12-reliability-gates.md) | Planned | Reliability | Deadline, one retry, shared breaker, three tests, failure probes. |
 | [13](docs/weeks/week-13-runtime-operations.md) | Planned | Runtime operations | Python 3.13 CodeZip, STAGING/PROD promotion, telemetry, two alarms, old-stack teardown. |
@@ -163,7 +165,7 @@ Each guide's success check is its exit gate. Completed guides may describe histo
 | --- | --- |
 | 1–4 | Strands/Runtime/Gateway foundations and tool seams. |
 | 5–8 | Contracts, corpus, canonical traces, deterministic local evaluation. |
-| 9–10 | Human expectations and one frozen custom-judge contract. |
+| 9–10 | Human expectations, one frozen custom-judge contract, and one bounded local all-six smoke. |
 | 11–12 | Terraform state, Identity/IAM, Policy/guardrails, weather reliability. |
 | 13–14 | Runtime versions/endpoints, CloudWatch/SNS, managed evaluation, OIDC CI. |
 | 15–16 | CloudFront/WAF public boundary, Budget, operations and recovery. |
