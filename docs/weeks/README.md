@@ -22,7 +22,7 @@ Read [`LEARNING_PLAN.md`](../../LEARNING_PLAN.md) first. Each guide has one inte
 | Week | Guide | Outcome |
 | --- | --- | --- |
 | 9 | [Human Gold for the Final Slice](week-09-human-labeling.md) | Eight frozen expectations: six behavior, two denials |
-| 10 | [One Custom Judge Contract](week-10-judge-calibration.md) | One frozen rubric/script and dry run; no model call |
+| 10 | [One Custom Judge Contract](week-10-judge-calibration.md) | Frozen rubric, provider-free dry run, six-vector calibration, and six-case local evaluation |
 
 ## Phase 3 — Governed weather path (Weeks 11–12)
 

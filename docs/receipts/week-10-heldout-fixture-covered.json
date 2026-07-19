@@ -1,0 +1,19 @@
+{
+  "runStatus": "valid_fixture_covered",
+  "priorReceipts": [
+    "docs/receipts/week-10-heldout.json",
+    "docs/receipts/week-10-heldout-normalized.json"
+  ],
+  "judgeModelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+  "judgePromptSha256": "d0a6a6e08ff5a028297a08bb4fb64ad65d662b1266e8045dadbd2dfa9e52aa9b",
+  "calibrationPromptSha256": "d0a6a6e08ff5a028297a08bb4fb64ad65d662b1266e8045dadbd2dfa9e52aa9b",
+  "caseIds": ["slice-01", "slice-02", "slice-03", "slice-04", "slice-05", "slice-06"],
+  "outcomes": [
+    {"caseId": "slice-01", "evaluators": {"week10_builtin_tool_selection": {"label": "Yes", "score": 1.0, "testPass": true}, "week10_builtin_tool_parameters": {"label": "Yes", "score": 1.0, "testPass": true}, "week10_custom_judge": {"label": "pass/pass", "score": 1.0, "testPass": true}}},
+    {"caseId": "slice-02", "evaluators": {"week10_builtin_tool_selection": {"label": "Yes", "score": 1.0, "testPass": true}, "week10_builtin_tool_parameters": {"label": "Yes", "score": 1.0, "testPass": true}, "week10_custom_judge": {"label": "pass/pass", "score": 1.0, "testPass": true}}},
+    {"caseId": "slice-03", "evaluators": {"week10_builtin_tool_selection": {"label": "Yes", "score": 1.0, "testPass": true}, "week10_builtin_tool_parameters": {"label": "Yes", "score": 0.5, "testPass": false}, "week10_custom_judge": {"label": "pass/pass", "score": 1.0, "testPass": true}}},
+    {"caseId": "slice-04", "evaluators": {"week10_builtin_tool_selection": {"label": "Yes", "score": 0.5, "testPass": false}, "week10_builtin_tool_parameters": {"label": "Yes", "score": 0.5, "testPass": false}, "week10_custom_judge": {"label": "pass/pass", "score": 1.0, "testPass": true}}},
+    {"caseId": "slice-05", "evaluators": {"week10_builtin_tool_selection": {"label": "Yes", "score": 1.0, "testPass": true}, "week10_builtin_tool_parameters": {"label": "Yes", "score": 1.0, "testPass": true}, "week10_custom_judge": {"label": "pass/pass", "score": 1.0, "testPass": true}}},
+    {"caseId": "slice-06", "evaluators": {"week10_builtin_tool_selection": {"label": "not_applicable", "score": null, "testPass": null}, "week10_builtin_tool_parameters": {"label": "not_applicable", "score": null, "testPass": null}, "week10_custom_judge": {"label": "pass/not_applicable", "score": 1.0, "testPass": true}}}
+  ]
+}

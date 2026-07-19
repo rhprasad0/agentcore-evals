@@ -91,8 +91,9 @@ def summarize_reports(
 
     outcomes = {case_id: {"caseId": case_id, "evaluators": {}} for case_id in case_ids}
     for report in reports:
-        for case, score, test_pass, details in zip(
-            report.cases, report.scores, report.test_passes, report.detailed_results, strict=True
+        reasons = getattr(report, "reasons", [None] * len(report.cases))
+        for case, score, test_pass, details, reason in zip(
+            report.cases, report.scores, report.test_passes, report.detailed_results, reasons, strict=True
         ):
             case_id = case.get("name")
             evaluator = case.get("evaluator")
@@ -101,7 +102,8 @@ def summarize_reports(
             first_detail = details[0] if details else None
             label = getattr(first_detail, "label", None)
             if evaluator == "week10_custom_judge" and not isinstance(label, str):
-                raise JudgeInputError(f"custom judge {case_id} has no verdict")
+                detail = reason if isinstance(reason, str) and reason else "no evaluator detail"
+                raise JudgeInputError(f"custom judge {case_id} has no verdict: {detail}")
             outcome = {
                 "score": score,
                 "testPass": test_pass,

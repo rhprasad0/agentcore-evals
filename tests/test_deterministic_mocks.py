@@ -97,6 +97,24 @@ class MockRegistryTests(unittest.TestCase):
             result,
         )
 
+    def test_conversion_rows_have_exact_weather_success_fixtures(self) -> None:
+        registry = MockRegistry.from_repo_root(REPO_ROOT)
+
+        for example_id, arguments in (
+            ("tc-0006", {"city": "Oslo", "units": "metric"}),
+            ("tc-0097", {"city": "Boston", "units": "imperial"}),
+        ):
+            with self.subTest(example_id=example_id):
+                result = registry.invoke(
+                    example_id,
+                    "weather.get_current_weather",
+                    arguments,
+                )
+
+                self.assertTrue(result["ok"])
+                self.assertEqual(arguments["city"], result["city"])
+                self.assertEqual(arguments["units"], result["units"])
+
     def test_mutating_a_result_cannot_leak_into_later_calls_or_registries(self) -> None:
         first_registry = MockRegistry.from_repo_root(REPO_ROOT)
         result = first_registry.invoke(

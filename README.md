@@ -111,7 +111,7 @@ STAGING spans → custom judge + AgentCore Evaluations
 
 > **Week 9 closed — 2026-07-19.** Reviewed and froze eight human expectations before model output: six behavioral rows eligible for the future judge lanes and two boundary rows explicitly excluded. The checked-in report records the input, gold, and per-expectation SHA-256 digests and the scope limit. Link: [`docs/reports/week-09-human-labels.md`](docs/reports/week-09-human-labels.md).
 
-> **Week 10 in progress — 2026-07-19.** Provider-free all-eight-ID judge-contract dry run passed; the disjoint calibration pack and all-six local Strands evaluator are ready. The first live calibration attempt was blocked before inference by an expired AWS session. Link: [`docs/reports/week-10-judge-contract.md`](docs/reports/week-10-judge-contract.md).
+> **Week 10 in progress — 2026-07-19.** The provider-free all-eight-ID gate passed; the frozen six-vector calibration matched 6/6 labels; and one all-six local Strands run is recorded. Built-in tool lanes passed on all five applicable cases, while the frozen custom judge disagreed on `slice-03` and `slice-04`; no deployed claim follows. Link: [`docs/reports/week-10-judge-contract.md`](docs/reports/week-10-judge-contract.md).
 
 ## Guardrails
 

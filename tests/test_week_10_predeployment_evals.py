@@ -64,9 +64,10 @@ class Week10PredeploymentTests(unittest.TestCase):
             scores=[0.0],
             test_passes=[False],
             detailed_results=[[]],
+            reasons=["An error occurred: invalid provider verdict: ValidationError"],
         )
 
-        with self.assertRaisesRegex(JudgeInputError, "has no verdict"):
+        with self.assertRaisesRegex(JudgeInputError, "invalid provider verdict: ValidationError"):
             summarize_reports([report], ["slice-01"], {})
 
     def test_custom_judge_normalizes_conversion_tool_outputs(self) -> None:

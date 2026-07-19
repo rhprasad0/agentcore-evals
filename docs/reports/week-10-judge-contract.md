@@ -1,6 +1,6 @@
 # Week 10 — Judge Contract and Pre-deployment Evaluation Receipt
 
-**Status:** provider-free contract and calibration freeze complete; held-out Strands execution not run.
+**Status:** provider-free contract, calibration freeze, and held-out local Strands execution complete.
 
 ## Contract
 
@@ -24,7 +24,7 @@ uv run --locked python -m scripts.judge_weather_calculator --dry-run
 Receipt:
 
 ```json
-{"eligibleCaseIds":["slice-01","slice-02","slice-03","slice-04","slice-05","slice-06"],"excludedCaseIds":["slice-07","slice-08"],"providerTouched":false,"renderedCaseIds":["slice-01","slice-02","slice-03","slice-04","slice-05","slice-06"],"renderedRequestSha256":{"slice-01":"ef9f4a6fbfe8f2de00f1571fbb0564c0020072c779e4097e92b6fa69768ec2e1","slice-02":"c659bf168381615a099ba16743ebe9acd4eb27c38a8a006963a8ea8fe7cf1543","slice-03":"cd0da59260526b92d2d370365ef42904ef3553a576a9bc434d88d5b092535710","slice-04":"aaaa3bf9d05f4f1d78e54787511523913f39ae5ded3a9c7c1227a262c56c2772","slice-05":"a6439b4f57b53b7f1f31e8671dc6665f8e4ae0e743eb8f0c4d9e96bb36687432","slice-06":"ffba3da56d98246dbed49235364545d7eb6be2e73fb56f445a64e656e9527e76}}
+{"eligibleCaseIds":["slice-01","slice-02","slice-03","slice-04","slice-05","slice-06"],"excludedCaseIds":["slice-07","slice-08"],"providerTouched":false,"renderedCaseIds":["slice-01","slice-02","slice-03","slice-04","slice-05","slice-06"],"renderedRequestSha256":{"slice-01":"015250c12ac9a30cd3386b04c2ff38db99a9d7f00ef03047f9aec6ecd2745a2f","slice-02":"9947e27feabb9555cbee53d023f9691f0739fff132e094f2a4f397768ecc6306","slice-03":"95eca390faf029357d4e8cced26744ef8df20b4c114c2f737b650db9f4d6d1dc","slice-04":"9e7c35b7220d67eb390b7190e53a94a70ed6ae97389e232c05cf06dd6a3ea9a0","slice-05":"e2a45ee2cc3f1aec71acda61b2fb7dbe730b681281f5d1f4bc6c28a3f1719bf5","slice-06":"06821ea69a1ada171c12bcb314d62ccd6e0ed465c7b415cd0f75b27df686f6a6"}}
 ```
 
 ## Calibration and held-out local evaluation
@@ -33,9 +33,13 @@ The calibration pack contains six disjoint synthetic evidence vectors: three rev
 
 Candidate `v1` stopped on its first provider response because the prompt requested compact evidence codes without enumerating the parser's finite code set. No calibration label was accepted and no held-out case ran. Candidate `v2` was the single permitted mechanical revision: it names that existing finite code set in the prompt.
 
-After refreshing the local AWS session, candidate `v2` ran the six-vector pack once. All six labels matched the human labels; the frozen receipt is [`docs/receipts/week-10-calibration.json`](../receipts/week-10-calibration.json). No held-out case ran.
+After refreshing the local AWS session, candidate `v2` ran the six-vector pack once. All six labels matched the human labels; the frozen receipt is [`docs/receipts/week-10-calibration.json`](../receipts/week-10-calibration.json).
 
 The held-out command requires this receipt and rejects any missing, incomplete, mismatched-model, or mismatched-rubric calibration result.
+
+## Held-out local results
+
+The first held-out receipt is retained as [`invalid evidence-shape output`](../receipts/week-10-heldout.json): the custom adapter supplied `result.content` where the frozen conversion expectations require `result.output.*`. The normalized retry is also retained as [`invalid fixture-coverage output`](../receipts/week-10-heldout-normalized.json): `tc-0006` and `tc-0097` lacked their exact row-scoped weather success fixtures. After restoring those fixtures, the separately labeled [`fixture-covered receipt`](../receipts/week-10-heldout-fixture-covered.json) records a custom-judge match on all six behavioral rows. `slice-06` remains `not_applicable` for the two built-in tool lanes. The built-in evaluators still expose a separate reporting discrepancy on the conversion rows: their labels are `Yes`, but one or both lane scores are `0.5` with `testPass: false`. Treat that as evaluator-semantics evidence, not an agent failure or a reason to retune the frozen judge.
 
 ## Claim boundary
 
