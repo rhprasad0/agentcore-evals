@@ -100,11 +100,17 @@ def summarize_reports(
                 raise JudgeInputError("Strands report has an unexpected case or evaluator")
             first_detail = details[0] if details else None
             label = getattr(first_detail, "label", None)
-            outcomes[case_id]["evaluators"][evaluator] = {
+            if evaluator == "week10_custom_judge" and not isinstance(label, str):
+                raise JudgeInputError(f"custom judge {case_id} has no verdict")
+            outcome = {
                 "score": score,
                 "testPass": test_pass,
                 "label": label,
             }
+            rationale = getattr(first_detail, "reason", None)
+            if evaluator == "week10_custom_judge" and isinstance(rationale, str):
+                outcome["rationale"] = rationale
+            outcomes[case_id]["evaluators"][evaluator] = outcome
     for case_id, evaluator_names in not_applicable.items():
         for evaluator in evaluator_names:
             outcomes[case_id]["evaluators"][evaluator] = {

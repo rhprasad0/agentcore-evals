@@ -59,7 +59,7 @@ def compare_planted_facts(
             (
                 "tool.result",
                 canonical.get("result", {}).get("output"),
-                _parse_native_result(native.tool_result.content),
+                parse_native_tool_result(native.tool_result.content),
             ),
             (
                 "tool.correlation",
@@ -75,7 +75,7 @@ def compare_planted_facts(
     return mismatches
 
 
-def _parse_native_result(value: Any) -> Any:
+def parse_native_tool_result(value: Any) -> Any:
     parsed = value
     for _ in range(4):
         if not isinstance(parsed, str):
@@ -89,5 +89,5 @@ def _parse_native_result(value: Any) -> Any:
         parsed = candidate
     if isinstance(parsed, list) and len(parsed) == 1 and isinstance(parsed[0], dict):
         if "text" in parsed[0]:
-            return _parse_native_result(parsed[0]["text"])
+            return parse_native_tool_result(parsed[0]["text"])
     return parsed

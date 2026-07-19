@@ -10,6 +10,7 @@ from strands_evals.types.evaluation import EvaluationData, EvaluationOutput
 from strands_evals.types.trace import EvaluationLevel, TextContent
 
 from scripts.judge_weather_calculator import JudgeInputError, judge_case
+from src.strands_evals_compatibility import parse_native_tool_result
 
 
 _RUNTIME_TO_CONTRACT = {
@@ -47,7 +48,10 @@ class WeatherCalculatorJudgeEvaluator(Evaluator[str, str]):
                         {
                             "tool_id": tool_id,
                             "arguments": execution.tool_call.arguments,
-                            "result": {"content": execution.tool_result.content, "error": execution.tool_result.error},
+                            "result": {
+                                "output": parse_native_tool_result(execution.tool_result.content),
+                                "error": execution.tool_result.error,
+                            },
                         }
                     )
             elif not user_request and entry.content and isinstance(entry.content[0], TextContent):
