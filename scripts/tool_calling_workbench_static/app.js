@@ -57,6 +57,10 @@ function isFinalized() {
   return state.dataset.manifest.reviewStatus === "human-reviewed";
 }
 
+function canFinalize() {
+  return state.dataset.capabilities?.canFinalize !== false;
+}
+
 function visibleRows() {
   const { search, family, review, author } = state.filters;
   const needle = normalized(search);
@@ -145,6 +149,7 @@ async function loadDataset() {
 
 function renderHeader() {
   const { manifest, summary } = state.dataset;
+  document.title = manifest.workbenchTitle || document.title;
   const reviewed = summary.reviewCounts.reviewed;
   const total = summary.rowCount;
   const percent = total ? (reviewed / total) * 100 : 0;
@@ -153,7 +158,7 @@ function renderHeader() {
   const top = element("div", { class: "header-top" });
   top.append(
     element("div", { class: "brand" },
-      element("h1", { text: "Corpus review workbench" }),
+      element("h1", { text: manifest.workbenchTitle || "Corpus review workbench" }),
       element("code", { text: `${manifest.datasetId}@${manifest.version}` }),
     ),
     element("span", {
@@ -169,6 +174,9 @@ function renderHeader() {
       element("span", { style: `width: ${percent}%` }),
     ),
   ));
+  if (state.dataset.notice) {
+    header.append(element("div", { class: "notice draft", text: state.dataset.notice }));
+  }
   const families = Object.entries(summary.familyCounts).map(([family, count]) =>
     element("span", { class: "summary-item", text: `${family}: ${count}` }),
   );
@@ -510,8 +518,10 @@ function renderInspector() {
     element("button", { type: "button", class: "primary", text: "Save row", "data-action": "save-row", disabled: isFinalized() || Boolean(state.rawError), onClick: () => saveRow(state.draftRow) }),
     element("button", { type: "button", text: "Mark reviewed", disabled: isFinalized(), onClick: () => markReviewStatus("reviewed") }),
     element("button", { type: "button", text: "Return to pending", disabled: isFinalized(), onClick: () => markReviewStatus("pending") }),
-    element("button", { type: "button", class: "danger", text: "Finalize dataset review", disabled: isFinalized(), onClick: finalizeDataset }),
   );
+  if (canFinalize()) {
+    actions.append(element("button", { type: "button", class: "danger", text: "Finalize dataset review", disabled: isFinalized(), onClick: finalizeDataset }));
+  }
   editorPanel.append(actions);
   inspector.append(editorPanel);
   return inspector;

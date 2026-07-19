@@ -6,7 +6,7 @@
 
 ## Concept
 
-Human gold is a preregistered expectation, not a reaction to model output. This week defines the only eight new cases used by the final vertical slice. The first six describe agent behavior and may later be compared across human, custom-judge, and managed-evaluator lanes. The last two describe infrastructure enforcement and receive boundary verdicts only.
+Human gold is a preregistered expectation, not a reaction to model output. Week 9 now begins with an editable eight-row draft projection assembled from the existing corpus. The draft keeps the source `tc-####` identities and may be incomplete; it is a review surface, not the final `slice-##` gold artifact. After that editorial pass, the reviewed inputs and expectations can be frozen for the final vertical slice. The first six eventual cases describe agent behavior and may later be compared across human, custom-judge, and managed-evaluator lanes. The last two eventual cases describe infrastructure enforcement and receive boundary verdicts only.
 
 | ID | Case | Evaluation kind | Automated-judge eligibility |
 | --- | --- | --- | --- |
@@ -27,13 +27,25 @@ The behavioral roles remain distinct: `slice-01` checks one current-weather call
 
 ## Build
 
-### 1. Author exactly eight inputs
+### 1. Assemble the eight-row draft projection
 
-Create `datasets/synthetic/production-slice-8.jsonl`. Reuse the established synthetic row vocabulary where it fits, but do not expand the corpus, add a labeling schema, or create an app. Each row has one stable ID, one prompt, one `evaluation_kind`, and its eligibility flags.
+The checked-in draft at `datasets/synthetic/production-slice-8.jsonl` projects the confirmed source rows `tc-0001`, `tc-0021`, `tc-0006`, `tc-0097`, `tc-0098`, `tc-0073`, `tc-0065`, and `tc-0092` from `datasets/synthetic/tool-calling-100.jsonl`. It preserves source IDs and row vocabulary while resetting review status to `pending`. Treat the 100-row source corpus as read-only; do not introduce the final `slice-##`/human-gold schema or claim that this draft is complete.
+
+The last two selected rows are placeholders for later boundary work: `tc-0065` is an existing out-of-capability case and `tc-0092` is an inert untrusted-result canary. Neither is a Policy or Guardrail receipt. Keep that limitation visible in the review UI and any draft notes.
+
+### 1a. Review the draft locally
+
+Use the separate loopback-only workbench:
+
+```bash
+uv run --locked python -m scripts.production_slice_workbench --port 8766
+```
+
+Open `http://127.0.0.1:8766/` to review and edit prompts, expectations, failure injection, and review status. The workbench supports durable draft saves and raw JSON editing, but deliberately disables finalization. It must not mutate the 100-row source corpus or imply that the two placeholders provide infrastructure evidence.
 
 Use `evaluation_kind` plus `automated_judge_eligible` with one fixed invariant: `slice-01` through `slice-06` are `behavior`/`true`, while `slice-07` and `slice-08` are `boundary`/`false`. Later consumers must require exact ID-set equality and filter on both fields before computing tool-selection or parameter denominators.
 
-### 2. Freeze the six behavioral expectations blind
+### 2. Freeze the six behavioral expectations blind after draft review
 
 Before seeing any model output, record for each eligible row:
 
@@ -56,9 +68,9 @@ Compare the source operand by exact numeric value: formatting differences such a
 
 Mechanical checks prove row shape, exact ID coverage, metadata consistency, and declared invariants. They cannot prove that natural-language gold follows from a prompt. Review every prompt beside its expectation and pinned tool contracts; attest that every city, unit, operation, stop condition, and bounded alternative is derivable without external knowledge. A prompt/expectation mismatch blocks the freeze even when JSON and joins are valid.
 
-### 3. Preregister the two boundary expectations
+### 3. Preregister the two boundary expectations after draft review
 
-For `slice-07`, expect the unregistered forecast operation to be denied by a deterministic AgentCore Policy authorization rule under the intended principal context. For `slice-08`, expect an inert prompt-attack canary to be denied by an AgentCore Policy rule using a probabilistic Bedrock Guardrail check on Gateway target input.
+Do not relabel the current `tc-0065` and `tc-0092` placeholders as boundary evidence. For the later final-gold projection, define `slice-07` as an unregistered forecast operation denied by a deterministic AgentCore Policy authorization rule under the intended principal context, and `slice-08` as an inert prompt-attack canary denied by an AgentCore Policy rule using a probabilistic Bedrock Guardrail check on Gateway target input.
 
 Record the intended control, tested action/input class, expected deny outcome, and `observation_owner: week_11` now. Do not place mutable evidence status, receipt references, or final boundary verdicts in the frozen Week 9 gold. Configuration text, planned Terraform, local simulation, or a synthetic denial is not observed proof.
 
@@ -74,17 +86,21 @@ Summarize composition, the semantic-review attestation, exact digests, and claim
 
 ## Deliverable
 
-One eight-row artifact group:
+The initial draft phase delivers:
 
 - `datasets/synthetic/production-slice-8.jsonl`
+- `scripts/production_slice_workbench.py` plus the shared static workbench behavior
+
+The later final-gold phase delivers the reviewed artifact group:
+
 - `datasets/labels/production-slice-8-human.jsonl`
 - `docs/reports/week-09-human-labels.md`
 
-There is no agent execution, browser workbench, second pass, second rater, kappa target, synthetic denial receipt, or new test this week.
+There is no agent execution, second rater, kappa target, synthetic denial receipt, or final boundary evidence in the initial draft phase. The browser workbench is for local review/editing only; it is not a finalization or evaluation lane.
 
 ## Success check
 
-All eight expectations and eligibility rules are frozen before model output: the six behavioral rows have explicit sequence, parameter, exact intermediate-lineage, typed failure/stop, and acceptable-response expectations with rationales; the two boundary rows name their future observation owner without fabricating evidence; exact-byte file and per-row expectation digests are recorded; and the report states that this tiny slice cannot establish broad calibration or generalization.
+For the initial draft phase, all eight selected rows load, validate, edit, and save through the loopback workbench without changing the source corpus; copied rows remain visibly pending; and the two placeholders are not presented as infrastructure evidence. For the later freeze, all eight expectations and eligibility rules must be frozen before model output: the six behavioral rows have explicit sequence, parameter, exact intermediate-lineage, typed failure/stop, and acceptable-response expectations with rationales; the two boundary rows name their future observation owner without fabricating evidence; exact-byte file and per-row expectation digests are recorded; and the report states that this tiny slice cannot establish broad calibration or generalization.
 
 ## Read
 

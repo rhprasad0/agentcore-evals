@@ -100,7 +100,7 @@ def validate_dataset(snapshot: DatasetSnapshot, paths: DatasetPaths) -> list[Val
     Draft202012Validator.check_schema(manifest_schema)
     Draft202012Validator.check_schema(example_schema)
 
-    issues.extend(_schema_issues(Draft202012Validator(manifest_schema), snapshot.manifest, "manifest"))
+    issues.extend(schema_issues(Draft202012Validator(manifest_schema), snapshot.manifest, "manifest"))
     try:
         resolve_exact_version_bindings(
             snapshot.manifest["agentManifest"],
@@ -114,7 +114,7 @@ def validate_dataset(snapshot: DatasetSnapshot, paths: DatasetPaths) -> list[Val
     validator = Draft202012Validator(example_schema)
     for index, row in enumerate(snapshot.rows, start=1):
         example_id = row.get("exampleId", f"row-{index}") if isinstance(row, dict) else f"row-{index}"
-        issues.extend(_schema_issues(validator, row, str(example_id)))
+        issues.extend(schema_issues(validator, row, str(example_id)))
     issues.extend(_duplicate_prompt_issues(snapshot.rows))
     issues.extend(_call_bound_issues(snapshot.rows))
     granted_tool_ids = {
@@ -123,7 +123,7 @@ def validate_dataset(snapshot: DatasetSnapshot, paths: DatasetPaths) -> list[Val
         if isinstance(reference, dict) and isinstance(reference.get("toolId"), str)
     }
     issues.extend(_tool_reference_issues(snapshot.rows, granted_tool_ids))
-    contract_metadata, contract_issues = _contract_metadata(snapshot.manifest, paths)
+    contract_metadata, contract_issues = load_contract_metadata(snapshot.manifest, paths)
     issues.extend(contract_issues)
     issues.extend(_constraint_path_issues(snapshot.rows, contract_metadata.input_fields))
     issues.extend(
@@ -163,7 +163,7 @@ def _resolve_repo_path(repo_root: Path, relative_path: str) -> Path:
     return candidate
 
 
-def _schema_issues(
+def schema_issues(
     validator: Draft202012Validator,
     document: Any,
     prefix: str,
@@ -260,7 +260,7 @@ def _tool_reference_issues(
     return issues
 
 
-def _contract_metadata(
+def load_contract_metadata(
     manifest: dict[str, Any],
     paths: DatasetPaths,
 ) -> tuple[ContractMetadata, list[ValidationIssue]]:
