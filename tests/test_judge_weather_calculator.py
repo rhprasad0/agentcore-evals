@@ -37,8 +37,12 @@ class JudgeCalibrationTests(unittest.TestCase):
     def test_dry_run_accounts_for_all_eight_without_a_provider(self) -> None:
         receipt = run_dry_run(REPO_ROOT)
 
-        self.assertEqual([f"slice-{index:02}" for index in range(1, 7)], receipt["eligibleCaseIds"])
+        eligible_ids = [f"slice-{index:02}" for index in range(1, 7)]
+        self.assertEqual(eligible_ids, receipt["eligibleCaseIds"])
         self.assertEqual(["slice-07", "slice-08"], receipt["excludedCaseIds"])
+        self.assertEqual(eligible_ids, receipt["renderedCaseIds"])
+        self.assertEqual(set(eligible_ids), set(receipt["renderedRequestSha256"]))
+        self.assertTrue(all(len(digest) == 64 for digest in receipt["renderedRequestSha256"].values()))
         self.assertFalse(receipt["providerTouched"])
 
     def test_boundary_case_is_rejected_before_provider_is_called(self) -> None:

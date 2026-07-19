@@ -24,7 +24,7 @@ uv run --locked python -m scripts.judge_weather_calculator --dry-run
 Receipt:
 
 ```json
-{"eligibleCaseIds":["slice-01","slice-02","slice-03","slice-04","slice-05","slice-06"],"excludedCaseIds":["slice-07","slice-08"],"providerTouched":false}
+{"eligibleCaseIds":["slice-01","slice-02","slice-03","slice-04","slice-05","slice-06"],"excludedCaseIds":["slice-07","slice-08"],"providerTouched":false,"renderedCaseIds":["slice-01","slice-02","slice-03","slice-04","slice-05","slice-06"],"renderedRequestSha256":{"slice-01":"ef9f4a6fbfe8f2de00f1571fbb0564c0020072c779e4097e92b6fa69768ec2e1","slice-02":"c659bf168381615a099ba16743ebe9acd4eb27c38a8a006963a8ea8fe7cf1543","slice-03":"cd0da59260526b92d2d370365ef42904ef3553a576a9bc434d88d5b092535710","slice-04":"aaaa3bf9d05f4f1d78e54787511523913f39ae5ded3a9c7c1227a262c56c2772","slice-05":"a6439b4f57b53b7f1f31e8671dc6665f8e4ae0e743eb8f0c4d9e96bb36687432","slice-06":"ffba3da56d98246dbed49235364545d7eb6be2e73fb56f445a64e656e9527e76}}
 ```
 
 ## Calibration and held-out local evaluation

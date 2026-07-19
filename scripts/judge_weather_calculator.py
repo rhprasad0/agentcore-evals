@@ -13,6 +13,8 @@ from typing import Any, Literal, Mapping
 from pydantic import BaseModel
 from strands import Agent
 
+from src.production_slice_dataset import SlicePaths, load_slice, validate_slice
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 HELDOUT_CASE_IDS = frozenset(
@@ -188,7 +190,54 @@ def run_dry_run(repo_root: Path) -> dict[str, Any]:
     excluded = [row["case_id"] for row in rows if row.get("automated_judge_eligible") is not True]
     if eligible != sorted(HELDOUT_CASE_IDS) or excluded != ["slice-07", "slice-08"]:
         raise JudgeInputError("frozen eligibility split differs from the Week 10 contract")
-    return {"eligibleCaseIds": eligible, "excludedCaseIds": excluded, "providerTouched": False}
+    paths = SlicePaths.from_repo_root(repo_root)
+    snapshot = load_slice(paths)
+    if issues := validate_slice(snapshot, paths):
+        raise JudgeInputError(f"production slice is invalid: {issues[0].path}: {issues[0].message}")
+    drafts = {row["goldDraft"]["caseId"]: row for row in snapshot.rows}
+    rendered: dict[str, str] = {}
+    for row in rows:
+        case_id = row["case_id"]
+        if case_id not in HELDOUT_CASE_IDS:
+            continue
+        draft = drafts.get(case_id)
+        prompt = draft.get("prompt") if isinstance(draft, Mapping) else None
+        expected = row.get("expectation")
+        _validate_dry_run_request(case_id, prompt, expected)
+        request = _judge_prompt(
+            case_id,
+            expected,
+            {"user_request": prompt, "observed_calls": []},
+        )
+        rendered[case_id] = sha256(request.encode("utf-8")).hexdigest()
+    if list(rendered) != eligible:
+        raise JudgeInputError("dry run did not render every eligible case")
+    return {
+        "eligibleCaseIds": eligible,
+        "excludedCaseIds": excluded,
+        "renderedCaseIds": list(rendered),
+        "renderedRequestSha256": rendered,
+        "providerTouched": False,
+    }
+
+
+def _validate_dry_run_request(case_id: str, prompt: Any, expected: Any) -> None:
+    """Validate a model-visible request shape without inventing an observed trajectory."""
+
+    if not isinstance(prompt, str) or not prompt.strip() or not isinstance(expected, Mapping):
+        raise JudgeInputError(f"dry run {case_id} lacks prompt or expectation")
+    sequence = expected.get("orderedToolSequence")
+    tools = expected.get("toolIds")
+    constraints = expected.get("argConstraints")
+    if (
+        not isinstance(sequence, list)
+        or not all(isinstance(tool, str) for tool in sequence)
+        or not isinstance(tools, list)
+        or not all(isinstance(tool, str) for tool in tools)
+        or not isinstance(constraints, list)
+        or any(tool not in tools for tool in sequence)
+    ):
+        raise JudgeInputError(f"dry run {case_id} has invalid normalized expectation")
 
 
 def run_calibration(repo_root: Path, provider: Callable[[str], Mapping[str, Any]] = bedrock_provider) -> dict[str, Any]:
