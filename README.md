@@ -81,8 +81,8 @@ STAGING spans → custom judge + AgentCore Evaluations
 | ✅ | [5 — Contracts](docs/weeks/week-05-tool-contracts.md) | Contracts, manifests, taxonomy, IAM denials. |
 | ✅ | [6 — Dataset](docs/weeks/week-06-dataset-validation.md) | 100 reviewed rows, mocks, traces, validators. |
 | ✅ | [7 — Specimen](docs/weeks/week-07-specimen.md) | Pinned 62-case weather projection. |
-| 🚧 | [8 — Harness closeout](docs/weeks/week-08-local-harness.md) | One fixture-backed 62-case baseline and closeout receipt. |
-| ⬜ | [9 — Human gold](docs/weeks/week-09-human-labeling.md) | Eight frozen expectations: six behavior, two denials. |
+| ✅ | [8 — Harness closeout](docs/weeks/week-08-local-harness.md) | One fixture-backed 62-case baseline and closeout receipt. |
+| 🚧 | [9 — Human gold](docs/weeks/week-09-human-labeling.md) | Eight frozen expectations: six behavior, two denials. |
 | ⬜ | [10 — Judge contract](docs/weeks/week-10-judge-calibration.md) | One frozen prompt/script and dry run; no model call. |
 | ⬜ | [11 — Terraform + Gateway](docs/weeks/week-11-gateway-weather.md) | Remote state, Identity/OpenAPI target, Policy/guardrails, allow/deny receipts. |
 | ⬜ | [12 — Reliability](docs/weeks/week-12-reliability-gates.md) | Deadline, one retry, shared breaker, three tests. |
@@ -106,6 +106,8 @@ STAGING spans → custom judge + AgentCore Evaluations
 > **Week 6 closed — 2026-07-16.** Reviewed 100-row corpus, deterministic mocks, canonical trace schema, telemetry mapping, and one offline validation command. Links: [`datasets/synthetic/tool-calling-100.manifest.json`](datasets/synthetic/tool-calling-100.manifest.json), [`docs/telemetry-compatibility.md`](docs/telemetry-compatibility.md).
 
 > **Week 7 closed — 2026-07-17.** Pinned weather-only specimen, two 62-case normalized executions, and a bounded errata review. Links: [`docs/reports/week-07-full-projection.md`](docs/reports/week-07-full-projection.md), [`docs/errata/week-07-dataset-errata.md`](docs/errata/week-07-dataset-errata.md).
+
+> **Week 8 closed — 2026-07-19.** Locked offline Stage B closeout: 57 focused tests passed; 62 projected cases accounted for; 60 evidence-valid traces; two instrument errors; zero gate errors; deterministic JSON/Markdown receipts. Link: [`docs/weeks/week-08-local-harness.md`](docs/weeks/week-08-local-harness.md).
 
 ## Guardrails
 

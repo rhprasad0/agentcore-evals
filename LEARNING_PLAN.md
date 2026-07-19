@@ -22,7 +22,7 @@ Weeks 1–7 are frozen historical foundation:
 | 6 | Reviewed 100-row corpus, deterministic mocks, canonical traces, validators, and safe fixtures. |
 | 7 | Pinned weather-only specimen and two normalized 62-case executions with explicit instrument errors. |
 
-Week 8 is in progress under a reduced closeout contract. Keep the existing harness, fixtures, adapters, gates, schemas, and reporting code. Close it only when one fixture-backed Stage B run:
+Week 8 closed under the reduced closeout contract after one fixture-backed Stage B run:
 
 1. accounts for all 62 projected cases;
 2. keeps instrument and gate errors outside behavioral denominators;
@@ -145,7 +145,7 @@ Each guide's success check is its exit gate. Completed guides may describe histo
 | [5](docs/weeks/week-05-tool-contracts.md) | Closed | Contracts | Schemas, manifests, taxonomy, and IAM denials. |
 | [6](docs/weeks/week-06-dataset-validation.md) | Closed | Dataset | 100 reviewed rows, mocks, traces, validators. |
 | [7](docs/weeks/week-07-specimen.md) | Closed | Specimen | Pinned 62-case weather projection and normalized traces. |
-| [8](docs/weeks/week-08-local-harness.md) | In progress | Harness closeout | One provenance-accounted fixture-backed 62-case baseline. |
+| [8](docs/weeks/week-08-local-harness.md) | Closed | Harness closeout | One provenance-accounted fixture-backed 62-case baseline. |
 | [9](docs/weeks/week-09-human-labeling.md) | Planned | Human gold | Eight preregistered expectations: six behavior, two denials. |
 | [10](docs/weeks/week-10-judge-calibration.md) | Planned | Judge contract | One frozen prompt/script and dry run; no model call. |
 | [11](docs/weeks/week-11-gateway-weather.md) | Planned | Terraform + Gateway | Remote state, Identity/OpenAPI target, Policy, native guardrail checks, allow/deny receipts. |

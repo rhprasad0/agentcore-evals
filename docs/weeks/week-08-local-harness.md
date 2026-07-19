@@ -62,7 +62,60 @@ Record the exact command, locked SDK version, fixture manifest identity/hash, co
 - [x] Provenance-linked fixture set with 60 traces and two explicit error receipts.
 - [x] Fixture-only Stage B preflight and replay with tested live-dependency denials.
 - [x] Schema-backed canonical JSON and Markdown renderers.
-- [ ] One freshly verified baseline receipt with exact command/version/hash/counts recorded.
+- [x] One freshly verified baseline receipt with exact command/version/hash/counts recorded.
+
+## Verified closeout receipt
+
+**Verified:** 2026-07-19 09:44:44 UTC
+**Environment:** locked `uv` environment; AWS credential/profile variables removed; AWS config and shared-credentials files set to `/dev/null`; `AWS_EC2_METADATA_DISABLED=true`.
+
+### Command sequence
+
+```bash
+tmpdir=$(mktemp -d)
+
+env -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY -u AWS_SESSION_TOKEN \
+  -u AWS_PROFILE -u AWS_DEFAULT_PROFILE \
+  AWS_EC2_METADATA_DISABLED=true AWS_CONFIG_FILE=/dev/null \
+  AWS_SHARED_CREDENTIALS_FILE=/dev/null \
+  uv run --locked python -m unittest \
+  tests/test_week_08_cases.py \
+  tests/test_week_08_gates.py \
+  tests/test_week_08_harness.py \
+  tests/test_week_08_reporting.py \
+  tests/test_week_08_strands_evals_sdk_contract.py
+
+env -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY -u AWS_SESSION_TOKEN \
+  -u AWS_PROFILE -u AWS_DEFAULT_PROFILE \
+  AWS_EC2_METADATA_DISABLED=true AWS_CONFIG_FILE=/dev/null \
+  AWS_SHARED_CREDENTIALS_FILE=/dev/null \
+  uv run --locked python -m scripts.summarize_run \
+  --repo-root . --format json \
+  --output "$tmpdir/week-08-stage-b-replay.json"
+
+env -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY -u AWS_SESSION_TOKEN \
+  -u AWS_PROFILE -u AWS_DEFAULT_PROFILE \
+  AWS_EC2_METADATA_DISABLED=true AWS_CONFIG_FILE=/dev/null \
+  AWS_SHARED_CREDENTIALS_FILE=/dev/null \
+  uv run --locked python -m scripts.summarize_run \
+  --repo-root . --format markdown \
+  --output "$tmpdir/week-08-stage-b-replay.md"
+```
+
+### Result and provenance
+
+- Focused tests: **57 passed**.
+- `strands-agents-evals==1.0.1`; `strands-agents==1.48.0`.
+- Fixture set: `evals.weather_only_regression`.
+- Fixture manifest SHA-256: `a1876b2492b6cdb194deb88ecabd551c2260bcabc9f33ca5b412461eaa566807`.
+- Projection SHA-256: `e35782f8f81d06e191b9d29e3e489cf977ca3df810190295d09c22fdc37a22f4`.
+- Experiment: `sha256:44a9f913a720759748d57647f002b0e924d39b38b65a2fdfbe713774bfc2cca5`.
+- Source run: `5a10e0ab-93dc-4e4f-99d6-73dfa3397e9c`.
+- Counts: **62 projected, 60 evidence-valid, 2 instrument errors, 0 gate errors**.
+- Canonical report SHA-256: JSON `7c0a0f4b37c12fb094f60ca4fee14162867b68cb712d3b97d0ef581fae45ef26`; Markdown `5531572383ae29becc0df241be47a9be60bfba49512bfaa9ff92b650e8d6a10c`.
+- Repeated rendering produced the same canonical aggregate; the committed receipts passed the report/public-safety checks and `git diff --check`.
+
+Week 8 is closed. The next bounded task is the eight-row Week 9 human expectation sheet.
 
 ## Integrated success check
 
