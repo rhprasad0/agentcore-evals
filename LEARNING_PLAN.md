@@ -68,7 +68,7 @@ CloudFront + WAF rate rule
        │         │    ├─ total deadline + one retry + shared DynamoDB breaker
        │         │    └─ AgentCore Gateway
        │         │         ├─ Policy permits current weather and denies forecast
-       │         │         ├─ native Policy guardrail checks on Gateway input/output
+       │         │         ├─ Policy rules use Bedrock Guardrail checks on Gateway input/output
        │         │         └─ OpenWeather OpenAPI target
        │         │              └─ Identity injects `appid`; Runtime never sees it
        │         └─ direct calculator tool
@@ -85,10 +85,10 @@ Ownership is intentionally split by responsibility:
 
 - Identity stores and injects the OpenWeather key.
 - Gateway invokes the provider target.
-- AgentCore Policy deterministically authorizes Gateway actions and runs native probabilistic checks there.
+- AgentCore Policy deterministically authorizes Gateway actions and can evaluate probabilistic Bedrock Guardrail checks there.
 - The Runtime wrapper owns model-visible naming, typed inputs, response normalization, deadline, retry, and breaker behavior.
 - The direct calculator does not pass through Gateway Policy.
-- The public proxy's separate Bedrock Guardrail covers browser input and final output; it is not the native Policy guardrail mechanism.
+- The public proxy's separate Bedrock Guardrail covers browser input and final output; it is not the Guardrail-in-Policy mechanism at Gateway.
 - Terraform owns durable resources and named endpoint promotion. The normal rollback is an HCL change, reviewed plan, and apply—not state surgery.
 
 ## Scope and non-goals
@@ -100,9 +100,9 @@ The broad deterministic baseline remains the 62-case weather projection. Weeks 9
 3. metric weather→calculator;
 4. imperial weather→calculator;
 5. weather failure stops before calculator;
-6. no-tool or clarification behavior;
+6. missing-location clarification with no tool call;
 7. deterministic Policy denial; and
-8. native Gateway guardrail denial.
+8. Policy denial using a Bedrock Guardrail check on Gateway target input.
 
 Only the first six are eligible for human/custom/managed tool-accuracy comparison. The two denial rows receive boundary-specific verdicts and never enter tool-selection or parameter-accuracy denominators. This eight-row comparison is a worked example, not calibrated population evidence: report counts and every disagreement, not impressive percentages without denominators.
 
@@ -111,6 +111,7 @@ Explicitly absent: a five-tool chain, write action, generalized resilience packa
 ## Managed evaluation boundaries (read before Week 8)
 
 - A judge score is a measurement, not truth. Freeze human expectations before output and freeze the custom rubric before final Runtime evidence.
+- Week 9 human gold remains immutable. Week 11 records the two observed boundary verdicts in a separate joined evidence file rather than rewriting the frozen expectations.
 - Collect the six eligible synthetic STAGING spans once from one immutable Runtime version. The custom judge and both managed built-ins evaluate those exact spans.
 - Record case ID, Runtime version, trace/span identity, evaluator ID, run date, eligibility, and transport. If those joins are missing, the comparison is invalid.
 - `Builtin.ToolSelectionAccuracy` and `Builtin.ToolParameterAccuracy` are moving managed dependencies; a local schema pass does not prove service acceptance.
@@ -124,6 +125,7 @@ Explicitly absent: a five-tool chain, write action, generalized resilience packa
 - [AgentCore Gateway](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html)
 - [AgentCore Identity](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/identity.html)
 - [AgentCore Policy](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy.html)
+- [Guardrails in AgentCore policies](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy-guardrails-in-policies.html)
 - [AgentCore Evaluations](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/evaluations.html)
 - [AgentCore Observability](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/observability.html)
 - [Terraform AgentCore Runtime](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/bedrockagentcore_agent_runtime)
@@ -148,7 +150,7 @@ Each guide's success check is its exit gate. Completed guides may describe histo
 | [8](docs/weeks/week-08-local-harness.md) | Closed | Harness closeout | One provenance-accounted fixture-backed 62-case baseline. |
 | [9](docs/weeks/week-09-human-labeling.md) | Planned | Human gold | Eight preregistered expectations: six behavior, two denials. |
 | [10](docs/weeks/week-10-judge-calibration.md) | Planned | Judge contract | One frozen prompt/script and dry run; no model call. |
-| [11](docs/weeks/week-11-gateway-weather.md) | Planned | Terraform + Gateway | Remote state, Identity/OpenAPI target, Policy, native guardrail checks, allow/deny receipts. |
+| [11](docs/weeks/week-11-gateway-weather.md) | Planned | Terraform + Gateway | Remote state, Identity/OpenAPI target, Policy, Guardrail checks, allow/deny receipts. |
 | [12](docs/weeks/week-12-reliability-gates.md) | Planned | Reliability | Deadline, one retry, shared breaker, three tests, failure probes. |
 | [13](docs/weeks/week-13-runtime-operations.md) | Planned | Runtime operations | Python 3.13 CodeZip, STAGING/PROD promotion, telemetry, two alarms, old-stack teardown. |
 | [14](docs/weeks/week-14-managed-evaluation-ci.md) | Planned | Managed eval + CI | Same-evidence comparison, offline PR gate, manual OIDC run, red/green receipt. |
@@ -183,6 +185,6 @@ Every metric names its unit, eligible population, numerator, denominator, and ex
 
 The completed dataset/fixture publication machinery is historical foundation, not future curriculum scope. Tracked evidence still uses synthetic inputs, placeholders, explicit provenance, and scoped claims.
 
-Live production controls are different: deterministic AgentCore Policy and native guardrail checks protect Gateway traffic, while a separate Bedrock Guardrail protects public proxy input/output. Neither covers the direct calculator as a Gateway tool boundary. WAF, the daily Runtime cap, kill switch, alarms, and Budget each control a different risk; no one control is a hard account-wide spend or safety guarantee.
+Live production controls are different: deterministic AgentCore Policy authorization plus Policy rules using probabilistic Bedrock Guardrail checks protect Gateway traffic, while a separate Bedrock Guardrail protects public proxy input/output. Neither covers the direct calculator as a Gateway tool boundary. WAF, the daily Runtime cap, kill switch, alarms, and Budget each control a different risk; no one control is a hard account-wide spend or safety guarantee.
 
 Judges remain measurements. Deployment remains evidence. Terraform state restoration remains break-glass. The honest sentence is always available: **measured X on Y under Z**.

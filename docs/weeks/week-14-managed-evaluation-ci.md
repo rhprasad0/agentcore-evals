@@ -31,7 +31,9 @@ Create `scripts/run_agentcore_managed_eval.py`. It loads exactly the six capture
 - `Builtin.ToolSelectionAccuracy`
 - `Builtin.ToolParameterAccuracy`
 
-Keep `slice-07` and `slice-08` in the output with human boundary verdicts and explicit custom/managed `not_eligible` values. The joined report has one row per case and shows evaluation kind, eligibility, human/boundary verdict, custom verdict, both managed results, and compact disagreement notes.
+Load all eight frozen expectations from `datasets/labels/production-slice-8-human.jsonl`, then join the two observed boundary verdicts from `datasets/evidence/production-slice-8-boundary.jsonl` by exact case ID, expectation version, and expectation digest. Reject duplicate, missing, extra, or digest-mismatched boundary evidence rather than mutating or silently superseding Week 9 gold.
+
+Keep `slice-07` and `slice-08` in the output with their frozen boundary expectations, separately observed boundary verdicts, and explicit custom/managed `not_eligible` values. The joined report has one row per case and shows evaluation kind, eligibility, human expectation or boundary verdict, custom verdict, both managed results, and compact disagreement notes.
 
 Do not execute this model-backed path from a developer shell. Dry validation may prove joins and render requests; the one metered execution belongs to the manual job.
 
@@ -51,7 +53,7 @@ The job accepts exactly six unique case/trace/span references, runs the custom a
 
 ### 4. Execute once and report honestly
 
-After reviewing expected spend, run the manual job once. Create `docs/reports/week-14-managed-evaluation.md` with eight rows, counts over the six eligible rows, every human/custom/managed disagreement, evaluator IDs/dates, Runtime identity, and transport details.
+After reviewing expected spend, run the manual job once. Create `docs/reports/week-14-managed-evaluation.md` with eight rows, counts over the six eligible rows, every human/custom/managed disagreement, the two separately joined boundary observations, evaluator IDs/dates, Runtime identity, and transport details.
 
 Do not infer calibration, stability, or false rates from six examples. A perfect six-of-six result still means only that the lanes agreed on this worked example.
 

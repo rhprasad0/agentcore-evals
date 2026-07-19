@@ -6,9 +6,9 @@
 
 ## Concept
 
-This week gives the final system one infrastructure owner and one governed external-tool boundary. Terraform owns the durable resources. AgentCore Identity owns the OpenWeather key, Gateway invokes the OpenAPI target, deterministic Policy authorizes operations, native Policy guardrail checks screen Gateway traffic, and a narrow Runtime wrapper is the only weather tool the model sees.
+This week gives the final system one infrastructure owner and one governed external-tool boundary. Terraform owns the durable resources. AgentCore Identity owns the OpenWeather key, Gateway invokes the OpenAPI target, deterministic Policy authorizes operations, Policy rules evaluate probabilistic Bedrock Guardrail checks on Gateway traffic, and a narrow Runtime wrapper is the only weather tool the model sees.
 
-The direct calculator stays outside Gateway. Identity does not normalize responses or retry calls. Policy/native checks do not govern calculator arguments or the final model response. Week 15 adds a separate Bedrock Guardrail at the public proxy; it is not shared with the native Gateway mechanism.
+The direct calculator stays outside Gateway. Identity does not normalize responses or retry calls. Gateway Policy/Guardrail checks do not govern calculator arguments or the final model response. Week 15 adds a separate Bedrock Guardrail at the public proxy; it is not the Guardrail-in-Policy mechanism used at Gateway.
 
 ## Build
 
@@ -36,11 +36,11 @@ Create `weatheragent/app/weather_agent/gateway_weather.py`. It accepts the exist
 
 The raw current-weather and forecast operations are never model-visible. The forecast probe exists only to produce one deterministic denial receipt and is never called again afterward. Week 12 adds deadline, retry, and breaker behavior; Week 11 proves only happy-path normalization.
 
-### 4. Attach Policy and native Gateway guardrail checks
+### 4. Attach Policy authorization and Bedrock Guardrail checks
 
 Run one Terraform-managed AgentCore Policy engine in `ENFORCE`. Author the smallest reviewed rules that permit current weather and deny forecast/unapproved actions. Add native `when guardrails` checks for prompt attack on target input and one narrowly reviewed output safeguard. Grant the Gateway role only the documented `bedrock:InvokeGuardrailChecks` permission required by this path.
 
-Keep deterministic authorization and probabilistic screening separate in receipts. A Policy denial and a guardrail block answer different questions.
+Keep deterministic authorization and probabilistic Bedrock Guardrail scoring separate in receipts. For the prompt-attack probe, the AgentCore Policy rule evaluates the returned Guardrail score and produces the tested Gateway allow/deny decision. An authorization denial and a Guardrail-informed Policy denial answer different questions.
 
 ### 5. Apply, probe, and read back
 
@@ -48,9 +48,11 @@ Run `terraform fmt -check`, `terraform validate`, an inspectable saved plan, exp
 
 1. allowed current-weather invocation;
 2. denied unregistered forecast invocation under the intended principal context; and
-3. inert prompt-attack canary blocked by the native Gateway guardrail policy.
+3. inert prompt-attack canary denied by the AgentCore Policy rule using a Bedrock Guardrail check on Gateway target input.
 
-Use the last two to complete the pending Week 9 boundary rows. They remain excluded from custom and managed tool-accuracy judges.
+Use the last two to create `datasets/evidence/production-slice-8-boundary.jsonl`; do not mutate the frozen Week 9 human-gold file. Its exactly two rows join `slice-07` and `slice-08` by `case_id`, `expectation_version`, and the matching frozen `expectation_sha256`, then record `observation_status`, boundary verdict, control, repository-relative receipt reference, tested scope, and observation time. Reject a row whose ID/version/digest does not match gold. A missing receipt remains pending in the report rather than becoming a pass.
+
+Keep the tracked evidence public-safe: no account IDs, ARNs, request IDs, live endpoints, raw prompts/responses, private paths, or principal identifiers. Both rows remain excluded from custom and managed tool-accuracy judges.
 
 ## Deliverable
 
@@ -61,7 +63,7 @@ One governed-boundary artifact group:
 - `schemas/openweather-gateway.openapi.yaml`
 - `weatheragent/app/weather_agent/gateway_weather.py`
 - `docs/reports/week-11-production-gateway-boundary.md`
-- completed boundary entries in `datasets/labels/production-slice-8-human.jsonl`
+- `datasets/evidence/production-slice-8-boundary.jsonl`
 
 The AgentCore CLI may package, validate, inspect, invoke, or evaluate; do not use its deploy path for final resources.
 

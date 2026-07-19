@@ -14,7 +14,7 @@ The curriculum is [`LEARNING_PLAN.md`](LEARNING_PLAN.md). The weekly guides are 
 1. **Exactly two capabilities:** current weather and calculator. Dropped: the five-tool/write-action path, labeling or judge platform, repeated/nightly managed campaigns, Memory/multi-agent work, and optimizer trial.
 2. **Terraform owns all final durable infrastructure:** remote state, AgentCore, IAM, observability, public edge, and the existing Budget.
 3. **AgentCore Identity owns the OpenWeather credential:** Gateway injects `appid`; the Runtime never receives the key.
-4. **Policy and guardrails have named scopes:** deterministic AgentCore Policy plus native guardrail checks govern Gateway traffic; a separate Bedrock Guardrail protects public proxy input/output.
+4. **Policy and guardrails have named scopes:** deterministic AgentCore Policy authorization plus Policy rules using probabilistic Bedrock Guardrail checks govern Gateway traffic; a separate Bedrock Guardrail protects public proxy input/output.
 5. **One tiny same-evidence evaluation:** six eligible synthetic STAGING traces go to human expectations, one custom judge, and two managed built-ins; two denial rows stay in separate boundary metrics.
 6. **Telemetry supports operations:** CloudWatch traces, a small dashboard, one duration alarm, one error alarm, and SNS notifications.
 7. **The public edge is capped:** private S3 UI through CloudFront, WAF rate rule, IAM-protected Lambda Function URL origin, atomic 10-Runtime-calls/day cap, and an immediate kill switch.
@@ -35,7 +35,7 @@ CloudFront + WAF
                  ├─ deadline + one retry + shared breaker
                  └─ AgentCore Gateway
                       ├─ deterministic Policy allow/deny
-                      ├─ native Policy guardrail checks
+                      ├─ Policy rules using Bedrock Guardrail checks
                       └─ OpenWeather target + Identity credential injection
 
 CloudWatch → dashboard/alarms → SNS
@@ -115,7 +115,7 @@ STAGING spans → custom judge + AgentCore Evaluations
 - Never create Terraform/CloudFormation dual ownership.
 - Judges are measurements, not truth; six rows do not establish calibration.
 - Identity owns the weather credential; no key in source, Runtime environment, Terraform plan, or state.
-- Policy/native guardrail checks cover Gateway traffic; the proxy Guardrail covers browser input/output; the calculator is direct.
+- Policy authorization and Guardrail-in-Policy checks cover Gateway traffic; the proxy Guardrail covers browser input/output; the calculator is direct.
 - The daily cap bounds Runtime invocations; WAF rate-limits edge requests; the kill switch disables new Runtime calls; alarms notify; the Budget warns about account spend. None is an account-wide hard cap.
 - Public launch blocks on a clean canary scan for proxy logs and `aws/spans`.
 - A normal rollback is reviewed Terraform plus endpoint promotion; state restoration is break-glass.
