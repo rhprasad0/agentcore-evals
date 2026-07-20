@@ -42,11 +42,11 @@ Log request IDs, decisions, duration, and error classes—not prompt/response bo
 
 Keep the public control table separate from the weather-breaker table and give each role only its own item operations. Provide an operator command that flips `enabled` immediately.
 
-### 3. Configure WAF and lower the existing Budget
+### 3. Configure WAF and preserve the existing Budget
 
 Attach one measured rate-based WAF rule to CloudFront and test it with a bounded burst. Record the chosen rate and observed block; do not pretend it eliminates abuse.
 
-In the separate existing `infra/terraform/budget/` root, lower the reviewed default and ignored operator override from `$100` to `$10`. Preserve the working direct-email 50%/80% actual and 100% forecast notifications; do not expose the destination or recreate a retired notification path. Apply and verify this root separately.
+In the separate existing `infra/terraform/budget/` root, preserve the `$100` limit and the working direct-email 50%/80% actual and 100% forecast notifications; do not expose the destination or recreate a retired notification path. Apply and verify this root separately.
 
 Document residual cost: traffic can still incur CloudFront, WAF, Lambda, DynamoDB, and Guardrail charges after Runtime is capped, and WAF has a monthly base charge.
 
@@ -54,7 +54,7 @@ Document residual cost: traffic can still incur CloudFront, WAF, Lambda, DynamoD
 
 The page links to the Week 8 baseline, Week 9 human gold, Week 11 governed Gateway receipt, Week 12 reliability report, Week 13 operations view, and Week 14 same-evidence/CI results.
 
-Run bounded checks for normal weather→calculator, direct-origin denials, input canary block, explicit output canary block, normal output-check execution, `enabled=false`, a temporary one-call daily limit, WAF rate block, and `$10` Budget readback. Then run a harmless PROD canary and inspect proxy logs plus `aws/spans`; public launch blocks if raw anonymous request/response bodies appear.
+Run bounded checks for normal weather→calculator, direct-origin denials, input canary block, explicit output canary block, normal output-check execution, `enabled=false`, a temporary one-call daily limit, WAF rate block, and `$100` Budget readback. Then run a harmless PROD canary and inspect proxy logs plus `aws/spans`; public launch blocks if raw anonymous request/response bodies appear.
 
 Require no-surprise repeat plans for the production-demo and Budget roots.
 
@@ -69,7 +69,7 @@ One hosted-demo artifact group:
 
 ## Success check
 
-An anonymous browser reaches the private-bucket UI and completes a weather→calculator request through CloudFront and named PROD while direct origins fail; output is allowlisted and sampled logs/spans contain no raw bodies; input/output Guardrail checks are proven; kill switch, temporary cap, and WAF each block without unintended Runtime calls; the existing Terraform Budget reads `$10`; and both roots finish with no unexpected drift.
+An anonymous browser reaches the private-bucket UI and completes a weather→calculator request through CloudFront and named PROD while direct origins fail; output is allowlisted and sampled logs/spans contain no raw bodies; input/output Guardrail checks are proven; kill switch, temporary cap, and WAF each block without unintended Runtime calls; the existing Terraform Budget reads `$100`; and both roots finish with no unexpected drift.
 
 ## Read
 

@@ -75,7 +75,7 @@ CloudFront + WAF rate rule
        └─ proxy Bedrock Guardrail: ApplyGuardrail(OUTPUT)
 
 CloudWatch traces/dashboard/alarms → SNS
-Existing Terraform-managed AWS Budget → $10 monthly limit and direct email alerts
+Existing Terraform-managed AWS Budget → $100 monthly limit and direct email alerts
 Synthetic STAGING spans → custom judge + AgentCore Evaluations
 Committed replay + three focused tests → offline pull-request gate
 Manual GitHub OIDC job → one metered same-evidence evaluation run
@@ -156,7 +156,7 @@ Each guide's success check is its exit gate. Completed guides may describe histo
 | [12](docs/weeks/week-12-reliability-gates.md) | Planned | Reliability | Deadline, one retry, shared breaker, three tests, failure probes. |
 | [13](docs/weeks/week-13-runtime-operations.md) | Planned | Runtime operations | Python 3.13 CodeZip, STAGING/PROD promotion, telemetry, two alarms, old-stack teardown. |
 | [14](docs/weeks/week-14-managed-evaluation-ci.md) | Planned | Managed eval + CI | Same-evidence comparison, offline PR gate, manual OIDC run, red/green receipt. |
-| [15](docs/weeks/week-15-hosted-demo.md) | Planned | Hosted demo | CloudFront UI, proxy Guardrail, daily cap, kill switch, WAF, $10 Budget. |
+| [15](docs/weeks/week-15-hosted-demo.md) | Planned | Hosted demo | CloudFront UI, proxy Guardrail, daily cap, kill switch, WAF, $100 Budget. |
 | [16](docs/weeks/week-16-capstone.md) | Planned | Incident drill | Alarm, kill, endpoint rollback, Terraform recovery, controlled keep-live closeout. |
 
 # Appendix A — Week × Capability Map

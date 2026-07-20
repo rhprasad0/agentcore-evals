@@ -68,7 +68,7 @@ Verify and record an owner/date for the next monthly review plus:
 - working `enabled` kill switch;
 - one WAF rate rule;
 - two actionable alarms;
-- existing `$10` Terraform Budget;
+- existing `$100` Terraform Budget;
 - named PROD endpoint;
 - remote locked/versioned state; and
 - exact emergency disable/destroy and resource-absence checks.

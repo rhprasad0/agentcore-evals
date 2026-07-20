@@ -42,7 +42,7 @@ Read [`LEARNING_PLAN.md`](../../LEARNING_PLAN.md) first. Each guide has one inte
 
 | Week | Guide | Outcome |
 | --- | --- | --- |
-| 15 | [Capped Hosted Demo](week-15-hosted-demo.md) | CloudFront edge, proxy Guardrail, cap, kill switch, WAF, $10 Budget |
+| 15 | [Capped Hosted Demo](week-15-hosted-demo.md) | CloudFront edge, proxy Guardrail, cap, kill switch, WAF, $100 Budget |
 | 16 | [Capstone Incident Drill](week-16-capstone.md) | Alarm, kill, rollback, Terraform recovery, controlled closeout |
 
 The final system is a hosted learning demo. Passing its checks is scoped evidence about named cases and controls, not a production-readiness or safety certificate.

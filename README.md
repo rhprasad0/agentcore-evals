@@ -39,7 +39,7 @@ CloudFront + WAF
                       └─ OpenWeather target + Identity credential injection
 
 CloudWatch → dashboard/alarms → SNS
-Terraform Budget → $10 monthly limit + direct email alerts
+Terraform Budget → $100 monthly limit + direct email alerts
 STAGING spans → custom judge + AgentCore Evaluations
 ```
 
@@ -88,7 +88,7 @@ STAGING spans → custom judge + AgentCore Evaluations
 | ⬜ | [12 — Reliability](docs/weeks/week-12-reliability-gates.md) | Deadline, one retry, shared breaker, three tests. |
 | ⬜ | [13 — Runtime operations](docs/weeks/week-13-runtime-operations.md) | Python 3.13 CodeZip, STAGING/PROD promotion, telemetry and alarms. |
 | ⬜ | [14 — Managed eval + CI](docs/weeks/week-14-managed-evaluation-ci.md) | Same-evidence comparison, offline PR gate, manual OIDC run. |
-| ⬜ | [15 — Hosted demo](docs/weeks/week-15-hosted-demo.md) | CloudFront edge, proxy Guardrail, cap, kill switch, WAF, $10 Budget. |
+| ⬜ | [15 — Hosted demo](docs/weeks/week-15-hosted-demo.md) | CloudFront edge, proxy Guardrail, cap, kill switch, WAF, $100 Budget. |
 | ⬜ | [16 — Incident drill](docs/weeks/week-16-capstone.md) | Alarm, kill, rollback, Terraform recovery, controlled closeout. |
 
 ## Progress log
