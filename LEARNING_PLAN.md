@@ -152,8 +152,8 @@ Each guide's success check is its exit gate. Completed guides may describe histo
 | [8](docs/weeks/week-08-local-harness.md) | Closed | Harness closeout | One provenance-accounted fixture-backed 62-case baseline. |
 | [9](docs/weeks/week-09-human-labeling.md) | Closed | Human gold | Eight frozen expectations: six behavior, two denials. |
 | [10](docs/weeks/week-10-judge-calibration.md) | Closed | Judge calibration | Provider-free dry run, disjoint calibration, then all-six held-out local Strands evaluation. |
-| [11](docs/weeks/week-11-gateway-weather.md) | In progress | Terraform + Gateway | Remote state, Identity/OpenAPI target, Policy, Guardrail checks, allow/deny receipts. |
-| [12](docs/weeks/week-12-reliability-gates.md) | Planned | Reliability | Deadline, one retry, shared breaker, three tests, failure probes. |
+| [11](docs/weeks/week-11-gateway-weather.md) | Closed | Terraform + Gateway | Remote state, Identity/OpenAPI target, Policy, Guardrail checks, allow/deny receipts. |
+| [12](docs/weeks/week-12-reliability-gates.md) | In progress | Reliability | Deadline, one retry, shared breaker, three tests, failure probes. |
 | [13](docs/weeks/week-13-runtime-operations.md) | Planned | Runtime operations | Python 3.13 CodeZip, STAGING/PROD promotion, telemetry, two alarms, old-stack teardown. |
 | [14](docs/weeks/week-14-managed-evaluation-ci.md) | Planned | Managed eval + CI | Same-evidence comparison, offline PR gate, manual OIDC run, red/green receipt. |
 | [15](docs/weeks/week-15-hosted-demo.md) | Planned | Hosted demo | CloudFront UI, proxy Guardrail, daily cap, kill switch, WAF, $100 Budget. |

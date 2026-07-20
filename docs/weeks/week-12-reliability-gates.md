@@ -1,6 +1,6 @@
 # Week 12 — Weather Reliability Boundary
 
-**Prerequisite:** Terraform owns the Gateway path; current weather succeeds through the narrow wrapper; Policy authorization and Guardrail-in-Policy receipts are complete.
+**Prerequisite:** Terraform owns the Gateway path; current weather succeeds through the narrow wrapper; the deterministic Policy authorization receipt is complete; and Guardrail-in-Policy evidence is explicitly deferred under Week 11's provider gap.
 
 [← Week 11](week-11-gateway-weather.md) · [Week index](README.md) · [Next: Week 13 →](week-13-runtime-operations.md)
 
