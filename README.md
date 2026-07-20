@@ -83,8 +83,8 @@ STAGING spans → custom judge + AgentCore Evaluations
 | ✅ | [7 — Specimen](docs/weeks/week-07-specimen.md) | Pinned 62-case weather projection. |
 | ✅ | [8 — Harness closeout](docs/weeks/week-08-local-harness.md) | One fixture-backed 62-case baseline and closeout receipt. |
 | ✅ | [9 — Human gold](docs/weeks/week-09-human-labeling.md) | Eight frozen expectations: six behavior, two denials. |
-| 🚧 | [10 — Judge calibration](docs/weeks/week-10-judge-calibration.md) | Provider-free dry run, disjoint judge calibration, then all-six held-out local Strands evaluation. |
-| ⬜ | [11 — Terraform + Gateway](docs/weeks/week-11-gateway-weather.md) | Remote state, Identity/OpenAPI target, Policy/guardrails, allow/deny receipts. |
+| ✅ | [10 — Judge calibration](docs/weeks/week-10-judge-calibration.md) | Provider-free dry run, disjoint judge calibration, then all-six held-out local Strands evaluation. |
+| 🚧 | [11 — Terraform + Gateway](docs/weeks/week-11-gateway-weather.md) | Remote state, Identity/OpenAPI target, Policy/guardrails, allow/deny receipts. |
 | ⬜ | [12 — Reliability](docs/weeks/week-12-reliability-gates.md) | Deadline, one retry, shared breaker, three tests. |
 | ⬜ | [13 — Runtime operations](docs/weeks/week-13-runtime-operations.md) | Python 3.13 CodeZip, STAGING/PROD promotion, telemetry and alarms. |
 | ⬜ | [14 — Managed eval + CI](docs/weeks/week-14-managed-evaluation-ci.md) | Same-evidence comparison, offline PR gate, manual OIDC run. |
@@ -111,7 +111,7 @@ STAGING spans → custom judge + AgentCore Evaluations
 
 > **Week 9 closed — 2026-07-19.** Reviewed and froze eight human expectations before model output: six behavioral rows eligible for the future judge lanes and two boundary rows explicitly excluded. The checked-in report records the input, gold, and per-expectation SHA-256 digests and the scope limit. Link: [`docs/reports/week-09-human-labels.md`](docs/reports/week-09-human-labels.md).
 
-> **Week 10 in progress — 2026-07-19.** The provider-free all-eight-ID gate passed; the frozen six-vector calibration matched 6/6 labels; and one all-six local Strands run is recorded. Built-in tool lanes passed on all five applicable cases, while the frozen custom judge disagreed on `slice-03` and `slice-04`; no deployed claim follows. Link: [`docs/reports/week-10-judge-contract.md`](docs/reports/week-10-judge-contract.md).
+> **Week 10 closed — 2026-07-19.** The provider-free all-eight-ID gate passed; the frozen six-vector calibration matched 6/6 labels; and the fixture-covered all-six local Strands run matched the custom judge on every behavioral row. Built-in evaluator score/test-pass discrepancies on conversion rows are recorded as evaluator-semantics evidence; no deployed claim follows. Link: [`docs/reports/week-10-judge-contract.md`](docs/reports/week-10-judge-contract.md).
 
 ## Guardrails
 
