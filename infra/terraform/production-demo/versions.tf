@@ -20,6 +20,20 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "openweather_api_key" {
+  description = "OpenWeather API key supplied only to AgentCore Identity's write-only field."
+  type        = string
+  sensitive   = true
+  ephemeral   = true
+  nullable    = false
+}
+
+variable "openweather_api_key_version" {
+  description = "Non-secret version incremented whenever the write-only API key rotates."
+  type        = number
+  default     = 1
+}
+
 provider "aws" {
   region = var.aws_region
 }

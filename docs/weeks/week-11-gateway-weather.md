@@ -6,7 +6,7 @@
 
 ## Concept
 
-This week gives the final system one infrastructure owner and one governed external-tool boundary. Terraform owns the durable resources. AgentCore Identity owns the OpenWeather key, Gateway invokes the OpenAPI target, deterministic Policy authorizes operations, Policy rules evaluate probabilistic Bedrock Guardrail checks on Gateway traffic, and a narrow Runtime wrapper is the only weather tool the model sees.
+This week gives the final system one infrastructure owner and one governed external-tool boundary. Terraform owns the durable resources. AgentCore Identity owns the OpenWeather key, Gateway invokes the OpenAPI target, deterministic Policy authorizes operations, and a narrow Runtime wrapper is the only weather tool the model sees.
 
 The direct calculator stays outside Gateway. Identity does not normalize responses or retry calls. Gateway Policy/Guardrail checks do not govern calculator arguments or the final model response. Week 15 adds a separate Bedrock Guardrail at the public proxy; it is not the Guardrail-in-Policy mechanism used at Gateway.
 
@@ -36,11 +36,11 @@ Create `weatheragent/app/weather_agent/gateway_weather.py`. It accepts the exist
 
 The raw current-weather and forecast operations are never model-visible. The forecast probe exists only to produce one deterministic denial receipt and is never called again afterward. Week 12 adds deadline, retry, and breaker behavior; Week 11 proves only happy-path normalization.
 
-### 4. Attach Policy authorization and Bedrock Guardrail checks
+### 4. Attach deterministic Policy authorization
 
-Run one Terraform-managed AgentCore Policy engine in `ENFORCE`. Author the smallest reviewed rules that permit current weather and deny forecast/unapproved actions. Add native `when guardrails` checks for prompt attack on target input and one narrowly reviewed output safeguard. Grant the Gateway role only the documented `bedrock:InvokeGuardrailChecks` permission required by this path.
+Run one Terraform-managed AgentCore Policy engine in `ENFORCE`. Author the smallest reviewed rules that permit current weather and deny forecast/unapproved actions. The reviewed unconditional operation rules require `IGNORE_ALL_FINDINGS`: AgentCore's analyzer identifies their intended all-scope allow/deny effect, while schema validation remains enabled.
 
-Keep deterministic authorization and probabilistic Bedrock Guardrail scoring separate in receipts. For the prompt-attack probe, the AgentCore Policy rule evaluates the returned Guardrail score and produces the tested Gateway allow/deny decision. An authorization denial and a Guardrail-informed Policy denial answer different questions.
+**Provider gap:** AWS provider `6.55.0` exposes only `definition.cedar`, while AgentCore Guardrail statements require the API's separate `definition.policy` union member. The upstream provider work remains open ([#48648](https://github.com/hashicorp/terraform-provider-aws/issues/48648), [#48711](https://github.com/hashicorp/terraform-provider-aws/pull/48711)). Do not add `local-exec` or Console-owned policies to bypass Terraform ownership. Guardrail-in-Policy checks, `bedrock:InvokeGuardrailChecks`, and the prompt-attack/output-safeguard receipt are deferred until that support ships.
 
 ### 5. Apply, probe, and read back
 
@@ -48,9 +48,9 @@ Run `terraform fmt -check`, `terraform validate`, an inspectable saved plan, exp
 
 1. allowed current-weather invocation;
 2. denied unregistered forecast invocation under the intended principal context; and
-3. inert prompt-attack canary denied by the AgentCore Policy rule using a Bedrock Guardrail check on Gateway target input.
+3. record the unavailable prompt-attack Guardrail probe as a provider-gap limitation rather than a pass.
 
-Use the last two to create `datasets/evidence/production-slice-8-boundary.jsonl`; do not mutate the frozen Week 9 human-gold file. Its exactly two rows join `slice-07` and `slice-08` by `case_id`, `expectation_version`, and the matching frozen `expectation_sha256`, then record `observation_status`, boundary verdict, control, repository-relative receipt reference, tested scope, and observation time. Reject a row whose ID/version/digest does not match gold. A missing receipt remains pending in the report rather than becoming a pass.
+Use the forecast receipt to create the authorization observation in `datasets/evidence/production-slice-8-boundary.jsonl`; do not mutate the frozen Week 9 human-gold file. The deferred Guardrail row remains pending in the report rather than becoming a pass. Each observation joins `slice-07` or `slice-08` by `case_id`, `expectation_version`, and the matching frozen `expectation_sha256`, then records `observation_status`, boundary verdict, control, repository-relative receipt reference, tested scope, and observation time. Reject a row whose ID/version/digest does not match gold.
 
 Keep the tracked evidence public-safe: no account IDs, ARNs, request IDs, live endpoints, raw prompts/responses, private paths, or principal identifiers. Both rows remain excluded from custom and managed tool-accuracy judges.
 
@@ -69,7 +69,7 @@ The AgentCore CLI may package, validate, inspect, invoke, or evaluate; do not us
 
 ## Success check
 
-Terraform creates the final Gateway boundary without CloudFormation co-ownership; one local weather→calculator trace succeeds through the wrapper with the exact intermediate value; Identity injects the key without exposing it in Runtime, plan, or state; forecast and prompt-attack probes are denied by their intended controls; and the repeat plan shows no unexpected change.
+Terraform creates the deterministic Gateway boundary without CloudFormation co-ownership; one local weather→calculator trace succeeds through the wrapper with the exact intermediate value; Identity injects the key without exposing it in Runtime, plan, or state; the forecast probe is denied by Policy; the Guardrail receipt is explicitly deferred for the provider gap; and the repeat plan shows no unexpected change.
 
 ## Read
 

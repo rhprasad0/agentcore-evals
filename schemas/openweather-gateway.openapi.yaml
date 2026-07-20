@@ -1,0 +1,74 @@
+openapi: 3.0.3
+info:
+  title: OpenWeather current-weather boundary
+  version: 1.0.0
+  description: Current weather is the only model-facing capability through the Runtime wrapper.
+servers:
+  - url: https://api.openweathermap.org
+paths:
+  /data/2.5/weather:
+    get:
+      operationId: get_current_weather
+      summary: Get current weather for a named city.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: units
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [metric, imperial, standard]
+            default: metric
+      responses:
+        '200':
+          description: Current conditions.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [main, weather]
+                properties:
+                  name:
+                    type: string
+                  main:
+                    type: object
+                    required: [temp]
+                    properties:
+                      temp:
+                        type: number
+                  weather:
+                    type: array
+                    minItems: 1
+                    items:
+                      type: object
+                      required: [description]
+                      properties:
+                        description:
+                          type: string
+        '401':
+          description: Upstream rejected the injected credential.
+        '404':
+          description: City was not found.
+  /data/2.5/forecast:
+    get:
+      operationId: get_forecast
+      summary: Controlled authorization-denial probe; never registered with the model.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '200':
+          description: Forecast response; this operation must be denied by Gateway Policy.
+          content:
+            application/json:
+              schema:
+                type: object
